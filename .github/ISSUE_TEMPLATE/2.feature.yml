@@ -1,0 +1,32 @@
+name: Feature request 🚀  
+description: Suggest a new idea for data-river
+labels: ['status: needs triage']  
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a clear and searchable summary of the feature in the title above ⬆️.
+
+  - type: checkboxes
+    attributes:
+      label: Duplicates
+      description: Please [search the history](https://github.com/softflow24/data-river/issues) to see if an issue or feature request already exists for the same idea.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Summary 💡
+      description: Describe how the feature should work or be implemented.
+
+  - type: textarea
+    attributes:
+      label: Examples 🌈
+      description: Provide links to other implementations, similar projects, or screenshots of the expected behavior.
+
+  - type: textarea
+    attributes:
+      label: Motivation 🔦
+      description: What are you trying to accomplish? How has the absence of this feature affected you? Providing context helps us better understand the impact and prioritize accordingly.
