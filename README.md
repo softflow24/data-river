@@ -1,5 +1,11 @@
 # **data-river** 🌊
 
+[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9) &ensp;
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/Data_River?style=social)](https://twitter.com/Data_River) &ensp;
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 **Empowering Everyone to Code & Automate Visually**
 
 Welcome to **data-river**, an open-source framework that makes programming and automation accessible to everyone—from kids just learning to code to business professionals looking to streamline workflows. Whether you're building educational tools, automating business processes, or integrating AI models, **data-river** allows you to create powerful workflows with an intuitive visual interface and a marketplace of reusable components.
