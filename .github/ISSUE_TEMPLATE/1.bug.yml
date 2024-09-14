@@ -1,5 +1,5 @@
 name: Bug report 🐛
-description: Create a bug report for **data-river**.
+description: Create a bug report for data-river.
 labels: ['status: needs triage']
 body:
   - type: markdown
@@ -53,7 +53,7 @@ body:
 
   - type: input
     attributes:
-      label: Which version of **data-river** are you using?
+      label: Which version of data-river are you using?
       description: Please provide the version of **data-river** you are using. Ensure that you are on the latest release before submitting this bug report.
     validations:
       required: true
