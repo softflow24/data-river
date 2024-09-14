@@ -1,0 +1,81 @@
+name: Bug report 🐛
+description: Create a bug report for **data-river**.
+labels: ['status: needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### ⚠️ Before you continue
+        * Make sure you are using the [latest release](https://github.com/softflow24/data-river/releases).
+        * Join our [Discord](https://discord.gg/GjrVyZH9) to discuss or check if your issue is known.
+        * **Thoroughly search the [existing issues](https://github.com/softflow24/data-river/issues) before creating a new one**.
+
+  - type: checkboxes
+    attributes:
+      label: ⚠️ Search for existing issues first ⚠️
+      description: >
+        Please [search the history](https://github.com/softflow24/data-river/issues)
+        to see if an issue already exists for the same problem.
+      options:
+        - label: I have searched the existing issues, and there is no existing issue for my problem
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        Please confirm that the issue you have is described well and precisely in the title above ⬆️.
+        A good rule of thumb: What would you type if you were searching for the issue?
+
+        For example:
+        BAD - **data-river** crashes on startup
+        GOOD - After running `npm start`, **data-river** crashes with an error related to webpack.
+
+  - type: dropdown
+    attributes:
+      label: Which Operating System are you using?
+      description: >
+        Please select the operating system you were using to run **data-river** when this problem occurred.
+      options:
+        - Windows
+        - Linux
+        - MacOS
+        - Docker
+        - Devcontainer / Codespace
+        - Windows Subsystem for Linux (WSL)
+        - Other
+    validations:
+      required: true
+      nested_fields:
+        - type: text
+          attributes:
+            label: Specify the system
+            description: Please specify the system you are working on.
+
+  - type: input
+    attributes:
+      label: Which version of **data-river** are you using?
+      description: Please provide the version of **data-river** you are using. Ensure that you are on the latest release before submitting this bug report.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Describe your issue.
+      description: Describe the problem you are experiencing. Try to describe only the issue and phrase it short but clear. ⚠️ Provide NO other data in this field.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ The following is OPTIONAL but highly encouraged if you want us to help resolve the issue faster. ⚠️
+
+        "Please copy and paste the error output from your **terminal** (if it's a server-side issue) or from your **browser console** (if it's a frontend issue)."
+
+  - type: textarea
+    attributes:
+      label: Paste Error from Terminal/Console
+      description: |
+        Copy and paste the error output from the **terminal** (if the issue occurred server-side) or from the **browser console** (if it's a frontend issue). This will help us understand the issue better. 
+    validations:
+      required: false
