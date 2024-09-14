@@ -1,9 +1,7 @@
 # **data-river** 🌊
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9) &ensp;
-
-[![Twitter Follow](https://img.shields.io/twitter/follow/Data_River?style=social)](https://twitter.com/Data_River) &ensp;
-
+[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
+[![Twitter Follow](https://img.shields.io/twitter/follow/Data_River?style=social)](https://twitter.com/Data_River)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Empowering Everyone to Code & Automate Visually**
