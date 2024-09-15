@@ -19,6 +19,7 @@ jobs:
         with:
           configuration-path: .github/labeler.yml
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-versioned-regex: 0
 
       - name: Apply labels for issue titles only
         uses: github/issue-labeler@v3.4
@@ -27,6 +28,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           include-title: 1
           include-body: 0
+          enable-versioned-regex: 0
 
 
 
