@@ -1,0 +1,84 @@
+name: "OKR Issue"
+description: "Track an Objective and Key Results for data-river project"
+title: "[OKR] - "
+labels: ["OKR"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎯 Objective (What are we trying to achieve?)
+        Please describe the overarching objective for this OKR. Be clear and actionable. You may also describe why this objective is critical for the project.
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: 🎯 Objective
+      description: What is the main objective of this OKR? Why is this objective important to the project?
+      placeholder: "Example: Develop the Basic Node Library to power the core logic of data-river."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## ✅ Key Results (What are the measurable outcomes?)
+        List your Key Results below. Make sure each Key Result is Specific, Measurable, Achievable, Relevant, and Time-bound (SMART). Use the task list format to track the progress of each result.
+
+  - type: textarea
+    id: key_results
+    attributes:
+      label: ✅ Key Results
+      description: Add your measurable outcomes as a task list. Link relevant issues for automatic progress tracking.
+      placeholder: |
+        Example:
+        - [ ] [#1] Complete the Start Node implementation.
+        - [ ] [#2] Complete the End Node implementation.
+        - [ ] [#3] Test the nodes in a simple workflow to validate functionality.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🏆 Success Criteria (How will we measure success?)
+        Define how you will measure success. This could be based on Key Result completion or a more specific metric like usage, tests, or feedback.
+
+  - type: textarea
+    id: success_criteria
+    attributes:
+      label: 🏆 Success Criteria
+      description: What is the success metric for this OKR? How do you define success?
+      placeholder: "Example: The Basic Node Library is functional, modular, and passes all unit tests. Successfully tested in real workflows."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## ⏳ Timeline (What is the timeframe for completion?)
+        Define the time period for this OKR.
+
+  - type: input
+    id: timeline
+    attributes:
+      label: ⏳ Timeline
+      description: When do you expect to complete this OKR? 
+      placeholder: "Example: Q3 2024"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 📝 Additional Notes
+        Add any relevant notes or context here.
+
+  - type: textarea
+    id: additional_notes
+    attributes:
+      label: 📝 Additional Notes
+      description: Any additional information to consider for this OKR?
+      placeholder: "Example: Weekly sync-up meetings to track progress."
+    validations:
+      required: false
