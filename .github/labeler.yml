@@ -1,20 +1,20 @@
 # Match for Quarter
 Q1:
-  - "timeline.*Q1"
+  - 'timeline.*Q1'
 Q2:
-  - "timeline.*Q2"
+  - 'timeline.*Q2'
 Q3:
-  - "timeline.*Q3"
+  - 'timeline.*Q3'
 Q4:
-  - "timeline.*Q4"
+  - 'timeline.*Q4'
 
 # Match for Year
 2024:
-  - "timeline.*2024"
+  - 'timeline.*2024'
 2025:
-  - "timeline.*2025"
+  - 'timeline.*2025'
 2026:
-  - "timeline.*2026"
+  - 'timeline.*2026'
 
 Subtask:
-  - "### Subtask:"
+  - '### Subtask:'
