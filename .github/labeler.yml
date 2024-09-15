@@ -1,0 +1,17 @@
+# Match for Quarter
+Q1:
+  - "id: timeline.*Q1"
+Q2:
+  - "id: timeline.*Q2"
+Q3:
+  - "id: timeline.*Q3"
+Q4:
+  - "id: timeline.*Q4"
+
+# Match for Year
+2024:
+  - "id: timeline.*2024"
+2025:
+  - "id: timeline.*2025"
+2026:
+  - "id: timeline.*2026"
