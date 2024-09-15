@@ -1,2 +1,2 @@
 OKR:
-  - '^\\[OKR\\]'   # Regex to match titles starting with [OKR]
+  - '^\[OKR\]'   # Regex to match titles starting with [OKR]
