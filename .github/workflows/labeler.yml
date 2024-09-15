@@ -19,3 +19,16 @@ jobs:
         with:
           configuration-path: .github/labeler.yml
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply labels for issue titles only
+        uses: github/issue-labeler@v3.4
+        with:
+          configuration-path: .github/labeler-titles.yml
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          include-title: 1
+          include-body: 0
+
+
+
+
+          
