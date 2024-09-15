@@ -1,0 +1,2 @@
+okr:
+  - '^\\[OKR\\]'   # Regex to match titles starting with [OKR]
