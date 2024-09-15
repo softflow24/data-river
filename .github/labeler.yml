@@ -1,20 +1,20 @@
 # Match for Quarter
 Q1:
-  - 'timeline.*Q1'
+  - '[t|T]imeline[\n.]*Q1'
 Q2:
-  - 'timeline.*Q2'
+  - '[t|T]imeline[\n.]*Q2'
 Q3:
-  - 'timeline.*Q3'
+  - '[t|T]imeline[\n.]*Q3'
 Q4:
-  - 'timeline.*Q4'
+  - '[t|T]imeline[\n.]*Q4'
 
 # Match for Year
 2024:
-  - 'timeline.*2024'
+  - '[t|T]imeline[\n]*\w{1,5}\s2024'
 2025:
-  - 'timeline.*2025'
+  - '[t|T]imeline[\n]*\w{1,5}\s2025'
 2026:
-  - 'timeline.*2026'
+  - '[t|T]imeline[\n]*\w{1,5}\s2026'
 
 Subtask:
   - '### Subtask:'
