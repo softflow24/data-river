@@ -1,0 +1,120 @@
+name: "SMART Task"
+description: "Create a task that follows the SMART framework"
+title: "[Task] - "
+labels: ["Task"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Task Overview
+        Provide a brief overview of the task in alignment with the OKR.
+
+  - type: textarea
+    id: task_overview
+    attributes:
+      label: Task Overview
+      description: Briefly describe the task and its role in the overall OKR.
+      placeholder: "Example: Implement the Start Node to initiate workflows in the data-river system."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## SMART Criteria
+        Define the SMART criteria for this task.
+
+  - type: input
+    id: specific
+    attributes:
+      label: Specific 🎯
+      description: What exactly needs to be done?
+      placeholder: "Example: Develop a Start node that initializes the flow."
+    validations:
+      required: true
+
+  - type: input
+    id: measurable
+    attributes:
+      label: Measurable 📏
+      description: How will you measure success?
+      placeholder: "Example: The Start node should successfully trigger any workflow."
+    validations:
+      required: true
+
+  - type: input
+    id: achievable
+    attributes:
+      label: Achievable 🚀
+      description: How will you ensure this task is achievable?
+      placeholder: "Example: Use basic trigger functions and ensure compatibility with other nodes."
+    validations:
+      required: true
+
+  - type: input
+    id: relevant
+    attributes:
+      label: Relevant 🎯
+      description: How does this task contribute to the overall OKR?
+      placeholder: "Example: The node is essential because it starts all workflows."
+    validations:
+      required: true
+
+  - type: input
+    id: time_bound
+    attributes:
+      label: Time-bound ⏳
+      description: What is the deadline for this task?
+      placeholder: "Example: Complete in 3 days."
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Subtasks 📝
+        Break the task down into smaller steps.
+
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Subtasks
+      description: List the subtasks required to complete the task.
+      placeholder: |
+        Example:
+        - [ ] Design node class for Start.
+        - [ ] Implement initialization logic.
+        - [ ] Write unit tests for triggering functionality.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Acceptance Criteria ✅
+        Define what “done” looks like for this task.
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List the criteria that will mark this task as completed.
+      placeholder: |
+        Example:
+        - [ ] Start node is functional and triggers flows.
+        - [ ] Unit tests pass.
+        - [ ] Integrated into flow editor UI.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional Notes 🗒
+        Add any relevant notes or context for this task.
+
+  - type: textarea
+    id: additional_notes
+    attributes:
+      label: Additional Notes
+      description: Any other information you want to provide?
+      placeholder: "Example: Ensure compatibility with Input and Output nodes."
+    validations:
+      required: false
