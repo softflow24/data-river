@@ -1,7 +1,6 @@
 # **data-river** 🌊
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
-[![Twitter Follow](https://img.shields.io/twitter/follow/Data_River?style=social)](https://twitter.com/Data_River)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Empowering Everyone to Code & Automate Visually**
@@ -61,8 +60,8 @@ Right now, we’re laying the foundation. This means there’s no code to clone 
 
 ### Ways to Help:
 
-- **Join the Discussion**: We’ve created a [Discord/Slack](#) channel where you can share ideas, give feedback, and help shape the platform before we even release a single line of code.
-- **Roadmap Feedback**: Check out the [Roadmap](#) to see where we're headed. Share your thoughts on upcoming features and priorities.
+- **Join the Discussion**: We’ve created a [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9) channel where you can share ideas, give feedback, and help shape the platform before we even release a single line of code.
+- **Roadmap Feedback**: Check out the [Roadmap](https://github.com/orgs/softflow24/projects/2/views/4?filterQuery=) to see where we're headed. Share your thoughts on upcoming features and priorities.
 - **Become a Champion**: Be one of the first to advocate for **data-river** in your community. Help us grow by sharing the vision on social media or at meetups.
 - **Suggest Nodes/Features**: Think of nodes you’d want to build or see in the marketplace—whether it's a basic math operation, an API call, or something creative like a chatbot builder. Suggest ideas and help us define the node library!
 
@@ -87,9 +86,7 @@ We’re at the start of something big, and we want you to be a part of it.
 
 ### Let’s build this together!
 
-- **Discord/Slack**: [Join the conversation](#)
-- **GitHub Discussions**: [Give feedback](#)
-- **Stay Updated**: [Subscribe to our newsletter](#)
+- **Discord**: [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
 
 Together, we can shape the future of programming and automation, making it simpler, more accessible, and more fun.
 
