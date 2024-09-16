@@ -27,7 +27,7 @@ Welcome to **data-river**, an open-source framework that makes programming and a
 
 - **Visual Nodes**: Drag, drop, and customize visual elements to create logic and workflows.
 - **Dynamic UI**: Tailored experiences for kids, professionals, and developers. From cartoon-like elements for children to sleek professional UIs for businesses.
-- **Stateful Execution (Server-Side)**: Handle long-running workflows and complex business processes with built-in state management running on the server. These server nodes can be written in **any language**, such as **Python**, making the platform adaptable to different developer preferences.
+- **Stateful Execution (Server-Side)**: Handle long-running workflows and complex business processes with built-in state management running on the server. These server nodes can be written in **any language**, by default written in **JavaScript** but we should have a port to other languages such as **python**, making the platform adaptable to different developer preferences.
 - **Run Anywhere**: Simple flows can run directly in any browser, thanks to **JavaScript-based nodes**. This allows for flexibility in building and testing workflows locally without needing server resources for basic tasks.
 - **Asynchronous Processing**: Perform async operations like API calls effortlessly, managing inputs and outputs seamlessly.
 - **Scheduled Workflows**: Thanks to **Temporal**, **data-river** can support scheduled workflows, making it easy to set up recurring processes or delayed executions for tasks like notifications or data updates.
