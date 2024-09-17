@@ -1,0 +1,21 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "outDir": "./dist",
+      "rootDir": "../..",
+      "target": "es5",
+      "module": "commonjs",
+      "jsx": "react",
+      "lib": ["es2017", "dom"],
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/**/*"  // Ensure this line is present to include all TypeScript files in the src directory
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
