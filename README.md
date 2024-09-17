@@ -61,7 +61,7 @@ Right now, we’re laying the foundation. This means there’s no code to clone 
 ### Ways to Help:
 
 - **Join the Discussion**: We’ve created a [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9) channel where you can share ideas, give feedback, and help shape the platform before we even release a single line of code.
-- **Roadmap Feedback**: Check out the [Roadmap](https://github.com/orgs/softflow24/projects/2/views/4?filterQuery=) to see where we're headed. Share your thoughts on upcoming features and priorities.
+- **Roadmap Feedback**: Check out the [Roadmap](https://github.com/orgs/softflow24/projects/2/views/4) to see where we're headed. Share your thoughts on upcoming features and priorities.
 - **Become a Champion**: Be one of the first to advocate for **data-river** in your community. Help us grow by sharing the vision on social media or at meetups.
 - **Suggest Nodes/Features**: Think of nodes you’d want to build or see in the marketplace—whether it's a basic math operation, an API call, or something creative like a chatbot builder. Suggest ideas and help us define the node library!
 
