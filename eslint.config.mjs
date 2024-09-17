@@ -1,4 +1,3 @@
-import js from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import reactPlugin from "eslint-plugin-react";
@@ -32,9 +31,9 @@ export default [
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
-      "**/packages/frontend/**", // Ignore the entire frontend package
+      "**/packages/client/**", // Ignore the entire client package
       "**/.*", // Ignore dotfiles explicitly
-      "**/frontend/**",
+      "**/client/**",
     ],
   },
 ];

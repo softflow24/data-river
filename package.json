@@ -2,8 +2,9 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "build": "lerna run build",
     "lint:root": "eslint .",
-    "lint:remix": "eslint packages/frontend",
+    "lint:remix": "eslint packages/client",
     "lint:all": "npm run lint:root && npm run lint:remix",
     "prepare": "husky"
   },
