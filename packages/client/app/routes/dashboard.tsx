@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import setCookie, { Cookie } from "set-cookie-parser";
 import { AppSidebar } from "~/components/app-sidebar";
 import { SidebarLayout, SidebarTrigger } from "~/components/ui/sidebar";
-import { EnhancedNodeEditorComponent } from "~/components/enhanced-node-editor";
+import Editor from "@data-river/editor";
 import ClientOnly from "~/components/client-only";
 
 // Define the type for the loader's return data
@@ -17,7 +17,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const cookies: Cookie[] = setCookie.parse(cookieHeader || "");
 
   // Find and parse the 'sidebar:state' cookie, default to false if not found
-  const sidebarState = cookies.find(cookie => cookie.name === 'sidebar:state')?.value === 'true' || false;
+  const sidebarState =
+    cookies.find((cookie) => cookie.name === "sidebar:state")?.value ===
+      "true" || false;
 
   return json<LoaderData>({ sidebarState });
 };
@@ -33,7 +35,7 @@ export default function Page() {
         <div className="h-full rounded-md p-2">
           {/* <SidebarTrigger /> */}
           <ClientOnly>
-            <EnhancedNodeEditorComponent />
+            <Editor />
           </ClientOnly>
         </div>
       </main>
