@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import setCookie, { Cookie } from "set-cookie-parser";
 import { AppSidebar } from "~/components/app-sidebar";
 import { SidebarLayout, SidebarTrigger } from "~/components/ui/sidebar";
-import { EnhancedNodeEditorComponent } from "~/components/enhanced-node-editor";
+import EnhancedNodeEditorComponent from "~/components/enhanced-node-editor";
 import ClientOnly from "~/components/client-only";
 
 // Define the type for the loader's return data
