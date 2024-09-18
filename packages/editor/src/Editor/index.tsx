@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import ReactFlow, {
   Node,
   Edge,
@@ -26,7 +26,6 @@ import {
   ZoomIn,
   ZoomOut,
   Undo,
-  ArrowLeft,
   MousePointer,
   Hand,
   PlusCircle,
@@ -102,7 +101,9 @@ const CustomNode = ({
           position={Position.Right}
           className={`w-3 h-3 ${isMinimalist ? "!bg-gray-300" : "!bg-white"}`}
           id="no"
-          style={{ top: "75%" }}
+          style={{
+            top: "75%",
+          }}
         />
       )}
       <div className="flex items-center">
@@ -184,19 +185,34 @@ const initialNodes: Node[] = [
   {
     id: "1",
     type: "start",
-    position: { x: 0, y: 100 },
-    data: { label: "Start", isMinimalist: false },
+    position: {
+      x: 0,
+      y: 100,
+    },
+    data: {
+      label: "Start",
+      isMinimalist: false,
+    },
   },
   {
     id: "2",
     type: "process",
-    position: { x: 200, y: 0 },
-    data: { label: "Process", isMinimalist: false },
+    position: {
+      x: 200,
+      y: 0,
+    },
+    data: {
+      label: "Process",
+      isMinimalist: false,
+    },
   },
   {
     id: "3",
     type: "conditional",
-    position: { x: 400, y: 100 },
+    position: {
+      x: 400,
+      y: 100,
+    },
     data: {
       label: "Condition",
       condition: "text contains Yes",
@@ -206,23 +222,62 @@ const initialNodes: Node[] = [
   {
     id: "4",
     type: "action",
-    position: { x: 600, y: 0 },
-    data: { label: "Action", isMinimalist: false },
+    position: {
+      x: 600,
+      y: 0,
+    },
+    data: {
+      label: "Action",
+      isMinimalist: false,
+    },
   },
   {
     id: "5",
     type: "response",
-    position: { x: 800, y: 100 },
-    data: { label: "Response", isMinimalist: false },
+    position: {
+      x: 800,
+      y: 100,
+    },
+    data: {
+      label: "Response",
+      isMinimalist: false,
+    },
   },
 ];
 
 const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2", animated: true },
-  { id: "e2-3", source: "2", target: "3", animated: true },
-  { id: "e3-4", source: "3", target: "4", sourceHandle: "yes", animated: true },
-  { id: "e3-5", source: "3", target: "5", sourceHandle: "no", animated: true },
-  { id: "e4-5", source: "4", target: "5", animated: true },
+  {
+    id: "e1-2",
+    source: "1",
+    target: "2",
+    animated: true,
+  },
+  {
+    id: "e2-3",
+    source: "2",
+    target: "3",
+    animated: true,
+  },
+  {
+    id: "e3-4",
+    source: "3",
+    target: "4",
+    sourceHandle: "yes",
+    animated: true,
+  },
+  {
+    id: "e3-5",
+    source: "3",
+    target: "5",
+    sourceHandle: "no",
+    animated: true,
+  },
+  {
+    id: "e4-5",
+    source: "4",
+    target: "5",
+    animated: true,
+  },
 ];
 
 function Flow() {
@@ -234,7 +289,7 @@ function Flow() {
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    [setEdges],
   );
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
@@ -245,8 +300,14 @@ function Flow() {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
       type: "process",
-      position: { x: Math.random() * 500, y: Math.random() * 500 },
-      data: { label: `Node ${nodes.length + 1}`, isMinimalist },
+      position: {
+        x: Math.random() * 500,
+        y: Math.random() * 500,
+      },
+      data: {
+        label: `Node ${nodes.length + 1}`,
+        isMinimalist,
+      },
     };
     setNodes((nds) => nds.concat(newNode));
   }, [nodes, setNodes, isMinimalist]);
@@ -256,8 +317,11 @@ function Flow() {
     setNodes((nds) =>
       nds.map((node) => ({
         ...node,
-        data: { ...node.data, isMinimalist: !isMinimalist },
-      }))
+        data: {
+          ...node.data,
+          isMinimalist: !isMinimalist,
+        },
+      })),
     );
   }, [isMinimalist, setNodes]);
 
@@ -276,7 +340,9 @@ function Flow() {
       >
         <Background />
         <Controls
-          style={{ bottom: "12px" }}
+          style={{
+            bottom: "12px",
+          }}
           className="flex flex-row bg-transparent mb-2"
           position="bottom-left"
           showFitView={false}
