@@ -1,21 +1,17 @@
 {
-    "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-      "outDir": "./dist",
-      "rootDir": "../..",
-      "target": "es5",
-      "module": "commonjs",
-      "jsx": "react",
-      "lib": ["es2017", "dom"],
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
-    },
-    "include": [
-        "src/**/*"  // Ensure this line is present to include all TypeScript files in the src directory
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "./src", // Root directory of your TypeScript files
+    "declaration": true, // Emit .d.ts declaration files
+    "declarationDir": "./dist", // Where to store .d.ts files
+    "module": "esnext", // Module system (ESNext, CommonJS, etc.)
+    "target": "es6", // Target ECMAScript version
+    "jsx": "react-jsx", // Support for JSX/React
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true, // Enable strict type-checking
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"], // Include all TypeScript files in src
+  "exclude": ["node_modules", "dist"]
 }
