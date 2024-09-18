@@ -3,6 +3,8 @@ import { useLoaderData } from "@remix-run/react";
 import setCookie, { Cookie } from "set-cookie-parser";
 import { AppSidebar } from "~/components/app-sidebar";
 import { SidebarLayout, SidebarTrigger } from "~/components/ui/sidebar";
+import { EnhancedNodeEditorComponent } from "~/components/enhanced-node-editor";
+import ClientOnly from "~/components/client-only";
 
 // Define the type for the loader's return data
 interface LoaderData {
@@ -27,9 +29,12 @@ export default function Page() {
   return (
     <SidebarLayout defaultOpen={sidebarState}>
       <AppSidebar />
-      <main className="flex flex-1 flex-col p-2 transition-all duration-300 ease-in-out">
+      <main className="flex flex-1 flex-col p-2 transition-all duration-300 ease-in-out h-screen overflow-hidden">
         <div className="h-full rounded-md p-2">
-          <SidebarTrigger />
+          {/* <SidebarTrigger /> */}
+          <ClientOnly>
+            <EnhancedNodeEditorComponent />
+          </ClientOnly>
         </div>
       </main>
     </SidebarLayout>
