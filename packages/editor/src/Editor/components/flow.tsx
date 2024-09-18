@@ -5,26 +5,14 @@ import ReactFlow, {
   useEdgesState,
   Connection,
   useReactFlow,
-  Controls,
-  ControlButton,
   Background,
-  MiniMap,
 } from "reactflow";
-import {
-  ZoomIn,
-  ZoomOut,
-  Undo,
-  Redo,
-  PlusCircle,
-  MousePointer,
-  Hand,
-  LayoutGrid,
-} from "lucide-react";
+import "reactflow/dist/style.css";
 
 import { initialNodes } from "./initialNodes";
 import { initialEdges } from "./initialEdges";
 import { nodeTypes } from "./nodeTypes";
-import "reactflow/dist/style.css";
+import Controls from "./controls";
 
 const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -78,85 +66,13 @@ const Flow = () => {
         fitView
       >
         <Background />
-
-        {/* Controls */}
         <Controls
-          style={{ bottom: "12px" }}
-          className="flex flex-row bg-transparent mb-2"
-          position="bottom-left"
-          showFitView={false}
-          showInteractive={false}
-          showZoom={false}
-        >
-          {/* MiniMap and Zoom Controls */}
-          <div className="mr-2 flex flex-col items-center bg-white p-2 rounded-lg shadow-md">
-            <MiniMap
-              style={{ position: "absolute", margin: 0, marginBottom: "60px" }}
-              position="bottom-left"
-              pannable
-              zoomable
-            />
-            <div className="mt-2 flex items-center justify-between w-auto">
-              <ControlButton
-                className="text-gray-600 hover:text-gray-800"
-                onClick={() => zoomOut()}
-              >
-                <ZoomOut size={20} />
-              </ControlButton>
-              <span className="mx-2 text-sm font-medium text-gray-500">
-                {Math.round(getZoom() * 100)}%
-              </span>
-              <ControlButton
-                className="text-gray-600 hover:text-gray-800"
-                onClick={() => zoomIn()}
-              >
-                <ZoomIn size={20} />
-              </ControlButton>
-            </div>
-          </div>
-
-          {/* Undo/Redo Controls */}
-          <div className="mr-2 flex items-center bg-white p-2 rounded-lg shadow-md">
-            <ControlButton
-              className="text-gray-600 hover:text-gray-800"
-              onClick={() => console.log("undo")}
-            >
-              <Undo size={20} />
-            </ControlButton>
-            <ControlButton
-              className="text-gray-600 hover:text-gray-800"
-              onClick={() => console.log("redo")}
-            >
-              <Redo size={20} />
-            </ControlButton>
-          </div>
-
-          {/* Action Tools (Add Node, Hand Tool) */}
-          <div className="flex items-center bg-white p-2 rounded-lg shadow-md">
-            <ControlButton
-              className="text-gray-600 hover:text-gray-800"
-              onClick={() => addNewNode()}
-            >
-              <PlusCircle size={20} />
-            </ControlButton>
-            {/* Separator */}
-            <div className="w-px h-6 bg-gray-300 mx-2"></div>
-            <ControlButton className="text-gray-600 hover:text-gray-800">
-              <MousePointer size={20} />
-            </ControlButton>
-            {/* Separator */}
-            <div className="w-px h-6 bg-gray-300 mx-2"></div>
-            <ControlButton className="text-blue-500 bg-blue-100 p-1 rounded-md">
-              <Hand size={20} />
-            </ControlButton>
-            <ControlButton
-              onClick={toggleMinimalist}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <LayoutGrid size={20} />
-            </ControlButton>
-          </div>
-        </Controls>
+          zoomOut={zoomOut}
+          zoomIn={zoomIn}
+          getZoom={getZoom}
+          addNewNode={addNewNode}
+          toggleMinimalist={toggleMinimalist}
+        />
       </ReactFlow>
     </div>
   );
