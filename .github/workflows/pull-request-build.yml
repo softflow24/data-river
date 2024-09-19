@@ -1,0 +1,27 @@
+name: "PR Build"
+on:
+  # Runs on pull-requests against the develop / main branch
+  pull_request:
+    branches:
+      - development
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run linter
+        run: npm run lint:all
+# TODO - Uncomment when all build steps work
+# - name: Build
+#  run: npm run build
