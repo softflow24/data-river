@@ -23,7 +23,9 @@ jobs:
         run: npm run lint:all
       - name: Build
         run: npm run build
+
   package:
+    needs: build
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
