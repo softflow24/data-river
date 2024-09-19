@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 
 import MiniMapZoomControls from "./MiniMapZoomControls";
 import UndoRedoControls from "./UndoRedoControls";
@@ -12,7 +12,7 @@ interface ControlsProps {
   toggleMinimalist: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({
+const Controls: FC<ControlsProps> = ({
   zoomOut,
   zoomIn,
   getZoom,
