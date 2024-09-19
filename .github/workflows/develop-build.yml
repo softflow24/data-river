@@ -1,9 +1,8 @@
 name: "Development"
 on:
   push:
-# TODO - Uncomment
-#branches:
-# - development
+    branches:
+      - development
 
 jobs:
   build:
