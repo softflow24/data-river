@@ -17,7 +17,7 @@ Before you begin, please review our [Code of Conduct](https://github.com/softflo
 To contribute to **Data-river**, follow these steps to get the project running locally on your machine:
 
 1. **Fork the repository**:  
-   Visit the Zap repository and click the "Fork" button to create your own copy.
+   Visit the Data-River repository and click the "Fork" button to create your own copy.
 
 2. **Clone the fork**:  
    Clone your forked repository to your local machine:
@@ -27,8 +27,11 @@ To contribute to **Data-river**, follow these steps to get the project running l
    cd data-river
 
    ```
-
-3. **Install dependencies**
+3. Switch to ```development``` branch. You will create your PR against this branch, not ```main```.
+4. ```cd data-river/packages/client```
+5. ```pnpm install```
+6. ```pnpm run dev```
+7. navigate to http://localhost:5173/dashboard
 
 ## Backlog of Tasks
 
