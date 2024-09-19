@@ -1,5 +1,9 @@
 name: "Auto Label Issues"
 on:
+# TODO - Remove this before merging
+  push:
+    branches:
+      - automation/add-initial-ci
 # Runs on pull-requests against the main branch
   pull_request:
     branches:
