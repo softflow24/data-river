@@ -7,6 +7,8 @@
 
 Welcome to **data-river**, an open-source framework that makes programming and automation accessible to everyone—from kids just learning to code to business professionals looking to streamline workflows. Whether you're building educational tools, automating business processes, or integrating AI models, **data-river** allows you to create powerful workflows with an intuitive visual interface and a marketplace of reusable components.
 
+[Here](https://github.com/softflow24/data-river/blob/main/USE_CASE_EXAMPLES.md) you can find some example of the use cases.
+
 **No screenshots yet, no code yet. Just a bold idea.** 🎉
 
 ---
@@ -61,7 +63,7 @@ Right now, we’re laying the foundation. This means there’s no code to clone 
 ### Ways to Help:
 
 - **Join the Discussion**: We’ve created a [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9) channel where you can share ideas, give feedback, and help shape the platform before we even release a single line of code.
-- **Roadmap Feedback**: Check out the [Roadmap](https://github.com/orgs/softflow24/projects/2/views/4?filterQuery=) to see where we're headed. Share your thoughts on upcoming features and priorities.
+- **Roadmap Feedback**: Check out the [Roadmap](https://github.com/orgs/softflow24/projects/2/views/4) to see where we're headed. Share your thoughts on upcoming features and priorities.
 - **Become a Champion**: Be one of the first to advocate for **data-river** in your community. Help us grow by sharing the vision on social media or at meetups.
 - **Suggest Nodes/Features**: Think of nodes you’d want to build or see in the marketplace—whether it's a basic math operation, an API call, or something creative like a chatbot builder. Suggest ideas and help us define the node library!
 
@@ -93,3 +95,24 @@ Together, we can shape the future of programming and automation, making it simpl
 ---
 
 **data-river** – Flow into the Future of Automation 🌊
+
+## Getting Started
+
+To contribute to **Data-river**, follow these steps to get the project running locally on your machine:
+
+1. **Fork the repository**:  
+   Visit the Data-River repository and click the "Fork" button to create your own copy.
+
+2. **Clone the fork**:  
+   Clone your forked repository to your local machine:
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/data-river.git
+   cd data-river
+
+   ```
+3. Switch to ```development``` branch. You will create your PR against this branch, not ```main```.
+4. ```cd data-river/packages/client```
+5. ```pnpm install```
+6. ```pnpm run dev```
+7. navigate to http://localhost:5173/dashboard
