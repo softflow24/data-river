@@ -95,3 +95,24 @@ Together, we can shape the future of programming and automation, making it simpl
 ---
 
 **data-river** – Flow into the Future of Automation 🌊
+
+## Getting Started
+
+To contribute to **Data-river**, follow these steps to get the project running locally on your machine:
+
+1. **Fork the repository**:  
+   Visit the Data-River repository and click the "Fork" button to create your own copy.
+
+2. **Clone the fork**:  
+   Clone your forked repository to your local machine:
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/data-river.git
+   cd data-river
+
+   ```
+3. Switch to ```development``` branch. You will create your PR against this branch, not ```main```.
+4. ```cd data-river/packages/client```
+5. ```pnpm install```
+6. ```pnpm run dev```
+7. navigate to http://localhost:5173/dashboard
