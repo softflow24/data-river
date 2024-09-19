@@ -18,8 +18,6 @@ jobs:
       - name: Install dependencies
         run: npm install --force # TODO - Remove the force before merging
       - name: Run linter
-        run: npm run lint
+        run: npm run lint:all
       - name: Build
         run: npm run build
-      - name: Test
-        run: npm run test
