@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { FC, ReactNode } from "react";
 
 interface ControlButtonProps {
   onClick: () => void;
@@ -6,7 +6,7 @@ interface ControlButtonProps {
   active?: boolean;
 }
 
-const ControlButton: React.FC<ControlButtonProps> = ({
+const ControlButton: FC<ControlButtonProps> = ({
   onClick,
   children,
   active = false,

@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { ZoomOut, ZoomIn } from "lucide-react";
 import { MiniMap } from "reactflow";
 
@@ -10,7 +10,7 @@ interface MiniMapZoomControlsProps {
   getZoom: () => number;
 }
 
-const MiniMapZoomControls: React.FC<MiniMapZoomControlsProps> = ({
+const MiniMapZoomControls: FC<MiniMapZoomControlsProps> = ({
   zoomOut,
   zoomIn,
   getZoom,

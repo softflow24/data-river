@@ -32,11 +32,5 @@ export default defineConfig({
     },
     preserveSymlinks: true,
   },
-  build: {
-    outDir: ".vite/renderer", // Output directory for the build
-    rollupOptions: {
-      input: "./src/index.tsx", // Entry point for the application
-    },
-  },
   clearScreen: false, // Helps keep logs clean
 });

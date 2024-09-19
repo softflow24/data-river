@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { PlusCircle, MousePointer, Hand, LayoutGrid } from "lucide-react";
 
 import ControlButton from "./ControlButton";
@@ -9,7 +9,7 @@ interface ActionToolsControlsProps {
   toggleMinimalist: () => void;
 }
 
-const ActionToolsControls: React.FC<ActionToolsControlsProps> = ({
+const ActionToolsControls: FC<ActionToolsControlsProps> = ({
   addNewNode,
   toggleMinimalist,
 }) => {

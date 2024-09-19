@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "dev": "pnpm --filter client dev",
     "build": "lerna run build",
     "lint:root": "eslint .",
     "lint:remix": "eslint packages/client",
