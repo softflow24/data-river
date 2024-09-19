@@ -1,10 +1,9 @@
 name: "PR Build"
 on:
-  # Runs on pull-requests against the develop / main branch
-  pull_request:
-    branches:
-      - development
-      - main
+  push:
+# TODO - Uncomment
+#branches:
+# - development
 
 jobs:
   build:
