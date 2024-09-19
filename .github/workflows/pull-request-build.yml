@@ -1,0 +1,21 @@
+name: "Auto Label Issues"
+on:
+# Runs on pull-requests against the main branch
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Installs / Lints / Builds / Tests
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Run linter
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
