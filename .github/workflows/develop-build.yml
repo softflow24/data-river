@@ -1,4 +1,4 @@
-name: "PR Build"
+name: "Development"
 on:
   push:
 # TODO - Uncomment
@@ -23,3 +23,10 @@ jobs:
         run: npm run lint:all
       - name: Build
         run: npm run build
+  package:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      # Temp until we decide how to package the app
+      - name: HelloWorld
+        run: echo "Hello World"
