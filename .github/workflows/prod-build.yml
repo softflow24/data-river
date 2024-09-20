@@ -15,7 +15,9 @@ on:
         description: "Test scenario tags"
         required: false
         type: boolean
-
+  push:
+    branches:
+      - automation/*
 jobs:
   # TODO - Add caching of build so that can be re-used across pipeliens
   build:
