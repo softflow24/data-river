@@ -1,7 +1,7 @@
 import { Play, GitBranch, Box, Zap, MessageSquare } from "lucide-react";
 import { Handle, Position } from "reactflow";
 
-interface NodeData {
+export interface NodeData {
   label: string;
 }
 

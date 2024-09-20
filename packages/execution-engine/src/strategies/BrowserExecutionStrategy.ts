@@ -6,8 +6,8 @@ import { IExecutionStrategy } from "./IExecutionStrategy";
 export class BrowserExecutionStrategy implements IExecutionStrategy {
   async execute(
     blockConfig: IBlockConfig,
-    inputs: Record<string, any>,
-  ): Promise<Record<string, any>> {
+    inputs: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const block = this.createBlockInstance(blockConfig);
     return block.execute(inputs);
   }

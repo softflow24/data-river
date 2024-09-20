@@ -3,8 +3,8 @@ import { IBlock, IBlockConfig } from "@shared/interfaces";
 export abstract class Block implements IBlock {
   id: string;
   type: string;
-  inputs: Record<string, any>;
-  outputs: Record<string, any>;
+  inputs: Record<string, unknown>;
+  outputs: Record<string, unknown>;
   retry: number;
   timeout: number;
   // eslint-disable-next-line no-unused-vars
@@ -24,7 +24,9 @@ export abstract class Block implements IBlock {
    * Abstract method to execute the block's main functionality.
    */
   // eslint-disable-next-line no-unused-vars
-  abstract execute(inputs: Record<string, any>): Promise<Record<string, any>>;
+  abstract execute(
+    inputs: Record<string, unknown>,
+  ): Promise<Record<string, unknown>>;
 
   /**
    * Handle errors that occur during execution.

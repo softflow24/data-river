@@ -7,7 +7,9 @@ export class StartBlock extends Block {
     super(config);
   }
 
-  async execute(inputs: Record<string, any>): Promise<Record<string, any>> {
+  async execute(
+    inputs: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     console.log("Workflow started");
     // Initialize workflow state if needed
     return {};

@@ -1,3 +1,3 @@
 export interface IWorkflowState {
-  [key: string]: any;
+  [blockId: string]: Record<string, unknown>;
 }

@@ -7,7 +7,9 @@ export class EndBlock extends Block {
     super(config);
   }
 
-  async execute(inputs: Record<string, any>): Promise<Record<string, any>> {
+  async execute(
+    inputs: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     console.log("Workflow ended");
     // Perform any cleanup if needed
     return {};

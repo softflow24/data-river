@@ -1,7 +1,7 @@
 export class VariableResolver {
-  private scopes: Record<string, Record<string, any>>;
+  private scopes: Record<string, Record<string, unknown>>;
 
-  constructor(scopes: Record<string, Record<string, any>> = {}) {
+  constructor(scopes: Record<string, Record<string, unknown>> = {}) {
     this.scopes = {
       global: {},
       collection: {},
@@ -12,7 +12,10 @@ export class VariableResolver {
     };
   }
 
-  setScope(scope: keyof typeof this.scopes, variables: Record<string, any>) {
+  setScope(
+    scope: keyof typeof this.scopes,
+    variables: Record<string, unknown>,
+  ) {
     this.scopes[scope] = variables;
   }
 
@@ -25,8 +28,9 @@ export class VariableResolver {
         "collection",
         "global",
       ]) {
-        if (this.scopes[scope][variableName] !== undefined) {
-          return this.scopes[scope][variableName];
+        const value = this.scopes[scope][variableName];
+        if (value !== undefined) {
+          return String(value); // Convert to string
         }
       }
       return `{{${variableName}}}`; // Unresolved variable

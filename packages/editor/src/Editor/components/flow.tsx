@@ -6,6 +6,7 @@ import ReactFlow, {
   Connection,
   useReactFlow,
   Background,
+  NodeTypes,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -62,7 +63,7 @@ const Flow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={nodeTypes}
+        nodeTypes={nodeTypes as unknown as NodeTypes}
         fitView
       >
         <Background />

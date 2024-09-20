@@ -49,7 +49,7 @@ export class ExecutionEngine {
   private async executeBlockWithRetry(
     block: Block,
     blockConfig: IBlockConfig,
-  ): Promise<Record<string, any>> {
+  ): Promise<Record<string, unknown>> {
     const retryCount = blockConfig.retry || 0;
     let attempts = 0;
     while (attempts <= retryCount) {
@@ -71,26 +71,31 @@ export class ExecutionEngine {
     );
   }
 
-  private getInputsForBlock(blockId: string): Record<string, any> {
-    const inputs: Record<string, any> = {};
+  private getInputsForBlock(blockId: string): Record<string, unknown> {
+    const inputs: Record<string, unknown> = {};
     this.connections
       .filter((conn) => conn.to === blockId)
       .forEach((conn) => {
-        inputs[conn.inputKey] = this.workflowState[conn.from]?.[conn.outputKey];
+        if (conn.from && conn.outputKey && conn.inputKey) {
+          inputs[conn.inputKey] =
+            this.workflowState[conn.from]?.[conn.outputKey];
+        }
       });
     return inputs;
   }
 
   private handleBlockOutputs(
     blockConfig: IBlockConfig,
-    outputs: Record<string, any>,
+    outputs: Record<string, unknown>,
   ): void {
     this.updateWorkflowState(blockConfig.id, outputs);
     // Additional logic to pass outputs to connected blocks
   }
 
-  private resolveVariables(inputs: Record<string, any>): Record<string, any> {
-    const resolvedInputs: Record<string, any> = {};
+  private resolveVariables(
+    inputs: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const resolvedInputs: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(inputs)) {
       resolvedInputs[key] =
         typeof value === "string"
@@ -100,7 +105,7 @@ export class ExecutionEngine {
     return resolvedInputs;
   }
 
-  private updateWorkflowState(blockId: string, data: Record<string, any>) {
+  private updateWorkflowState(blockId: string, data: Record<string, unknown>) {
     this.workflowState[blockId] = data;
   }
 

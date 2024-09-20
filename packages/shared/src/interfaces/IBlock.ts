@@ -4,11 +4,11 @@ import { IBlockConfig } from ".";
 export interface IBlock {
   id: string;
   type: string;
-  inputs: Record<string, any>;
-  outputs: Record<string, any>;
+  inputs: Record<string, unknown>;
+  outputs: Record<string, unknown>;
   retry: number;
   timeout: number;
   onError: (error: Error, blockConfig: IBlockConfig) => void;
-  execute(inputs: Record<string, any>): Promise<Record<string, any>>;
+  execute(inputs: Record<string, unknown>): Promise<Record<string, unknown>>;
   handleError(error: Error): void;
 }
