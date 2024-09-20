@@ -46,9 +46,9 @@ importers:
 
   packages/blocks:
     dependencies:
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
+      '@data-river/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/jest':
         specifier: ^29.5.13
@@ -59,6 +59,9 @@ importers:
       ts-jest:
         specifier: ^29.2.5
         version: 29.2.5(@babel/core@7.25.2)(jest@29.7.0)(typescript@5.6.2)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
 
   packages/client:
     dependencies:
@@ -343,9 +346,12 @@ importers:
 
   packages/execution-engine:
     dependencies:
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
+      '@data-river/blocks':
+        specifier: workspace:*
+        version: link:../blocks
+      '@data-river/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/jest':
         specifier: ^29.5.13
@@ -356,9 +362,15 @@ importers:
       ts-jest:
         specifier: ^29.2.5
         version: 29.2.5(@babel/core@7.25.2)(jest@29.7.0)(typescript@5.6.2)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
 
   packages/server:
     dependencies:
+      '@data-river/blocks':
+        specifier: workspace:*
+        version: link:../blocks
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -368,13 +380,13 @@ importers:
       express:
         specifier: ^4.21.0
         version: 4.21.0
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
       ws:
         specifier: ^8.18.0
         version: 8.18.0
     devDependencies:
+      '@data-river/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@types/jest':
         specifier: ^29.5.13
         version: 29.5.13
@@ -384,6 +396,11 @@ importers:
       ts-jest:
         specifier: ^29.2.5
         version: 29.2.5(@babel/core@7.25.2)(jest@29.7.0)(typescript@5.6.2)
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
+  packages/shared: {}
 
 packages:
 
