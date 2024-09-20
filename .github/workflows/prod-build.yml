@@ -1,0 +1,31 @@
+name: "Prod"
+on:
+  workflow_dispatch:
+jobs:
+  # TODO - Add caching of build so that can be re-used across pipeliens
+  build:
+    # Avoids releasing prod with other branches than main
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: npm run build
+
+  package:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      # Temp until we decide how to package the app
+      - name: HelloWorld
+        run: echo "Hello World"
