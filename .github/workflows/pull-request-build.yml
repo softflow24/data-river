@@ -22,6 +22,5 @@ jobs:
         run: pnpm install
       - name: Run linter
         run: npm run lint:all
-# TODO - Uncomment when all build steps work
-# - name: Build
-#  run: npm run build
+      - name: Build
+        run: npm run build
