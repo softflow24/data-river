@@ -1,6 +1,20 @@
 name: "Prod"
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      tags:
+        description: "Test scenario tags"
+        required: false
+        type: boolean
 
 jobs:
   # TODO - Add caching of build so that can be re-used across pipeliens
