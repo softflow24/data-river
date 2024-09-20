@@ -1,5 +1,6 @@
 name: "Prod"
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
   # TODO - Add caching of build so that can be re-used across pipeliens
