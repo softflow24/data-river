@@ -1,14 +1,16 @@
+import { injectable } from "tsyringe";
+
+@injectable()
 export class VariableResolver {
   private scopes: Record<string, Record<string, unknown>>;
 
-  constructor(scopes: Record<string, Record<string, unknown>> = {}) {
+  constructor() {
     this.scopes = {
       global: {},
       collection: {},
       environment: {},
       data: {},
       local: {},
-      ...scopes,
     };
   }
 

@@ -1,14 +1,16 @@
 {
   "name": "@data-river/execution-engine",
   "version": "0.1.0",
-  "main": "src/ExecutionEngine.ts",
+  "main": "src/index.ts",
   "scripts": {
     "build": "tsc -b",
     "test": "jest"
   },
   "dependencies": {
     "@data-river/blocks": "workspace:*",
-    "@data-river/shared": "workspace:*"
+    "@data-river/shared": "workspace:*",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

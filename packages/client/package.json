@@ -10,6 +10,9 @@
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
   },
+  "resolutions": {
+    "tslib": "^1.14.1"
+  },
   "dependencies": {
     "@data-river/editor": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
@@ -42,11 +45,11 @@
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
-    "@remix-run/node": "^2.12.0",
-    "@remix-run/react": "^2.12.0",
+    "@remix-run/node": "^2.12.1",
+    "@remix-run/react": "^2.12.1",
     "@remix-run/router": "^1.19.2",
-    "@remix-run/serve": "^2.12.0",
-    "@remix-run/server-runtime": "^2.12.0",
+    "@remix-run/serve": "^2.12.1",
+    "@remix-run/server-runtime": "^2.12.1",
     "@types/set-cookie-parser": "^2.4.10",
     "@web3-storage/multipart-parser": "^1.0.0",
     "class-variance-authority": "^0.7.0",
@@ -73,12 +76,12 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "turbo-stream": "^2.4.1",
-    "vaul": "^0.9.3",
+    "vaul": "^0.9.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.12.0",
-    "@types/react": "^18.3.7",
+    "@remix-run/dev": "^2.12.1",
+    "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
@@ -92,7 +95,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.12",
     "typescript": "^5.6.2",
-    "vite": "^5.4.6",
+    "vite": "^5.4.7",
     "vite-tsconfig-paths": "^4.3.2"
   },
   "engines": {

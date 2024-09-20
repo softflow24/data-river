@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import { IBlockConfig } from "@shared/interfaces";
-import { StartBlock } from "@blocks";
+import { createExecutionEngine } from "@execution-engine";
 import WS from "ws";
 
 const app: Application = express();
@@ -9,32 +9,32 @@ const wss = new WS.Server({ port: 8080 });
 
 app.use(express.json());
 
-app.post("/execute", (req: Request, res: Response) => {
+const engine = createExecutionEngine(
+  true,
+  {
+    maxConcurrentTasks: 1,
+    executionContext: "server",
+    supportsWebSocket: true,
+    retryOnFailure: false,
+  },
+  {
+    variables: {},
+  },
+  [],
+  wss,
+);
+
+app.post("/execute", async (req: Request, res: Response) => {
   const blockConfig: IBlockConfig = req.body;
-  // TODO: Use BlockFactory to create the block
-  const startBlock = new StartBlock(blockConfig);
   if (!blockConfig.inputs) {
     res.status(400).json({ error: "Inputs are required" });
     return;
   }
-  const outputs = startBlock.execute(blockConfig.inputs);
+  const outputs = await engine.executeWorkflow([blockConfig]);
   res.json({ outputs });
-});
-
-wss.on("connection", (ws) => {
-  ws.on("message", (message) => {
-    const blockConfig: IBlockConfig = JSON.parse(message.toString());
-    // TODO: Use BlockFactory to create the block
-    const simpleBlock = new StartBlock(blockConfig);
-    if (!blockConfig.inputs) {
-      ws.send(JSON.stringify({ error: "Inputs are required" }));
-      return;
-    }
-    const outputs = simpleBlock.execute(blockConfig.inputs);
-    ws.send(JSON.stringify({ outputs }));
-  });
 });
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+  console.log("WebSocket server running at ws://localhost:8080");
 });

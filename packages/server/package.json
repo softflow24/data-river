@@ -11,7 +11,8 @@
     "@types/ws": "^8.5.12",
     "express": "^4.21.0",
     "ws": "^8.18.0",
-    "@data-river/blocks": "workspace:*"
+    "@data-river/blocks": "workspace:*",
+    "@data-river/execution-engine": "workspace:*"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
