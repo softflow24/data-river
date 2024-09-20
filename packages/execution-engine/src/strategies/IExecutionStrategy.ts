@@ -1,4 +1,4 @@
-import { IBlock, IBlockConfig } from "@data-river/shared/interfaces";
+import { IBlock, IBlockConfig } from "@shared/interfaces";
 
 export interface IExecutionStrategy {
   execute(
