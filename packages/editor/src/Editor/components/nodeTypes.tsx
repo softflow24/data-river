@@ -1,5 +1,3 @@
-import React from "react";
-
 import CustomNode from "./customNode";
 
 export const nodeTypes = {
@@ -10,32 +8,28 @@ export const nodeTypes = {
       isMinimalist={props.data.isMinimalist}
     />
   ),
-  process: (props: any) => (
+  input: (props: any) => (
     <CustomNode
       {...props}
-      type="process"
+      type="input"
       isMinimalist={props.data.isMinimalist}
     />
   ),
-  conditional: (props: any) => (
+  logic: (props: any) => (
     <CustomNode
       {...props}
-      type="conditional"
+      type="logic"
       isMinimalist={props.data.isMinimalist}
     />
   ),
-  action: (props: any) => (
+  output: (props: any) => (
     <CustomNode
       {...props}
-      type="action"
+      type="output"
       isMinimalist={props.data.isMinimalist}
     />
   ),
-  response: (props: any) => (
-    <CustomNode
-      {...props}
-      type="response"
-      isMinimalist={props.data.isMinimalist}
-    />
+  end: (props: any) => (
+    <CustomNode {...props} type="end" isMinimalist={props.data.isMinimalist} />
   ),
 };

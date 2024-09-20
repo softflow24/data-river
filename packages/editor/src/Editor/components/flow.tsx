@@ -28,7 +28,7 @@ const Flow = () => {
   const addNewNode = useCallback(() => {
     const newNode = {
       id: `${nodes.length + 1}`,
-      type: "process",
+      type: "input", // Changed from "process" to "input"
       position: {
         x: Math.random() * 500,
         y: Math.random() * 500,

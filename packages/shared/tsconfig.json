@@ -7,9 +7,9 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
-    "baseUrl": "../..",
+    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["packages/shared/src/*"]
+      "@data-river/shared/*": ["../shared/*"]
     }
   },
   "include": ["src"],

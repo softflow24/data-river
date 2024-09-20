@@ -1,4 +1,3 @@
-import React from "react";
 import { Play, GitBranch, Box, Zap, MessageSquare } from "lucide-react";
 import { Handle, Position } from "reactflow";
 
@@ -19,13 +18,13 @@ const CustomNode = ({
     switch (type) {
       case "start":
         return "bg-blue-500 text-white";
-      case "process":
+      case "input":
         return "bg-purple-500 text-white";
-      case "conditional":
+      case "logic":
         return "bg-yellow-500 text-white";
-      case "action":
+      case "output":
         return "bg-green-500 text-white";
-      case "response":
+      case "end":
         return "bg-red-500 text-white";
       default:
         return "bg-gray-500 text-white";
@@ -36,13 +35,13 @@ const CustomNode = ({
     switch (type) {
       case "start":
         return <Play size={16} />;
-      case "process":
+      case "input":
         return <Box size={16} />;
-      case "conditional":
+      case "logic":
         return <GitBranch size={16} />;
-      case "action":
+      case "output":
         return <Zap size={16} />;
-      case "response":
+      case "end":
         return <MessageSquare size={16} />;
       default:
         return null;
