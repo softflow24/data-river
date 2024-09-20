@@ -1,25 +1,30 @@
 workflow:
   blocks:
-    
-name: Start
-    uses: blocks/start@0.1
-name: Input
-  uses: blocks/input@0.1
-  params: "Enter input"
-name: Logic
-uses: blocks/logic@0.1
-condition: "input == 'Yes'"
-onTrue: SuccessBlock
-onFalse: FailureBlock
-onError: ErrorBlock
-name: SuccessBlock
-uses: blocks/output@0.1
-message: "Condition met! Output success message."
-name: FailureBlock
-uses: blocks/output@0.1
-message: "Condition not met! Output failure message."
-name: End
-uses: blocks/end@0.1
-name: ErrorBlock
-uses: blocks/errorBlock@0.1
-message: "An error occurred!"
+    - name: Start
+      uses: blocks/start@0.1
+    - name: Input
+      uses: blocks/input@0.1
+      with:
+        value: "some text"
+      onError: ErrorBlock
+    - name: Logic
+      uses: blocks/logic@0.1
+      with:
+        condition: "input == 'Yes'"
+        onTrue: SuccessBlock
+        onFalse: FailureBlock
+      onError: ErrorBlock
+    - name: SuccessBlock
+      uses: blocks/output@0.1
+      with:
+        message: "Condition met! Output success message."
+    - name: FailureBlock
+      uses: blocks/output@0.1
+      with:
+        message: "Condition not met! Output failure message."
+    - name: End
+      uses: blocks/end@0.1
+    - name: ErrorBlock
+      uses: blocks/errorBlock@0.1
+      with:
+        message: "An error occurred!"

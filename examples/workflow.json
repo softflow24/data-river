@@ -2,51 +2,66 @@
   "id": "example-workflow",
   "blocks": [
     {
-      "id": "start-block",
-      "type": "start",
+      "id": "Start",
+      "type": "blocks/start@0.1",
       "inputs": {},
-      "outputs": {},
-      "onError": null
+      "outputs": { "next": "Input" }
     },
     {
-      "id": "input-block",
-      "type": "input",
-      "inputs": {},
-      "outputs": {}
+      "id": "Input",
+      "type": "blocks/input@0.1",
+      "inputs": { "startInput": "Start" },
+      "params": { "value": "some text" },
+      "outputs": { "inputValue": "Logic" },
+      "onError": "ErrorBlock"
     },
     {
-      "id": "logic-block",
-      "type": "logic",
-      "inputs": { "input": "{{input-block.userInput}}" },
-      "outputs": {},
-      "condition": "input === 'Yes'"
+      "id": "Logic",
+      "type": "blocks/logic@0.1",
+      "inputs": { "inputValue": "Input" },
+      "params": { "condition": "input == 'Yes'" },
+      "outputs": { "true": "SuccessBlock", "false": "FailureBlock" },
+      "onError": "ErrorBlock"
     },
     {
-      "id": "output-block",
-      "type": "output",
-      "inputs": { "result": "{{logic-block.conditionResult}}" },
-      "outputs": {}
+      "id": "SuccessBlock",
+      "type": "blocks/output@0.1",
+      "inputs": { "logicOutput": "Logic" },
+      "params": { "message": "Condition met! Output success message." },
+      "outputs": { "next": "End" }
     },
     {
-      "id": "end-block",
-      "type": "end",
-      "inputs": {},
-      "outputs": {}
+      "id": "FailureBlock",
+      "type": "blocks/output@0.1",
+      "inputs": { "logicOutput": "Logic" },
+      "params": { "message": "Condition not met! Output failure message." },
+      "outputs": { "next": "End" }
+    },
+    {
+      "id": "End",
+      "type": "blocks/end@0.1",
+      "inputs": { "previous": ["SuccessBlock", "FailureBlock"] }
+    },
+    {
+      "id": "ErrorBlock",
+      "type": "blocks/errorBlock@0.1",
+      "inputs": { "errorSource": ["Input", "Logic"] },
+      "params": { "message": "An error occurred!" }
     }
   ],
   "connections": [
-    { "from": "start-block", "to": "input-block" },
-    { "from": "input-block", "to": "logic-block" },
-    { "from": "logic-block", "to": "output-block" },
-    { "from": "output-block", "to": "end-block" }
+    { "from": "Start", "to": "Input" },
+    { "from": "Input", "to": "Logic" },
+    { "from": "Logic", "to": "SuccessBlock", "output": "true" },
+    { "from": "Logic", "to": "FailureBlock", "output": "false" },
+    { "from": "Logic", "to": "ErrorBlock", "onError": true },
+    { "from": "SuccessBlock", "to": "End" },
+    { "from": "FailureBlock", "to": "End" }
   ],
-  "environment": {
-    "variables": {}
-  },
   "config": {
-    "maxConcurrentTasks": 5,
-    "supportsWebSocket": true,
+    "maxConcurrentTasks": 1,
     "executionContext": "browser",
-    "retryOnFailure": true
+    "supportsWebSocket": false,
+    "retryOnFailure": false
   }
 }
