@@ -4,6 +4,8 @@ on:
 jobs:
   # TODO - Add caching of build so that can be re-used across pipeliens
   build:
+    # Avoids releasing prod with other branches than main
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
