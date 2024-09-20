@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
-import { IBlockConfig } from "@data-river/shared/interfaces";
-import SimpleBlock from "@blocks/simple-block";
+import { IBlockConfig } from "@shared/interfaces";
+import { StartBlock } from "@blocks";
 import WS from "ws";
 
 const app: Application = express();
@@ -11,16 +11,26 @@ app.use(express.json());
 
 app.post("/execute", (req: Request, res: Response) => {
   const blockConfig: IBlockConfig = req.body;
-  const simpleBlock = new SimpleBlock(blockConfig);
-  const outputs = simpleBlock.process(blockConfig.inputs);
+  // TODO: Use BlockFactory to create the block
+  const startBlock = new StartBlock(blockConfig);
+  if (!blockConfig.inputs) {
+    res.status(400).json({ error: "Inputs are required" });
+    return;
+  }
+  const outputs = startBlock.execute(blockConfig.inputs);
   res.json({ outputs });
 });
 
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     const blockConfig: IBlockConfig = JSON.parse(message.toString());
-    const simpleBlock = new SimpleBlock(blockConfig);
-    const outputs = simpleBlock.process(blockConfig.inputs);
+    // TODO: Use BlockFactory to create the block
+    const simpleBlock = new StartBlock(blockConfig);
+    if (!blockConfig.inputs) {
+      ws.send(JSON.stringify({ error: "Inputs are required" }));
+      return;
+    }
+    const outputs = simpleBlock.execute(blockConfig.inputs);
     ws.send(JSON.stringify({ outputs }));
   });
 });

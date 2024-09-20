@@ -1,41 +1,14 @@
-import React from "react";
+import CustomNode, { NodeData } from "./customNode";
 
-import CustomNode from "./customNode";
+interface NodeProps {
+  data: NodeData;
+  isMinimalist: boolean;
+}
 
 export const nodeTypes = {
-  start: (props: any) => (
-    <CustomNode
-      {...props}
-      type="start"
-      isMinimalist={props.data.isMinimalist}
-    />
-  ),
-  process: (props: any) => (
-    <CustomNode
-      {...props}
-      type="process"
-      isMinimalist={props.data.isMinimalist}
-    />
-  ),
-  conditional: (props: any) => (
-    <CustomNode
-      {...props}
-      type="conditional"
-      isMinimalist={props.data.isMinimalist}
-    />
-  ),
-  action: (props: any) => (
-    <CustomNode
-      {...props}
-      type="action"
-      isMinimalist={props.data.isMinimalist}
-    />
-  ),
-  response: (props: any) => (
-    <CustomNode
-      {...props}
-      type="response"
-      isMinimalist={props.data.isMinimalist}
-    />
-  ),
+  start: (props: NodeProps) => <CustomNode {...props} type="start" />,
+  input: (props: NodeProps) => <CustomNode {...props} type="input" />,
+  logic: (props: NodeProps) => <CustomNode {...props} type="logic" />,
+  output: (props: NodeProps) => <CustomNode {...props} type="output" />,
+  end: (props: NodeProps) => <CustomNode {...props} type="end" />,
 };

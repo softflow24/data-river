@@ -10,12 +10,14 @@
     "@types/express": "^4.17.21",
     "@types/ws": "^8.5.12",
     "express": "^4.21.0",
-    "typescript": "^5.6.2",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "@data-river/blocks": "workspace:*"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
     "jest": "^29.7.0",
-    "ts-jest": "^29.2.5"
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.2",
+    "@data-river/shared": "workspace:*"
   }
 }

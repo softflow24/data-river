@@ -1,32 +1,52 @@
 {
-    "id": "example-workflow",
-    "blocks": [
-        {
-            "id": "block1",
-            "type": "simple",
-            "inputs": {"input1": "{{globalVar}}"},
-            "outputs": {"result": "output1"},
-            "retry": 2,
-            "timeout": 5000,
-            "onError": "reportingBlock"
-        },
-        {
-            "id": "block2",
-            "type": "simple",
-            "inputs": {"input1": "{{output1}}"},
-            "outputs": {"result": "output2"}
-        }
-    ],
-    "connections": [
-        {"from": "block1", "to": "block2", "inputKey": "input1", "outputKey": "result"}
-    ],
-    "environment": {
-        "variables": {"globalVar": "testValue"}
+  "id": "example-workflow",
+  "blocks": [
+    {
+      "id": "start-block",
+      "type": "start",
+      "inputs": {},
+      "outputs": {},
+      "onError": null
     },
-    "config": {
-        "maxConcurrentTasks": 5,
-        "supportsWebSocket": true,
-        "executionContext": "browser",
-        "retryOnFailure": true
+    {
+      "id": "input-block",
+      "type": "input",
+      "inputs": {},
+      "outputs": {}
+    },
+    {
+      "id": "logic-block",
+      "type": "logic",
+      "inputs": { "input": "{{input-block.userInput}}" },
+      "outputs": {},
+      "condition": "input === 'Yes'"
+    },
+    {
+      "id": "output-block",
+      "type": "output",
+      "inputs": { "result": "{{logic-block.conditionResult}}" },
+      "outputs": {}
+    },
+    {
+      "id": "end-block",
+      "type": "end",
+      "inputs": {},
+      "outputs": {}
     }
+  ],
+  "connections": [
+    { "from": "start-block", "to": "input-block" },
+    { "from": "input-block", "to": "logic-block" },
+    { "from": "logic-block", "to": "output-block" },
+    { "from": "output-block", "to": "end-block" }
+  ],
+  "environment": {
+    "variables": {}
+  },
+  "config": {
+    "maxConcurrentTasks": 5,
+    "supportsWebSocket": true,
+    "executionContext": "browser",
+    "retryOnFailure": true
+  }
 }

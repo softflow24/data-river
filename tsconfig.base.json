@@ -1,18 +1,18 @@
 {
-    "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "lib": ["es6"],
-      "allowJs": true,
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "baseUrl": ".",
-      "paths": {
-        "@data-river/*": ["packages/*/src"],
-        "@blocks/*": ["packages/blocks/src/*"],
-      }
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@data-river/*": ["packages/*/src"],
+      "@blocks/*": ["packages/blocks/src/*"],
+      "@shared/*": ["packages/shared/src/*"]
     }
   }
-  
+}

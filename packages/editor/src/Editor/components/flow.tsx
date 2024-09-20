@@ -6,6 +6,7 @@ import ReactFlow, {
   Connection,
   useReactFlow,
   Background,
+  NodeTypes,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -28,7 +29,7 @@ const Flow = () => {
   const addNewNode = useCallback(() => {
     const newNode = {
       id: `${nodes.length + 1}`,
-      type: "process",
+      type: "input", // Changed from "process" to "input"
       position: {
         x: Math.random() * 500,
         y: Math.random() * 500,
@@ -62,7 +63,7 @@ const Flow = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={nodeTypes}
+        nodeTypes={nodeTypes as unknown as NodeTypes}
         fitView
       >
         <Background />
