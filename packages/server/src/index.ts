@@ -15,7 +15,7 @@ const config: IWorkflowConfig = {
 };
 
 const environment: IEnvironment = {
-  variables: { apiKey: "test_key" },
+  variables: { apiKey: process.env.API_KEY },
 };
 
 const connections: IConnection[] = [
@@ -25,7 +25,12 @@ const connections: IConnection[] = [
 ];
 
 const blockConfigs: IBlockConfig[] = [
-  { id: "Start", type: "blocks/start@0.1", inputs: {}, outputs: {} },
+  {
+    id: "Start",
+    type: "blocks/start@0.1",
+    inputs: {},
+    outputs: {},
+  },
   {
     id: "Input",
     type: "blocks/input@0.1",
@@ -38,7 +43,12 @@ const blockConfigs: IBlockConfig[] = [
     inputs: { data: "data" },
     outputs: {},
   },
-  { id: "End", type: "blocks/end@0.1", inputs: {}, outputs: {} },
+  {
+    id: "End",
+    type: "blocks/end@0.1",
+    inputs: {},
+    outputs: {},
+  },
 ];
 
 const wss = new WebSocket.Server({ port: 8080 });
