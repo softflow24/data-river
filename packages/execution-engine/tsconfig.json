@@ -12,5 +12,9 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "**/__tests__/*",
+    "dist",
+    "node_modules"
+  ]
 }
