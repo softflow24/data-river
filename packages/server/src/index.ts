@@ -1,21 +1,10 @@
 import { createExecutionEngine } from "@execution-engine";
-import {
-  IWorkflowConfig,
-  IEnvironment,
-  IConnection,
-  IBlockConfig,
-} from "@shared/interfaces";
+import { createExecutionEngineConfig } from "@execution-engine/config/ExecutionEngineConfig";
+import { IEnvironment, IConnection, IBlockConfig } from "@shared/interfaces";
 import WebSocket from "ws";
 
-const config: IWorkflowConfig = {
-  maxConcurrentTasks: 1,
-  executionContext: "server",
-  supportsWebSocket: true,
-  retryOnFailure: false,
-};
-
 const environment: IEnvironment = {
-  variables: { apiKey: process.env.API_KEY },
+  variables: { apiKey: process.env.API_KEY || "test" },
 };
 
 const connections: IConnection[] = [
@@ -54,13 +43,18 @@ const blockConfigs: IBlockConfig[] = [
 const wss = new WebSocket.Server({ port: 8080 });
 
 async function runWorkflow(isServer: boolean) {
-  const engine = createExecutionEngine(
-    isServer,
-    config,
+  const config = createExecutionEngineConfig({
+    workflowConfig: {
+      maxConcurrentTasks: 1,
+      executionContext: "server",
+      supportsWebSocket: true,
+      retryOnFailure: false,
+      connections,
+    },
     environment,
-    connections,
-    wss,
-  );
+  });
+
+  const engine = createExecutionEngine(config, wss);
   await engine.executeWorkflow(blockConfigs);
   console.log(
     `Workflow executed in ${isServer ? "server" : "browser"} environment`,

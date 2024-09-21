@@ -1,22 +1,21 @@
-import { IWorkflowConfig, IEnvironment, IConnection } from "@shared/interfaces";
 import WebSocket from "ws";
 
+import { IExecutionEngineConfig } from "./config/ExecutionEngineConfig";
 import { configureDI, container } from "./di/container";
 import { ExecutionEngine } from "./ExecutionEngine";
 import { VariableResolver } from "./VariableResolver";
 
 export function createExecutionEngine(
-  isServer: boolean,
-  config: IWorkflowConfig,
-  environment: IEnvironment,
-  connections: IConnection[],
+  config: IExecutionEngineConfig,
   wss?: WebSocket.Server,
 ): ExecutionEngine {
+  const isServer = config.workflowConfig.executionContext === "server";
   configureDI(isServer, wss);
 
-  container.register("WorkflowConfig", { useValue: config });
+  const { workflowConfig, environment } = config;
+
+  container.register("WorkflowConfig", { useValue: workflowConfig });
   container.register("Environment", { useValue: environment });
-  container.register("Connections", { useValue: connections });
   container.register(VariableResolver, { useClass: VariableResolver });
 
   return container.resolve(ExecutionEngine);

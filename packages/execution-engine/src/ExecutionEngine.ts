@@ -13,15 +13,16 @@ import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
 @injectable()
 export class ExecutionEngine {
   private workflowState: IWorkflowState = {};
+  private connections: IConnection[];
 
   constructor(
     @inject("WorkflowConfig") private config: IWorkflowConfig,
     @inject("Environment") private environment: IEnvironment,
     @inject(VariableResolver) private variableResolver: VariableResolver,
-    @inject("Connections") private connections: IConnection[],
     @inject("ExecutionStrategy") private executionStrategy: IExecutionStrategy,
   ) {
     this.variableResolver.setScope("environment", this.environment.variables);
+    this.connections = config.connections;
   }
 
   async executeWorkflow(blockConfigs: IBlockConfig[]): Promise<void> {
@@ -123,19 +124,5 @@ export class ExecutionEngine {
 
   resumeWorkflow(): void {
     // Implement logic to resume workflow execution
-  }
-
-  // Method to dynamically update workflow configuration
-  updateConfig(newConfig: Partial<IWorkflowConfig>): void {
-    this.config = { ...this.config, ...newConfig };
-  }
-
-  // Method to dynamically update environment variables
-  updateEnvironment(newVariables: Record<string, unknown>): void {
-    this.environment.variables = {
-      ...this.environment.variables,
-      ...newVariables,
-    };
-    this.variableResolver.setScope("environment", this.environment.variables);
   }
 }
