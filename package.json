@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "pnpm --filter client dev",
     "build": "lerna run build",
+    "test": "lerna run test",
     "lint:root": "eslint .",
     "lint:remix": "eslint packages/client",
     "lint:all": "npm run lint:root && npm run lint:remix",
@@ -25,7 +26,11 @@
     "husky": "^9.1.6",
     "lerna": "^8.1.8",
     "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "tsconfig-paths": "^4.2.0"
   },
-  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c"
+  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c",
+  "dependencies": {
+    "tslib": "2.7.0"
+  }
 }

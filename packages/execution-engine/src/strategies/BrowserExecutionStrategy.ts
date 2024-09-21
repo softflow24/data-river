@@ -1,8 +1,10 @@
+import { injectable } from "tsyringe";
 import { IBlock, IBlockConfig } from "@shared/interfaces";
-import { StartBlock } from "@blocks";
+import { createBlock } from "@blocks/blockFactory";
 
 import { IExecutionStrategy } from "./IExecutionStrategy";
 
+@injectable()
 export class BrowserExecutionStrategy implements IExecutionStrategy {
   async execute(
     blockConfig: IBlockConfig,
@@ -13,6 +15,6 @@ export class BrowserExecutionStrategy implements IExecutionStrategy {
   }
 
   createBlockInstance(blockConfig: IBlockConfig): IBlock {
-    return new StartBlock(blockConfig); // Example only, replace with actual block instance creation logic
+    return createBlock(blockConfig);
   }
 }

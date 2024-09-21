@@ -12,11 +12,13 @@ export class InputBlock extends Block {
   ): Promise<Record<string, unknown>> {
     // Simulate capturing user input
     const userInput = await getUserInput();
-    return { userInput };
+    return { data: userInput };
   }
 }
 
 async function getUserInput(): Promise<unknown> {
   // For POC, return a fixed value
-  return "Sample User Input";
+  const value = "Sample User Input with an env variable {{apiKey}}";
+  console.log("Received inputs:", value);
+  return value;
 }

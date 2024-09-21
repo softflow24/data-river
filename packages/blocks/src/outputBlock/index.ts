@@ -10,7 +10,7 @@ export class OutputBlock extends Block {
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    console.log("Output:", inputs);
+    console.log("Output:", inputs.data);
     // Display or export results
     return {};
   }
