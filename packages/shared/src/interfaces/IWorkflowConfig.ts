@@ -5,5 +5,6 @@ export interface IWorkflowConfig {
   supportsWebSocket: boolean;
   executionContext: "browser" | "server";
   retryOnFailure?: boolean;
+  continueOnError?: boolean;
   connections: IConnection[];
 }

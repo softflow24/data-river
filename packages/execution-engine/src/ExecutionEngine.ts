@@ -6,6 +6,7 @@ import {
   IBlockConfig,
   IWorkflowState,
 } from "@shared/interfaces";
+import logger from "@shared/utils/logger";
 
 import { VariableResolver } from "./VariableResolver";
 import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
@@ -26,30 +27,43 @@ export class ExecutionEngine {
   }
 
   async executeWorkflow(blockConfigs: IBlockConfig[]): Promise<void> {
+    logger.group("Executing Workflow");
+    logger.time("Workflow Execution");
+
     for (const blockConfig of blockConfigs) {
       try {
-        const inputs = this.getInputsForBlock(blockConfig.id);
+        const inputs = this.getInputsForBlock(blockConfig);
         const resolvedInputs = this.resolveVariables(inputs);
-        const outputs = await this.executeBlockWithRetry(
+        logger.debug(`Executing block: ${blockConfig.id}`, {
           blockConfig,
           resolvedInputs,
-        );
+        });
+
+        const updatedConfig = { ...blockConfig, inputs: resolvedInputs };
+        const outputs = await this.executeBlockWithRetry(updatedConfig);
+
+        logger.debug(`Block ${blockConfig.id} execution completed`, {
+          outputs,
+        });
         this.handleBlockOutputs(blockConfig, outputs);
       } catch (error) {
         this.handleBlockError(error as Error, blockConfig);
       }
     }
+
+    logger.timeEnd("Workflow Execution");
+    logger.groupEnd();
   }
 
   private async executeBlockWithRetry(
     blockConfig: IBlockConfig,
-    inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const retryCount = blockConfig.retry || 0;
     let attempts = 0;
     while (attempts <= retryCount) {
       try {
-        return await this.executionStrategy.execute(blockConfig, inputs);
+        const block = await this.executionStrategy.execute(blockConfig);
+        return block.outputs;
       } catch (error) {
         attempts++;
         if (attempts > retryCount) {
@@ -63,16 +77,26 @@ export class ExecutionEngine {
     );
   }
 
-  private getInputsForBlock(blockId: string): Record<string, unknown> {
+  private getInputsForBlock(
+    blockConfig: IBlockConfig,
+  ): Record<string, unknown> {
     const inputs: Record<string, unknown> = {};
     this.connections
-      .filter((conn) => conn.to === blockId)
+      .filter((conn) => conn.to === blockConfig.id)
       .forEach((conn) => {
         if (conn.from && conn.outputKey && conn.inputKey) {
           inputs[conn.inputKey] =
             this.workflowState[conn.from]?.[conn.outputKey];
         }
       });
+
+    // Externally provided inputs
+    if (blockConfig.inputs) {
+      Object.entries(blockConfig.inputs).forEach(([key, value]) => {
+        inputs[key] = value;
+      });
+    }
+
     return inputs;
   }
 
@@ -101,8 +125,7 @@ export class ExecutionEngine {
     if (blockConfig.onError) {
       blockConfig.onError(error, blockConfig);
     }
-    // Log the error or perform additional error handling
-    console.error(`Error in block ${blockConfig.id}:`, error);
+    logger.error(`Error in block ${blockConfig.id}:`, error);
   }
 
   private updateWorkflowState(blockId: string, data: Record<string, unknown>) {

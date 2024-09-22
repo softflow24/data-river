@@ -10,5 +10,8 @@ export interface IBlock {
   timeout: number;
   onError: (error: Error, blockConfig: IBlockConfig) => void;
   execute(inputs: Record<string, unknown>): Promise<Record<string, unknown>>;
+  safeExecute(
+    inputs: Record<string, unknown>,
+  ): Promise<Record<string, unknown>>;
   handleError(error: Error): void;
 }

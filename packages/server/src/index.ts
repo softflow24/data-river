@@ -2,13 +2,14 @@ import { createExecutionEngine } from "@execution-engine";
 import { createExecutionEngineConfig } from "@execution-engine/config/ExecutionEngineConfig";
 import { IEnvironment, IConnection, IBlockConfig } from "@shared/interfaces";
 import WebSocket from "ws";
+import logger from "@shared/utils/logger";
 
 const environment: IEnvironment = {
-  variables: { apiKey: process.env.API_KEY || "test" },
+  variables: { apiKey: process.env.API_KEY || "env-resolver-value" },
 };
 
 const connections: IConnection[] = [
-  { from: "Start", to: "Input", inputKey: "data", outputKey: "data" },
+  { from: "Start", to: "Input", inputKey: "trigger", outputKey: "started" },
   { from: "Input", to: "Output", inputKey: "data", outputKey: "data" },
   { from: "Output", to: "End", inputKey: "data", outputKey: "data" },
 ];
@@ -17,30 +18,25 @@ const blockConfigs: IBlockConfig[] = [
   {
     id: "Start",
     type: "blocks/start@0.1",
-    inputs: {},
-    outputs: {},
   },
   {
     id: "Input",
     type: "blocks/input@0.1",
-    inputs: {},
-    outputs: { data: "data" },
+    inputs: {
+      input: "Sample User Input with an env variable {{apiKey}}", // Add this line to provide the required input
+    },
   },
   {
     id: "Output",
     type: "blocks/output@0.1",
-    inputs: { data: "data" },
-    outputs: {},
   },
   {
     id: "End",
     type: "blocks/end@0.1",
-    inputs: {},
-    outputs: {},
   },
 ];
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 4123 });
 
 async function runWorkflow(isServer: boolean) {
   const config = createExecutionEngineConfig({
@@ -56,7 +52,7 @@ async function runWorkflow(isServer: boolean) {
 
   const engine = createExecutionEngine(config, wss);
   await engine.executeWorkflow(blockConfigs);
-  console.log(
+  logger.info(
     `Workflow executed in ${isServer ? "server" : "browser"} environment`,
   );
 }

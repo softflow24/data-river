@@ -20,23 +20,22 @@ export class ServerExecutionStrategy implements IExecutionStrategy {
     }
   }
 
-  async execute(
-    blockConfig: IBlockConfig,
-    inputs: Record<string, unknown>,
-  ): Promise<Record<string, unknown>> {
+  async execute(blockConfig: IBlockConfig): Promise<IBlock> {
     const block = this.createBlockInstance(blockConfig);
-    const outputs = await block.execute(inputs);
+    await block.safeExecute(blockConfig.inputs ?? {});
 
     // Send real-time updates via WebSocket if available
     if (this.wss && this.wss.clients) {
       this.wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ blockId: blockConfig.id, outputs }));
+          client.send(
+            JSON.stringify({ blockId: blockConfig.id, outputs: block.outputs }),
+          );
         }
       });
     }
 
-    return outputs;
+    return block;
   }
 
   createBlockInstance(blockConfig: IBlockConfig): IBlock {
