@@ -6,6 +6,7 @@ import {
   createExecutionEngineConfig,
   IExecutionEngineConfig,
 } from "@execution-engine/config/ExecutionEngineConfig";
+import logger from "@shared/utils/logger";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -54,6 +55,6 @@ app.post("/execute", async (req: Request, res: Response) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`WebSocket server running at ws://localhost:${WS_PORT}`);
+  logger.info(`Server running at http://localhost:${PORT}`);
+  logger.info(`WebSocket server running at ws://localhost:${WS_PORT}`);
 });

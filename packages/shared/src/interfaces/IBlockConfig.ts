@@ -1,10 +1,10 @@
 export interface IBlockConfig {
   id: string;
   type: string;
+  inputConfigs?: Record<string, { type: string; required: boolean }>;
+  outputConfigs?: Record<string, { type: string }>;
   inputs?: Record<string, unknown>;
-  outputs?: Record<string, unknown>;
   retry?: number;
   timeout?: number;
-  // eslint-disable-next-line no-unused-vars
   onError?: (error: Error, blockConfig: IBlockConfig) => void;
 }

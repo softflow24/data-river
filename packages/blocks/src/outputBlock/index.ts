@@ -1,17 +1,23 @@
 import { IBlockConfig } from "@shared/interfaces";
+import logger from "@shared/utils/logger";
 
 import { Block } from "../block";
 
 export class OutputBlock extends Block {
   constructor(config: IBlockConfig) {
-    super(config);
+    super({
+      ...config,
+      inputConfigs: {
+        data: { type: "string", required: true },
+      },
+      outputConfigs: {},
+    });
   }
 
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    console.log("Output:", inputs.data);
-    // Display or export results
+    logger.debug("Output:", inputs.data);
     return {};
   }
 }

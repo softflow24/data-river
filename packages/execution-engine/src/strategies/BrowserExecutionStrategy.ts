@@ -6,12 +6,10 @@ import { IExecutionStrategy } from "./IExecutionStrategy";
 
 @injectable()
 export class BrowserExecutionStrategy implements IExecutionStrategy {
-  async execute(
-    blockConfig: IBlockConfig,
-    inputs: Record<string, unknown>,
-  ): Promise<Record<string, unknown>> {
+  async execute(blockConfig: IBlockConfig): Promise<IBlock> {
     const block = this.createBlockInstance(blockConfig);
-    return block.execute(inputs);
+    await block.safeExecute(blockConfig.inputs ?? {});
+    return block;
   }
 
   createBlockInstance(blockConfig: IBlockConfig): IBlock {
