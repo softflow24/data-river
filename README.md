@@ -56,6 +56,12 @@ While **data-river** isn't built solely for AI, it's designed to make integratin
 
 ---
 
+**Contributors**
+
+<a href="https://github.com/softflow24/data-river/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=softflow24/data-river" />
+</a>
+
 ## **How to Contribute**
 
 Right now, we’re laying the foundation. This means there’s no code to clone or build just yet, but you can still contribute!
