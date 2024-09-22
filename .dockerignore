@@ -1,0 +1,7 @@
+   node_modules
+   npm-debug.log
+   .dockerignore
+   Dockerfile
+   .git
+   .gitignore
+   .husky
