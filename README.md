@@ -1,6 +1,6 @@
 # **data-river** 🌊
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/CmEqvZQUQn)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Empowering Everyone to Code & Automate Visually**
@@ -55,6 +55,12 @@ While **data-river** isn't built solely for AI, it's designed to make integratin
 4. **Developers**: Use JavaScript classes for building or extending workflows with custom logic from the marketplace, and for more complex server-side logic, nodes can be built in **Python** or any language you prefer.
 
 ---
+
+**Contributors**
+
+<a href="https://github.com/softflow24/data-river/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=softflow24/data-river" />
+</a>
 
 ## **How to Contribute**
 
