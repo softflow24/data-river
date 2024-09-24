@@ -1,4 +1,5 @@
 import { Provider } from "react-redux";
+import { ReactFlowProvider } from "reactflow";
 
 import store from "./store";
 import FlowChart from "./components/Flow";
@@ -6,7 +7,9 @@ import FlowChart from "./components/Flow";
 const Editor = () => {
   return (
     <Provider store={store}>
-      <FlowChart />
+      <ReactFlowProvider>
+        <FlowChart />
+      </ReactFlowProvider>
     </Provider>
   );
 };

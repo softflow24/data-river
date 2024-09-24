@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
   ConnectionMode,
   Background,
@@ -11,6 +11,10 @@ import ReactFlow, {
   EdgeTypes,
   addEdge,
   OnConnect,
+  useReactFlow,
+  useOnViewportChange,
+  useStoreApi,
+  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Minimize2, Maximize2, Sun, Moon } from "lucide-react";
@@ -26,6 +30,7 @@ import {
   setSelectedEdgeId,
   setHoveredEdgeId,
   setEdges,
+  setViewport as setViewportAction,
 } from "../store";
 import { RootState } from "../store";
 
@@ -45,6 +50,12 @@ const edgeTypes: EdgeTypes = {
 const FlowChart: React.FC = () => {
   const dispatch = useDispatch();
 
+  const { setCenter } = useReactFlow();
+
+  useOnViewportChange({
+    onChange: (viewport) => dispatch(setViewportAction(viewport)),
+  });
+
   const minimalistic = useSelector(
     (state: RootState) => state.app.minimalistic,
   );
@@ -55,6 +66,30 @@ const FlowChart: React.FC = () => {
 
   const nodes = useSelector((state: RootState) => state.app.nodes);
   const edges = useSelector((state: RootState) => state.app.edges);
+
+  const [centeredToNode, setCenteredToNode] = useState<Node | null>(null);
+
+  const focusNode = () => {
+    if (centeredToNode?.id === selectedNodeId) return;
+
+    const node = nodes.find((x) => x.id === selectedNodeId);
+
+    if (!node) return;
+
+    console.log("focusNode", node);
+
+    const x = node.position.x + (node.width ?? 0) / 2;
+    const y = node.position.y + (node.height ?? 0) / 2;
+    const zoom = 1.85;
+
+    setCenter(x, y, { zoom });
+    setCenteredToNode(node);
+  };
+
+  useEffect(() => {
+    if (centeredToNode) return;
+    focusNode();
+  }, [nodes]);
 
   // Ensure there's always one node selected
   useEffect(() => {
@@ -149,7 +184,6 @@ const FlowChart: React.FC = () => {
         edgeTypes={edgeTypes}
         minZoom={0.5}
         maxZoom={3}
-        fitView
       >
         <Background color={lightTheme ? "#888" : "#aaa"} />
         <Controls />

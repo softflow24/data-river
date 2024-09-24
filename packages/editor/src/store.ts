@@ -6,6 +6,7 @@ import {
   EdgeChange,
   applyNodeChanges,
   applyEdgeChanges,
+  Viewport,
 } from "reactflow";
 
 interface AppState {
@@ -17,6 +18,7 @@ interface AppState {
   hoveredEdgeId: string | null;
   nodes: Node[];
   edges: Edge[];
+  viewport: Viewport;
 }
 
 const initialNodes: Node[] = [
@@ -73,6 +75,7 @@ const initialState: AppState = {
   hoveredEdgeId: null,
   nodes: initialNodes,
   edges: initialEdges,
+  viewport: { x: 0, y: 0, zoom: 1 },
 };
 
 const appSlice = createSlice({
@@ -110,6 +113,41 @@ const appSlice = createSlice({
     setEdges: (state, action: PayloadAction<Edge[]>) => {
       state.edges = action.payload;
     },
+    setZoom: (state, action: PayloadAction<number>) => {
+      state.viewport = { ...state.viewport, zoom: action.payload };
+    },
+    zoomIn: (state) => {
+      state.viewport = { ...state.viewport, zoom: state.viewport.zoom + 0.1 };
+    },
+    zoomOut: (state) => {
+      state.viewport = { ...state.viewport, zoom: state.viewport.zoom - 0.1 };
+    },
+    addNewNode: (state) => {
+      const newNode: Node = {
+        id: `${state.nodes.length + 1}`,
+        type: "custom",
+        position: { x: Math.random() * 500, y: Math.random() * 500 },
+        data: {
+          label: `Node ${state.nodes.length + 1}`,
+          color: "rgb(107 114 128)",
+          sourceHandle: true,
+          targetHandle: true,
+          icon: "Circle",
+        },
+      };
+      state.nodes.push(newNode);
+    },
+    setViewport: (state, action: PayloadAction<Viewport>) => {
+      if (action.payload.x !== undefined) {
+        state.viewport.x = action.payload.x;
+      }
+      if (action.payload.y !== undefined) {
+        state.viewport.y = action.payload.y;
+      }
+      if (action.payload.zoom !== undefined) {
+        state.viewport.zoom = action.payload.zoom;
+      }
+    },
   },
 });
 
@@ -123,6 +161,11 @@ export const {
   setEdges,
   setSelectedEdgeId,
   setHoveredEdgeId,
+  setZoom,
+  zoomIn,
+  zoomOut,
+  addNewNode,
+  setViewport,
 } = appSlice.actions;
 
 const store = configureStore({
