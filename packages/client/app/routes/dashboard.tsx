@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   // Find and parse the 'sidebar:state' cookie, default to false if not found
   const sidebarState =
     cookies.find((cookie) => cookie.name === "sidebar:state")?.value ===
-      "true" || false;
+      "true" || true;
 
   return json<LoaderData>({ sidebarState });
 };
@@ -33,7 +33,7 @@ export default function Page() {
       <AppSidebar />
       <main className="flex flex-1 flex-col p-2 transition-all duration-300 ease-in-out h-screen overflow-hidden">
         <div className="h-full rounded-md p-2">
-          {/* <SidebarTrigger /> */}
+          <SidebarTrigger />
           <ClientOnly>
             <Editor />
           </ClientOnly>
