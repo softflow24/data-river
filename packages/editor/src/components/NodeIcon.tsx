@@ -9,7 +9,9 @@ interface NodeIconProps {
 
 const NodeIcon: React.FC<NodeIconProps> = ({ icon, color, minimalistic }) => {
   const IconComponent = icon
-    ? Icons[icon as keyof typeof Icons]
+    ? (Icons[
+        icon as keyof typeof Icons
+      ] as React.ComponentType<Icons.LucideProps>)
     : Icons.HelpCircle;
 
   return (
