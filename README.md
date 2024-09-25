@@ -1,6 +1,6 @@
 # **data-river** 🌊
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/CmEqvZQUQn)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/CmEqvZQUQn?style=flat)](https://discord.gg/CmEqvZQUQn)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Empowering Everyone to Code & Automate Visually**
@@ -94,7 +94,7 @@ We’re at the start of something big, and we want you to be a part of it.
 
 ### Let’s build this together!
 
-- **Discord**: [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
+- **Discord**: [![Discord](https://dcbadge.vercel.app/api/server/CmEqvZQUQn?style=flat)](https://discord.gg/CmEqvZQUQn)
 
 Together, we can shape the future of programming and automation, making it simpler, more accessible, and more fun.
 
