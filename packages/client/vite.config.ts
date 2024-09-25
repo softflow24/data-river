@@ -13,7 +13,9 @@ export default defineConfig({
         v3_throwAbortReason: true,
       },
     }),
-    tsconfigPaths({ projects: ["./tsconfig.json"] }), // For resolving paths from tsconfig.json
+    tsconfigPaths({
+      projects: ["./tsconfig.json", "../../packages/editor/tsconfig.json"],
+    }), // For resolving paths from tsconfig.json
   ],
   server: {
     watch: {
