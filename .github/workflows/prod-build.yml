@@ -20,6 +20,7 @@ jobs:
         run: pnpm install
       - name: Build
         run: npm run build
+      ## No need to execute unit tests. They should have been tested in PR + Developp + Release Candidate
 
   package:
     needs: build
