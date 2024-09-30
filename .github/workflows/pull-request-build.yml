@@ -34,6 +34,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Build landing page Docker image
         uses: ./.github/actions/build-docker
         with:
@@ -48,6 +49,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Build client Docker image
         uses: ./.github/actions/build-docker
         with:
