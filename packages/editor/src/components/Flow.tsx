@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
+  Node,
   ConnectionMode,
   Background,
   Panel,
@@ -11,10 +12,11 @@ import ReactFlow, {
   EdgeTypes,
   addEdge,
   OnConnect,
+  OnNodesChange,
+  OnEdgesChange,
   useReactFlow,
   useOnViewportChange,
-  useStoreApi,
-  Node,
+  Viewport,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Minimize2, Maximize2, Sun, Moon } from "lucide-react";
@@ -31,13 +33,16 @@ import {
   setHoveredEdgeId,
   setEdges,
   setViewport as setViewportAction,
+  setIsSheetOpen,
 } from "../store";
-import { RootState } from "../store";
+import { RootState, AppDispatch } from "../store";
 
 import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
+
+import EditNodeSheet from "./EditNodeSheet";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -48,13 +53,8 @@ const edgeTypes: EdgeTypes = {
 };
 
 const FlowChart: React.FC = () => {
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<AppDispatch>();
   const { setCenter } = useReactFlow();
-
-  useOnViewportChange({
-    onChange: (viewport) => dispatch(setViewportAction(viewport)),
-  });
 
   const minimalistic = useSelector(
     (state: RootState) => state.app.minimalistic,
@@ -63,20 +63,22 @@ const FlowChart: React.FC = () => {
   const selectedNodeId = useSelector(
     (state: RootState) => state.app.selectedNodeId,
   );
-
+  const isSheetOpen = useSelector((state: RootState) => state.app.isSheetOpen);
   const nodes = useSelector((state: RootState) => state.app.nodes);
   const edges = useSelector((state: RootState) => state.app.edges);
 
   const [centeredToNode, setCenteredToNode] = useState<Node | null>(null);
 
-  const focusNode = () => {
+  useOnViewportChange({
+    onChange: (viewport: Viewport) => dispatch(setViewportAction(viewport)),
+  });
+
+  const focusNode = useCallback(() => {
     if (centeredToNode?.id === selectedNodeId) return;
 
     const node = nodes.find((x) => x.id === selectedNodeId);
 
     if (!node) return;
-
-    console.log("focusNode", node);
 
     const x = node.position.x + (node.width ?? 0) / 2;
     const y = node.position.y + (node.height ?? 0) / 2;
@@ -84,28 +86,27 @@ const FlowChart: React.FC = () => {
 
     setCenter(x, y, { zoom });
     setCenteredToNode(node);
-  };
+  }, [centeredToNode, selectedNodeId, nodes, setCenter]);
 
   useEffect(() => {
     if (centeredToNode) return;
     focusNode();
-  }, [nodes]);
+  }, [centeredToNode, focusNode]);
 
-  // Ensure there's always one node selected
   useEffect(() => {
     if (!selectedNodeId && nodes.length > 0) {
       dispatch(setSelectedNodeId(nodes[0].id));
     }
   }, [selectedNodeId, nodes, dispatch]);
 
-  const onNodesChangeHandler = useCallback(
+  const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
       dispatch(updateNodes(changes));
     },
     [dispatch],
   );
 
-  const onEdgesChangeHandler = useCallback(
+  const onEdgesChangeHandler: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       dispatch(updateEdges(changes));
     },
@@ -126,6 +127,7 @@ const FlowChart: React.FC = () => {
     },
     [dispatch],
   );
+
   const onEdgeMouseEnter: EdgeMouseHandler = useCallback(
     (_, edge) => {
       dispatch(setHoveredEdgeId(edge.id));
@@ -138,8 +140,8 @@ const FlowChart: React.FC = () => {
   }, [dispatch]);
 
   const onPaneClick = useCallback(() => {
-    setSelectedEdgeId(null);
-  }, []);
+    dispatch(setSelectedEdgeId(null));
+  }, [dispatch]);
 
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
@@ -151,6 +153,14 @@ const FlowChart: React.FC = () => {
   const onNodeMouseLeave: NodeMouseHandler = useCallback(() => {
     dispatch(setHoveredNodeId(null));
   }, [dispatch]);
+
+  const onNodeClick: NodeMouseHandler = useCallback(
+    (_, node) => {
+      dispatch(setSelectedNodeId(node.id));
+      dispatch(setIsSheetOpen(true));
+    },
+    [dispatch],
+  );
 
   return (
     <div
@@ -173,7 +183,7 @@ const FlowChart: React.FC = () => {
         onPaneClick={onPaneClick}
         onNodeMouseEnter={onNodeMouseEnter}
         onNodeMouseLeave={onNodeMouseLeave}
-        onNodeClick={(_, node) => dispatch(setSelectedNodeId(node.id))}
+        onNodeClick={onNodeClick}
         onNodeDragStart={(_, node) => dispatch(setSelectedNodeId(node.id))}
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
@@ -202,6 +212,8 @@ const FlowChart: React.FC = () => {
           <CustomNodeInfo />
         </Panel>
       </ReactFlow>
+
+      <EditNodeSheet />
     </div>
   );
 };

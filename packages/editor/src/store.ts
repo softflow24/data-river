@@ -19,6 +19,7 @@ interface AppState {
   nodes: Node[];
   edges: Edge[];
   viewport: Viewport;
+  isSheetOpen: boolean;
 }
 
 const initialNodes: Node[] = [
@@ -76,6 +77,7 @@ const initialState: AppState = {
   nodes: initialNodes,
   edges: initialEdges,
   viewport: { x: 0, y: 0, zoom: 1 },
+  isSheetOpen: false,
 };
 
 const appSlice = createSlice({
@@ -148,6 +150,9 @@ const appSlice = createSlice({
         state.viewport.zoom = action.payload.zoom;
       }
     },
+    setIsSheetOpen: (state, action: PayloadAction<boolean>) => {
+      state.isSheetOpen = action.payload;
+    },
   },
 });
 
@@ -156,6 +161,7 @@ export const {
   toggleLightTheme,
   setSelectedNodeId,
   setHoveredNodeId,
+  setNodes,
   updateNodes,
   updateEdges,
   setEdges,
@@ -166,6 +172,7 @@ export const {
   zoomOut,
   addNewNode,
   setViewport,
+  setIsSheetOpen,
 } = appSlice.actions;
 
 const store = configureStore({
