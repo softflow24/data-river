@@ -30,11 +30,8 @@ jobs:
   package-langing-page:
     name: "Package landing page"
     needs: build
-    uses: ./.github/workflows/templates/build-docker.yml
-    with:
-      DOCKER_IMAGE_TAG: ${{ github.sha }}
-      DOCKER_IMAGE_NAME: "landing-page"
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_FILE_PATH: "packages/www/Dockerfile"
-    secrets:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    runs-on: ubuntu-latest
+    steps:
+      # Builds docker images
+      - name: Build Docker image
+        run: docker build -f packages/www/Dockerfile -t ${{ vars.DOCKER_USERNAME }}/landing-page:${{ github.sha }} .
