@@ -42,7 +42,9 @@ jobs:
         with:
           dockerfile: "packages/www/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
-          tag: "pr-${{ github.sha }}"
+          ## Tag as pr-<pr-id>
+          tag: "pr-${{ github.event.pull_request.number }}"
+          shouldRelease: false
 
   package-client:
     name: "Package client"
@@ -59,4 +61,6 @@ jobs:
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
           ## Tag as pr-<pr-id>
           tag: "pr-${{ github.event.pull_request.number }}"
-          shouldRelease: false
+          shouldRelease: true
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
