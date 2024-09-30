@@ -19,4 +19,5 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Build Docker image
+      shell: bash # Specify the shell
       run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
