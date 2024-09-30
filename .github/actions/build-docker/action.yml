@@ -35,11 +35,24 @@ runs:
       shell: bash # Specify the shell
       run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
 
+    # Only if "shouldRelease" is true, then we should fail if username / password are not provided
+    - name: Ensure Docker username and password are provided
+      if: ${{ inputs.shouldRelease }}
+      run: |
+        if [ -z "${{ inputs.DOCKER_USERNAME }}" ]; then
+          echo "DOCKER_USERNAME is required when shouldRelease is true"
+          exit 1
+        fi
+        if [ -z "${{ inputs.DOCKER_PASSWORD }}" ]; then
+          echo "DOCKER_PASSWORD is required when shouldRelease is true"
+          exit 1
+        fi
+
     # Login in docker registry
     - name: Login to Docker registry
       if: ${{ inputs.shouldRelease }}
       shell: bash
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
+      run: echo "${{ inputs.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
     # Push the Docker image
     - name: Push Docker image
       if: ${{ inputs.shouldRelease }}
