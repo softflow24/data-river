@@ -30,7 +30,7 @@ jobs:
   package-landing-page:
     name: "Package landing page"
     needs: build
-    uses: ./.github/workflows/templates/build-docker.yml
+    uses: ./.github/workflows/build-docker.yml
     with:
       dockerfile: "packages/www/Dockerfile"
       image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
@@ -39,7 +39,7 @@ jobs:
   package-client:
     name: "Package client"
     needs: build
-    uses: ./.github/workflows/templates/build-docker.yml
+    uses: ./.github/workflows/build-docker.yml
     with:
       dockerfile: "packages/client/Dockerfile"
       image_name: "${{ vars.DOCKER_USERNAME }}/client"
