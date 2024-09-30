@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
+  Node,
+  Edge,
   ConnectionMode,
   Background,
   Panel,
@@ -11,10 +13,11 @@ import ReactFlow, {
   EdgeTypes,
   addEdge,
   OnConnect,
+  OnNodesChange,
+  OnEdgesChange,
   useReactFlow,
   useOnViewportChange,
-  useStoreApi,
-  Node,
+  Viewport,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Minimize2, Maximize2, Sun, Moon } from "lucide-react";
@@ -32,12 +35,24 @@ import {
   setEdges,
   setViewport as setViewportAction,
 } from "../store";
-import { RootState } from "../store";
+import { RootState, AppDispatch } from "../store";
 
 import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
+
+// Import shadcn components
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -47,14 +62,14 @@ const edgeTypes: EdgeTypes = {
   custom: CustomEdge,
 };
 
+interface NodeData {
+  label: string;
+  description: string;
+}
+
 const FlowChart: React.FC = () => {
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<AppDispatch>();
   const { setCenter } = useReactFlow();
-
-  useOnViewportChange({
-    onChange: (viewport) => dispatch(setViewportAction(viewport)),
-  });
 
   const minimalistic = useSelector(
     (state: RootState) => state.app.minimalistic,
@@ -63,20 +78,24 @@ const FlowChart: React.FC = () => {
   const selectedNodeId = useSelector(
     (state: RootState) => state.app.selectedNodeId,
   );
-
   const nodes = useSelector((state: RootState) => state.app.nodes);
   const edges = useSelector((state: RootState) => state.app.edges);
 
   const [centeredToNode, setCenteredToNode] = useState<Node | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [nodeName, setNodeName] = useState("");
+  const [nodeDescription, setNodeDescription] = useState("");
 
-  const focusNode = () => {
+  useOnViewportChange({
+    onChange: (viewport: Viewport) => dispatch(setViewportAction(viewport)),
+  });
+
+  const focusNode = useCallback(() => {
     if (centeredToNode?.id === selectedNodeId) return;
 
     const node = nodes.find((x) => x.id === selectedNodeId);
 
     if (!node) return;
-
-    console.log("focusNode", node);
 
     const x = node.position.x + (node.width ?? 0) / 2;
     const y = node.position.y + (node.height ?? 0) / 2;
@@ -84,28 +103,27 @@ const FlowChart: React.FC = () => {
 
     setCenter(x, y, { zoom });
     setCenteredToNode(node);
-  };
+  }, [centeredToNode, selectedNodeId, nodes, setCenter]);
 
   useEffect(() => {
     if (centeredToNode) return;
     focusNode();
-  }, [nodes]);
+  }, [centeredToNode, focusNode]);
 
-  // Ensure there's always one node selected
   useEffect(() => {
     if (!selectedNodeId && nodes.length > 0) {
       dispatch(setSelectedNodeId(nodes[0].id));
     }
   }, [selectedNodeId, nodes, dispatch]);
 
-  const onNodesChangeHandler = useCallback(
+  const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
       dispatch(updateNodes(changes));
     },
     [dispatch],
   );
 
-  const onEdgesChangeHandler = useCallback(
+  const onEdgesChangeHandler: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       dispatch(updateEdges(changes));
     },
@@ -126,6 +144,7 @@ const FlowChart: React.FC = () => {
     },
     [dispatch],
   );
+
   const onEdgeMouseEnter: EdgeMouseHandler = useCallback(
     (_, edge) => {
       dispatch(setHoveredEdgeId(edge.id));
@@ -138,8 +157,8 @@ const FlowChart: React.FC = () => {
   }, [dispatch]);
 
   const onPaneClick = useCallback(() => {
-    setSelectedEdgeId(null);
-  }, []);
+    dispatch(setSelectedEdgeId(null));
+  }, [dispatch]);
 
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
@@ -151,6 +170,35 @@ const FlowChart: React.FC = () => {
   const onNodeMouseLeave: NodeMouseHandler = useCallback(() => {
     dispatch(setHoveredNodeId(null));
   }, [dispatch]);
+
+  const onNodeClick: NodeMouseHandler = useCallback(
+    (_, node) => {
+      dispatch(setSelectedNodeId(node.id));
+      setNodeName((node.data as NodeData).label || "");
+      setNodeDescription((node.data as NodeData).description || "");
+      setIsSheetOpen(true);
+    },
+    [dispatch],
+  );
+
+  const handleSubmit = useCallback(() => {
+    if (selectedNodeId) {
+      const updatedNodes = nodes.map((node) =>
+        node.id === selectedNodeId
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                label: nodeName,
+                description: nodeDescription,
+              },
+            }
+          : node,
+      );
+      dispatch(updateNodes(updatedNodes));
+    }
+    setIsSheetOpen(false);
+  }, [selectedNodeId, nodeName, nodeDescription, nodes, dispatch]);
 
   return (
     <div
@@ -173,7 +221,7 @@ const FlowChart: React.FC = () => {
         onPaneClick={onPaneClick}
         onNodeMouseEnter={onNodeMouseEnter}
         onNodeMouseLeave={onNodeMouseLeave}
-        onNodeClick={(_, node) => dispatch(setSelectedNodeId(node.id))}
+        onNodeClick={onNodeClick}
         onNodeDragStart={(_, node) => dispatch(setSelectedNodeId(node.id))}
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
@@ -202,6 +250,40 @@ const FlowChart: React.FC = () => {
           <CustomNodeInfo />
         </Panel>
       </ReactFlow>
+
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Edit Node</SheetTitle>
+            <SheetDescription>
+              Make changes to the selected node.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Input
+                id="name"
+                value={nodeName}
+                onChange={(e) => setNodeName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Input
+                id="description"
+                value={nodeDescription}
+                onChange={(e) => setNodeDescription(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <SheetClose asChild>
+            <Button type="submit" onClick={handleSubmit}>
+              Save changes
+            </Button>
+          </SheetClose>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
