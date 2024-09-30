@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
   Node,
-  Edge,
   ConnectionMode,
   Background,
   Panel,
@@ -34,6 +33,7 @@ import {
   setHoveredEdgeId,
   setEdges,
   setViewport as setViewportAction,
+  setIsSheetOpen,
 } from "../store";
 import { RootState, AppDispatch } from "../store";
 
@@ -42,17 +42,7 @@ import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
 
-// Import shadcn components
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetClose,
-} from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import EditNodeSheet from "./EditNodeSheet";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -61,11 +51,6 @@ const nodeTypes: NodeTypes = {
 const edgeTypes: EdgeTypes = {
   custom: CustomEdge,
 };
-
-interface NodeData {
-  label: string;
-  description: string;
-}
 
 const FlowChart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -78,13 +63,11 @@ const FlowChart: React.FC = () => {
   const selectedNodeId = useSelector(
     (state: RootState) => state.app.selectedNodeId,
   );
+  const isSheetOpen = useSelector((state: RootState) => state.app.isSheetOpen);
   const nodes = useSelector((state: RootState) => state.app.nodes);
   const edges = useSelector((state: RootState) => state.app.edges);
 
   const [centeredToNode, setCenteredToNode] = useState<Node | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [nodeName, setNodeName] = useState("");
-  const [nodeDescription, setNodeDescription] = useState("");
 
   useOnViewportChange({
     onChange: (viewport: Viewport) => dispatch(setViewportAction(viewport)),
@@ -174,31 +157,10 @@ const FlowChart: React.FC = () => {
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setSelectedNodeId(node.id));
-      setNodeName((node.data as NodeData).label || "");
-      setNodeDescription((node.data as NodeData).description || "");
-      setIsSheetOpen(true);
+      dispatch(setIsSheetOpen(true));
     },
     [dispatch],
   );
-
-  const handleSubmit = useCallback(() => {
-    if (selectedNodeId) {
-      const updatedNodes = nodes.map((node) =>
-        node.id === selectedNodeId
-          ? {
-              ...node,
-              data: {
-                ...node.data,
-                label: nodeName,
-                description: nodeDescription,
-              },
-            }
-          : node,
-      );
-      dispatch(updateNodes(updatedNodes));
-    }
-    setIsSheetOpen(false);
-  }, [selectedNodeId, nodeName, nodeDescription, nodes, dispatch]);
 
   return (
     <div
@@ -251,39 +213,7 @@ const FlowChart: React.FC = () => {
         </Panel>
       </ReactFlow>
 
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit Node</SheetTitle>
-            <SheetDescription>
-              Make changes to the selected node.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Input
-                id="name"
-                value={nodeName}
-                onChange={(e) => setNodeName(e.target.value)}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Input
-                id="description"
-                value={nodeDescription}
-                onChange={(e) => setNodeDescription(e.target.value)}
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <SheetClose asChild>
-            <Button type="submit" onClick={handleSubmit}>
-              Save changes
-            </Button>
-          </SheetClose>
-        </SheetContent>
-      </Sheet>
+      <EditNodeSheet />
     </div>
   );
 };
