@@ -17,6 +17,14 @@ inputs:
     required: false
     default: "false"
     type: boolean
+  DOCKER_USERNAME:
+    description: "Docker username"
+    required: true
+    type: string
+  DOCKER_PASSWORD:
+    description: "Docker password"
+    required: true
+    type: string
 
 runs:
   using: "composite"
@@ -31,7 +39,7 @@ runs:
     - name: Login to Docker registry
       if: ${{ inputs.shouldRelease }}
       shell: bash
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
     # Push the Docker image
     - name: Push Docker image
       if: ${{ inputs.shouldRelease }}
