@@ -12,6 +12,11 @@ inputs:
     description: "Tag to use for the Docker image"
     required: true
     type: string
+  dev:
+    description: "Whether to add a 'dev' tag"
+    required: false
+    default: "false"
+    type: boolean
   shouldRelease:
     description: "Whether to release the Docker image in the registry"
     required: false
@@ -31,11 +36,19 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Build Docker image
-      shell: bash # Specify the shell
-      run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
 
-    # Only if "shouldRelease" is true, then we should fail if username / password are not provided
+    - name: Build Docker image with main tag
+      shell: bash
+      run: docker build -f "${{ inputs.dockerfile }}" -t "${{ inputs.image_name }}:${{ inputs.tag }}" .
+
+    - name: Tag with 'dev' if needed
+      if: inputs.dev == 'true'
+      shell: bash
+      run: |
+        echo "Tagging image with 'dev'"
+        docker tag "${{ inputs.image_name }}:${{ inputs.tag }}" "${{ inputs.image_name }}:dev"
+
+    # Only if "shouldRelease" is true, then we should fail if username/password are not provided
     - name: Ensure Docker username and password are provided
       if: inputs.shouldRelease == 'true'
       shell: bash
@@ -49,13 +62,21 @@ runs:
           echo "DOCKER_PASSWORD is required when shouldRelease is true"
           exit 1
         fi
-    # Login in docker registry
+
+    # Login to Docker registry
     - name: Login to Docker registry
       if: inputs.shouldRelease == 'true'
       shell: bash
       run: echo "${{ inputs.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
-    # Push the Docker image
+
+    # Push the main tag
     - name: Push Docker image
       if: inputs.shouldRelease == 'true'
       shell: bash
-      run: docker push ${{ inputs.image_name }}:${{ inputs.tag }}
+      run: docker push "${{ inputs.image_name }}:${{ inputs.tag }}"
+
+    # Push the 'dev' tag if needed
+    - name: Push 'dev' tag
+      if: inputs.shouldRelease == 'true' && inputs.dev == 'true'
+      shell: bash
+      run: docker push "${{ inputs.image_name }}:dev"
