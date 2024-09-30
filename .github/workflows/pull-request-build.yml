@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: List the directory structure
+        run: ls -R .github
 
       - name: Build landing page Docker image
         uses: ./.github/actions/build-docker
@@ -49,6 +51,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: List the directory structure
+        run: ls -R .github
 
       - name: Build client Docker image
         uses: ./.github/actions/build-docker
