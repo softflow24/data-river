@@ -15,7 +15,7 @@ inputs:
   shouldRelease:
     description: "Whether to release the Docker image in the registry"
     required: false
-    default: false
+    default: "false"
     type: boolean
   DOCKER_USERNAME:
     description: "Docker username"
