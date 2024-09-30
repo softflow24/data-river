@@ -27,24 +27,20 @@ jobs:
       - name: Tests
         run: npm run test
 
-  package-langing-page:
+  package-landing-page:
     name: "Package landing page"
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      # Builds docker images
-      - name: Build Docker image
-        run: docker build -f packages/www/Dockerfile -t ${{ vars.DOCKER_USERNAME }}/landing-page:${{ github.sha }} .
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      dockerfile: "packages/www/Dockerfile"
+      image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
+      tag: "${{github.sha}}"
 
   package-client:
     name: "Package client"
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      # Builds docker images
-      - name: Build Docker image
-        run: docker build -f packages/client/Dockerfile -t ${{ vars.DOCKER_USERNAME }}/client:${{ github.sha }} .
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      dockerfile: "packages/client/Dockerfile"
+      image_name: "${{ vars.DOCKER_USERNAME }}/client"
+      tag: "${{github.sha}}"

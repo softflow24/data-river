@@ -1,27 +1,26 @@
+name: "Build Docker Image"
+
 on:
   workflow_call:
-
-inputs:
-  DOCKER_FILE_PATH:
-    required: true
-    type: string
-  DOCKER_IMAGE_TAG:
-    required: true
-    type: string
-  DOCKER_IMAGE_NAME:
-    required: true
-    type: string
-  DOCKER_USERNAME:
-    required: true
-    type: string
-secrets:
-  DOCKER_PASSWORD:
-    required: true
+    inputs:
+      tag:
+        description: "Tag to use for the Docker image"
+        required: true
+        type: string
+      dockerfile:
+        description: "Path to the Dockerfile"
+        required: true
+        type: string
+      image_name:
+        description: "Docker image name"
+        required: true
+        type: string
 
 jobs:
-  build_docker:
+  build:
     runs-on: ubuntu-latest
     steps:
-      # Builds docker images
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Build Docker image
-        run: docker build -f ${{ inputs.DOCKER_FILE_PATH }} -t ${{ inputs.DOCKER_USERNAME }}/${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.DOCKER_IMAGE_TAG }} .
+        run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
