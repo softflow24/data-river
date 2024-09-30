@@ -37,7 +37,7 @@ runs:
 
     # Only if "shouldRelease" is true, then we should fail if username / password are not provided
     - name: Ensure Docker username and password are provided
-      if: ${{ inputs.shouldRelease }} == 'true'
+      if: inputs.shouldRelease == 'true'
       shell: bash
       run: |
         echo "Ensuring Docker username and password are provided when releasing the Docker image"
