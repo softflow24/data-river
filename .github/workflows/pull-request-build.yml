@@ -61,6 +61,4 @@ jobs:
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
           ## Tag as pr-<pr-id>
           tag: "pr-${{ github.event.pull_request.number }}"
-          shouldRelease: true
-          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          shouldRelease: false
