@@ -16,8 +16,5 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
     - name: Build Docker image
       run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
