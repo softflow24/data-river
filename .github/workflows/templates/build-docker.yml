@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+
+inputs:
+  DOCKER_FILE_PATH:
+    required: true
+    type: string
+  DOCKER_IMAGE_TAG:
+    required: true
+    type: string
+  DOCKER_IMAGE_NAME:
+    required: true
+    type: string
+  DOCKER_USERNAME:
+    required: true
+    type: string
+secrets:
+  DOCKER_PASSWORD:
+    required: true
+
+jobs:
+  build_docker:
+    runs-on: ubuntu-latest
+    steps:
+      # Builds docker images
+      - name: Build Docker image
+        run: docker build -f ${{ inputs.DOCKER_FILE_PATH }} -t ${{ inputs.DOCKER_USERNAME }}/${{ inputs.DOCKER_IMAGE_NAME }}:${{ inputs.DOCKER_IMAGE_TAG }} .

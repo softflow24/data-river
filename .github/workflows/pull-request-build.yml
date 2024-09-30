@@ -26,3 +26,15 @@ jobs:
         run: npm run build
       - name: Tests
         run: npm run test
+
+  package-langing-page:
+    name: "Package landing page"
+    needs: build
+    uses: ./.github/workflows/templates/build-docker.yml
+    with:
+      DOCKER_IMAGE_TAG: ${{ github.sha }}
+      DOCKER_IMAGE_NAME: "landing-page"
+      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+      DOCKER_FILE_PATH: "packages/www/Dockerfile"
+    secrets:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
