@@ -58,5 +58,6 @@ jobs:
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
           tag: "develop-${{ github.sha }}"
           shouldRelease: true
+          dev: true
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
