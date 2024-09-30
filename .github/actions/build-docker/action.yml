@@ -10,7 +10,7 @@ inputs:
     required: true
   tag:
     description: "Tag to use for the Docker image"
-    required: false
+    required: true
     type: string
   shouldRelease:
     description: "Whether to release the Docker image in the registry"

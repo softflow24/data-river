@@ -27,6 +27,8 @@ jobs:
       - name: Tests
         run: npm run test
 
+  # Package projects to make sure this is not broken upon merge request
+  # This is not pushed into docker registry as input "shouldRelease" is not set
   package-landing-page:
     name: "Package landing page"
     needs: build
@@ -40,6 +42,7 @@ jobs:
         with:
           dockerfile: "packages/www/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
+          tag: "pr-${{ github.sha }}"
 
   package-client:
     name: "Package client"
@@ -54,3 +57,4 @@ jobs:
         with:
           dockerfile: "packages/client/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
+          tag: "pr-${{ github.sha }}"
