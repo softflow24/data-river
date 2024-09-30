@@ -24,3 +24,41 @@ jobs:
         run: npm run lint:all
       - name: Build
         run: npm run build
+      - name: Tests
+        run: npm run test
+
+  # Package projects to make sure this is not broken upon merge request
+  # This is not pushed into docker registry as input "shouldRelease" is not set
+  package-landing-page:
+    name: "Package landing page"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build landing page Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/www/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
+          ## Tag as pr-<pr-id>
+          tag: "pr-${{ github.event.pull_request.number }}"
+          shouldRelease: false
+
+  package-client:
+    name: "Package client"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build client Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/client/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/client"
+          ## Tag as pr-<pr-id>
+          tag: "pr-${{ github.event.pull_request.number }}"
+          shouldRelease: false

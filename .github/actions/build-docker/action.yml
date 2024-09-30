@@ -1,0 +1,61 @@
+name: "Build Docker Image"
+description: "Build a Docker image for the specified Dockerfile"
+
+inputs:
+  dockerfile:
+    description: "Path to the Dockerfile"
+    required: true
+  image_name:
+    description: "Docker image name"
+    required: true
+  tag:
+    description: "Tag to use for the Docker image"
+    required: true
+    type: string
+  shouldRelease:
+    description: "Whether to release the Docker image in the registry"
+    required: false
+    default: "false"
+    type: boolean
+  DOCKER_USERNAME:
+    description: "Docker username"
+    required: true
+    type: string
+  DOCKER_PASSWORD:
+    description: "Docker password"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build Docker image
+      shell: bash # Specify the shell
+      run: docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image_name }}:${{ inputs.tag }} .
+
+    # Only if "shouldRelease" is true, then we should fail if username / password are not provided
+    - name: Ensure Docker username and password are provided
+      if: inputs.shouldRelease == 'true'
+      shell: bash
+      run: |
+        echo "Ensuring Docker username and password are provided when releasing the Docker image"
+        if [ -z "${{ inputs.DOCKER_USERNAME }}" ]; then
+          echo "DOCKER_USERNAME is required when shouldRelease is true"
+          exit 1
+        fi
+        if [ -z "${{ inputs.DOCKER_PASSWORD }}" ]; then
+          echo "DOCKER_PASSWORD is required when shouldRelease is true"
+          exit 1
+        fi
+    # Login in docker registry
+    - name: Login to Docker registry
+      if: inputs.shouldRelease == 'true'
+      shell: bash
+      run: echo "${{ inputs.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
+    # Push the Docker image
+    - name: Push Docker image
+      if: inputs.shouldRelease == 'true'
+      shell: bash
+      run: docker push ${{ inputs.image_name }}:${{ inputs.tag }}
