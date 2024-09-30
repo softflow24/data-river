@@ -39,34 +39,12 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    };
-
-    // Set initial mode
-    if (mediaQuery.matches) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    // Listen for changes in preference
-    mediaQuery.addEventListener("change", handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, []);
-
   return (
-    <html lang="en" className="h-full" style={{ backgroundColor: "#001220" }}>
+    <html
+      lang="en"
+      className="h-full dark"
+      style={{ backgroundColor: "#001220" }}
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
