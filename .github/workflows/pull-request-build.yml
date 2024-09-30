@@ -32,6 +32,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       # Builds docker images
       - name: Build Docker image
         run: docker build -f packages/www/Dockerfile -t ${{ vars.DOCKER_USERNAME }}/landing-page:${{ github.sha }} .
+
+  package-client:
+    name: "Package client"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # Builds docker images
+      - name: Build Docker image
+        run: docker build -f packages/client/Dockerfile -t ${{ vars.DOCKER_USERNAME }}/client:${{ github.sha }} .
