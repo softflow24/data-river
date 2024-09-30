@@ -25,7 +25,7 @@ export default [
       "no-unused-vars": "warn",
       semi: ["error", "always"],
       quotes: ["error", "double"],
-      "import/order": ["error", { "newlines-between": "always" }],
+      "import/order": ["off", { "newlines-between": "always" }],
       "react/react-in-jsx-scope": "off",
     },
     ignores: [

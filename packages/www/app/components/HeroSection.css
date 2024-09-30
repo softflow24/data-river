@@ -1,0 +1,75 @@
+.hero-section {
+  background: linear-gradient(to bottom, #96c7cc 0%, #c3ddd8 30%, #c3ddd8 100%);
+}
+
+.gradient-container {
+  background: linear-gradient(to bottom, #c3e5e5, #0d3f53);
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.gradient {
+  height: 300vh;
+  width: 300vw;
+  animation: gradient 20s linear infinite;
+  transform: translateX(-50vw) rotate(20deg);
+  position: absolute;
+  top: -100vh;
+  left: -100vw;
+}
+
+@keyframes gradient {
+  0% {
+    transform: translateX(-50vw) rotate(20deg);
+  }
+  100% {
+    transform: translateX(-150vw) rotate(20deg);
+  }
+}
+
+.ray {
+  display: inline-block;
+  height: 300%;
+  opacity: 1;
+  animation: blinkRay 4s infinite alternate linear;
+}
+
+@keyframes blinkRay {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.bubble-container {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.bubble-y {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes bubbleY {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
