@@ -71,7 +71,7 @@ export default function HeroSection() {
             Jump In and Explore
           </a>
           <a
-            href="https://github.com/yourusername/data-river"
+            href="https://github.com/softflow24/data-river"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 text-lg font-semibold text-blue-600 bg-white rounded-full hover:bg-gray-100 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center"
