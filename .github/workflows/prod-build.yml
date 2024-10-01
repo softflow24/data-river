@@ -35,7 +35,8 @@ jobs:
         with:
           dockerfile: "packages/www/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
-          tag: "latest" # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          tags: "latest" 
           shouldRelease: true
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -53,7 +54,8 @@ jobs:
         with:
           dockerfile: "packages/client/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
-          tag: "latest" # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          tags: "latest" 
           shouldRelease: true
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

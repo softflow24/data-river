@@ -8,15 +8,10 @@ inputs:
   image_name:
     description: "Docker image name"
     required: true
-  tag:
-    description: "Tag to use for the Docker image"
+  tags:
+    description: "Tags to use for the Docker image (comma-separated)"
     required: true
     type: string
-  dev:
-    description: "Whether to add a 'dev' tag"
-    required: false
-    default: "false"
-    type: boolean
   shouldRelease:
     description: "Whether to release the Docker image in the registry"
     required: false
@@ -37,16 +32,23 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build Docker image with main tag
-      shell: bash
-      run: docker build -f "${{ inputs.dockerfile }}" -t "${{ inputs.image_name }}:${{ inputs.tag }}" .
-
-    - name: Tag with 'dev' if needed
-      if: inputs.dev == 'true'
+    ## Builds with a temporary tag to only build once - This tag is not pushed
+    - name: Build Docker image
       shell: bash
       run: |
-        echo "Tagging image with 'dev'"
-        docker tag "${{ inputs.image_name }}:${{ inputs.tag }}" "${{ inputs.image_name }}:dev"
+        echo "Building Docker image..."
+        docker build -f "${{ inputs.dockerfile }}" -t "${{ inputs.image_name }}:temp" .
+
+    ## Tags with all the provided tags
+    - name: Tag Docker image with all tags
+      shell: bash
+      run: |
+        IFS=',' read -r -a tag_array <<< "${{ inputs.tags }}"
+        for tag in "${tag_array[@]}"
+        do
+          echo "Tagging image with tag $tag"
+          docker tag "${{ inputs.image_name }}:temp" "${{ inputs.image_name }}:$tag"
+        done
 
     # Only if "shouldRelease" is true, then we should fail if username/password are not provided
     - name: Ensure Docker username and password are provided
@@ -69,14 +71,12 @@ runs:
       shell: bash
       run: echo "${{ inputs.DOCKER_PASSWORD }}" | docker login -u "${{ inputs.DOCKER_USERNAME }}" --password-stdin
 
-    # Push the main tag
-    - name: Push Docker image
+    - name: Push Docker image with multiple tags
       if: inputs.shouldRelease == 'true'
       shell: bash
-      run: docker push "${{ inputs.image_name }}:${{ inputs.tag }}"
-
-    # Push the 'dev' tag if needed
-    - name: Push 'dev' tag
-      if: inputs.shouldRelease == 'true' && inputs.dev == 'true'
-      shell: bash
-      run: docker push "${{ inputs.image_name }}:dev"
+      run: |
+        for tag in "${tag_array[@]}"
+        do
+          echo "Pushing image with tag $tag"
+          docker push "${{ inputs.image_name }}:$tag"
+        done

@@ -38,9 +38,11 @@ jobs:
         with:
           dockerfile: "packages/www/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
-          tag: "develop-${{ github.sha }}"
+          ## Provided 2 tags
+          ## One will be unique per merge, so you can run an specific build / merge 
+          ## The other one is shared so that we can always have a reference for the "latest develop" build
+          tags: "develop-latest,develop-${{ github.sha }}"
           shouldRelease: true
-          dev: true
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -57,8 +59,10 @@ jobs:
         with:
           dockerfile: "packages/client/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
-          tag: "develop-${{ github.sha }}"
+          ## Provided 2 tags
+          ## One will be unique per merge, so you can run an specific build / merge 
+          ## The other one is shared so that we can always have a reference for the "latest develop" build
+          tags: "develop-latest,develop-${{ github.sha }}"
           shouldRelease: true
-          dev: true
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
