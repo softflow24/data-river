@@ -32,14 +32,22 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build Docker image with multiple tags
+    ## Builds with a temporary tag to only build once - This tag is not pushed
+    - name: Build Docker image
+      shell: bash
+      run: |
+        echo "Building Docker image..."
+        docker build -f "${{ inputs.dockerfile }}" -t "${{ inputs.image_name }}:temp" .
+
+    ## Tags with all the provided tags
+    - name: Tag Docker image with all tags
       shell: bash
       run: |
         IFS=',' read -r -a tag_array <<< "${{ inputs.tags }}"
         for tag in "${tag_array[@]}"
         do
-          echo "Building image with tag $tag"
-          docker build -f "${{ inputs.dockerfile }}" -t "${{ inputs.image_name }}:$tag" .
+          echo "Tagging image with tag $tag"
+          docker tag "${{ inputs.image_name }}:temp" "${{ inputs.image_name }}:$tag"
         done
 
     # Only if "shouldRelease" is true, then we should fail if username/password are not provided
