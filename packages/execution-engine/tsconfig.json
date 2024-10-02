@@ -1,10 +1,20 @@
 {
-    "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-      "outDir": "./dist",
-      "rootDir": "../..",
-      "lib": ["es2017", "dom"]
-    },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "**/__tests__/*"]
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "../..",
+    "lib": ["es2017", "dom"],
+    "baseUrl": "../..",
+    "paths": {
+      "@blocks": ["packages/blocks/src"],
+      "@blocks/*": ["packages/blocks/src/*"],
+      "@shared/*": ["packages/shared/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "**/__tests__/*",
+    "dist",
+    "node_modules"
+  ]
 }

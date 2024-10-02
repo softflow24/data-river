@@ -1,18 +1,44 @@
-import { IBlock, IBlockConfig } from "@data-river/shared/interfaces";
-import SimpleBlock from "@blocks/simple-block";
+import { injectable, inject } from "tsyringe";
+import { IBlock, IBlockConfig } from "@shared/interfaces";
+import { createBlock } from "@blocks/blockFactory";
+import WebSocket from "ws";
 
 import { IExecutionStrategy } from "./IExecutionStrategy";
 
+@injectable()
 export class ServerExecutionStrategy implements IExecutionStrategy {
-  async execute(
-    blockConfig: IBlockConfig,
-    inputs: Record<string, any>,
-  ): Promise<Record<string, any>> {
+  private wss?: WebSocket.Server;
+
+  constructor(
+    @inject("WebSocketServerFactory")
+    private wssFactory: () => WebSocket.Server | undefined,
+  ) {
+    try {
+      this.wss = this.wssFactory();
+    } catch (error) {
+      console.warn("WebSocket server initialization failed:", error);
+    }
+  }
+
+  async execute(blockConfig: IBlockConfig): Promise<IBlock> {
     const block = this.createBlockInstance(blockConfig);
-    return block.process(inputs);
+    await block.safeExecute(blockConfig.inputs ?? {});
+
+    // Send real-time updates via WebSocket if available
+    if (this.wss && this.wss.clients) {
+      this.wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(
+            JSON.stringify({ blockId: blockConfig.id, outputs: block.outputs }),
+          );
+        }
+      });
+    }
+
+    return block;
   }
 
   createBlockInstance(blockConfig: IBlockConfig): IBlock {
-    return new SimpleBlock(blockConfig); // Example only, replace with actual block instance creation logic
+    return createBlock(blockConfig);
   }
 }

@@ -1,0 +1,68 @@
+name: "Development"
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run linter
+        run: npm run lint:all
+      - name: Build
+        run: npm run build
+      - name: Tests
+        run: npm run test
+
+  package-landing-page:
+    name: "Package landing page"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build landing page Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/www/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
+          ## Provided 2 tags
+          ## One will be unique per merge, so you can run an specific build / merge 
+          ## The other one is shared so that we can always have a reference for the "latest develop" build
+          tags: "develop-latest,develop-${{ github.sha }}"
+          shouldRelease: true
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  package-client:
+    name: "Package client"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build client Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/client/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/client"
+          ## Provided 2 tags
+          ## One will be unique per merge, so you can run an specific build / merge 
+          ## The other one is shared so that we can always have a reference for the "latest develop" build
+          tags: "develop-latest,develop-${{ github.sha }}"
+          shouldRelease: true
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

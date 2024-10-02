@@ -1,6 +1,6 @@
 # **data-river** 🌊
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/CmEqvZQUQn?style=flat)](https://discord.gg/CmEqvZQUQn)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Empowering Everyone to Code & Automate Visually**
@@ -19,7 +19,7 @@ Welcome to **data-river**, an open-source framework that makes programming and a
 
 **data-river** is designed to be flexible and adaptive:
 
-- **For Kids**: Start with visual blocks that teach programming basics, inspired by tools like Scratch. Kids can create simple logic, experiment with coding concepts, and feel empowered by building their first workflows. 
+- **For Kids**: Start with visual blocks that teach programming basics, inspired by tools like Scratch. Kids can create simple logic, experiment with coding concepts, and feel empowered by building their first workflows.
 - **For Business Professionals**: Automate processes like email workflows, approval chains, and API integrations using a drag-and-drop interface, without writing code.
 - **For Developers**: Build and customize workflows by using **JavaScript-based nodes** available in the marketplace. Developers can focus on creating efficient automation without reinventing the wheel.
 
@@ -56,6 +56,12 @@ While **data-river** isn't built solely for AI, it's designed to make integratin
 
 ---
 
+**Contributors**
+
+<a href="https://github.com/softflow24/data-river/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=softflow24/data-river" />
+</a>
+
 ## **How to Contribute**
 
 Right now, we’re laying the foundation. This means there’s no code to clone or build just yet, but you can still contribute!
@@ -88,10 +94,62 @@ We’re at the start of something big, and we want you to be a part of it.
 
 ### Let’s build this together!
 
-- **Discord**: [![Discord](https://dcbadge.vercel.app/api/server/GjrVyZH9?style=flat)](https://discord.gg/GjrVyZH9)
+- **Discord**: [![Discord](https://dcbadge.vercel.app/api/server/CmEqvZQUQn?style=flat)](https://discord.gg/CmEqvZQUQn)
 
 Together, we can shape the future of programming and automation, making it simpler, more accessible, and more fun.
 
 ---
 
 **data-river** – Flow into the Future of Automation 🌊
+
+## Getting Started
+
+To contribute to **Data-river**, follow these steps to get the project running locally on your machine:
+
+1. **Fork the repository**:  
+   Visit the Data-River repository and click the "Fork" button to create your own copy.
+
+2. **Clone the fork**:  
+   Clone your forked repository to your local machine:
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/data-river.git
+   cd data-river
+   ```
+
+3. Switch to `development` branch. You will create your PR against this branch, not `main`.
+4. `cd data-river/packages/client`
+5. `pnpm install`
+6. `pnpm run dev`
+7. navigate to http://localhost:5173/dashboard
+
+## Running with Docker Compose
+
+If you prefer to run the application using Docker Compose, follow these steps:
+
+1. Ensure you have Docker and Docker Compose installed on your machine.
+
+2. Navigate to the root directory of the project:
+
+   ```bash
+   cd data-river
+   ```
+
+3. Build and start the Docker containers:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. Once the containers are up and running, you can access the application at:
+   http://localhost:3000
+
+To stop the Docker containers, use:
+
+```bash
+docker-compose down
+```
+
+### Sponsors
+[![GitBook - Icon - Light](https://github.com/user-attachments/assets/68d6700b-fcfa-4ca9-bdd5-72014c851858)](https://www.gitbook.com/)
+

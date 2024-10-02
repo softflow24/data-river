@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: packages/client/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  www:
+    build:
+      context: .
+      dockerfile: packages/www/Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production

@@ -5,12 +5,12 @@ on:
     branches:
       - main
   pull_request:
-    types: [opened, reopened, synchronize]
-  pull_request_target:
+    branches:
+      - main
     types: [opened, reopened, synchronize]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   update_release_draft:
@@ -22,7 +22,7 @@ jobs:
       # Checkout the repository
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       # Set up Release Drafter
       - name: Release Drafter
         uses: release-drafter/release-drafter@v6

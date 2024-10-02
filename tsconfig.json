@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@data-river/*": ["packages/*/src"],
+      "@blocks/*": ["packages/blocks/src/*"],
+      "@blocks": ["packages/blocks/src"],
+      "@shared/*": ["packages/shared/src/*"],
+      "@shared": ["packages/shared/src"],
+      "@execution-engine/*": ["packages/execution-engine/src/*"],
+      "@execution-engine": ["packages/execution-engine/src"]
+    }
+  }
+}

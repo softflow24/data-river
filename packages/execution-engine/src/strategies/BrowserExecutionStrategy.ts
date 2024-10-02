@@ -1,18 +1,18 @@
-import { IBlock, IBlockConfig } from "@data-river/shared/interfaces";
-import SimpleBlock from "@blocks/simple-block";
+import { injectable } from "tsyringe";
+import { IBlock, IBlockConfig } from "@shared/interfaces";
+import { createBlock } from "@blocks/blockFactory";
 
 import { IExecutionStrategy } from "./IExecutionStrategy";
 
+@injectable()
 export class BrowserExecutionStrategy implements IExecutionStrategy {
-  async execute(
-    blockConfig: IBlockConfig,
-    inputs: Record<string, any>,
-  ): Promise<Record<string, any>> {
+  async execute(blockConfig: IBlockConfig): Promise<IBlock> {
     const block = this.createBlockInstance(blockConfig);
-    return block.process(inputs);
+    await block.safeExecute(blockConfig.inputs ?? {});
+    return block;
   }
 
   createBlockInstance(blockConfig: IBlockConfig): IBlock {
-    return new SimpleBlock(blockConfig); // Example only, replace with actual block instance creation logic
+    return createBlock(blockConfig);
   }
 }

@@ -1,0 +1,61 @@
+name: "Prod"
+on:
+  workflow_dispatch:
+jobs:
+  # TODO - Add caching of build so that can be re-used across pipeliens
+  build:
+    # Avoids releasing prod with other branches than main
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: npm run build
+      ## No need to execute unit tests. They should have been tested in PR + Developp + Release Candidate
+
+  package-landing-page:
+    name: "Package landing page"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build landing page Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/www/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
+          # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          tags: "latest" 
+          shouldRelease: true
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  package-client:
+    name: "Package client"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build client Docker image
+        uses: ./.github/actions/build-docker
+        with:
+          dockerfile: "packages/client/Dockerfile"
+          image_name: "${{ vars.DOCKER_USERNAME }}/client"
+          # TODO - Decide versioning and how to get it here... ( v1.0.x, v1.x.x, v.x.x)
+          tags: "latest" 
+          shouldRelease: true
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

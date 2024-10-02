@@ -1,74 +1,75 @@
+import { inject, injectable } from "tsyringe";
 import {
-  IBlockConfig,
   IWorkflowConfig,
   IEnvironment,
-  IWorkflowState,
-  IWorkflow,
   IConnection,
-} from "@data-river/shared/interfaces";
+  IBlockConfig,
+  IWorkflowState,
+} from "@shared/interfaces";
+import logger from "@shared/utils/logger";
 
-import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
 import { VariableResolver } from "./VariableResolver";
+import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
 
+@injectable()
 export class ExecutionEngine {
-  private config: IWorkflowConfig;
-  private workflowState: IWorkflowState;
-  private environment: IEnvironment;
-  private variableResolver: VariableResolver;
-  private executionStrategy: IExecutionStrategy;
+  private workflowState: IWorkflowState = {};
   private connections: IConnection[];
 
   constructor(
-    config: IWorkflowConfig,
-    environment: IEnvironment,
-    executionStrategy: IExecutionStrategy,
-    variableResolver: VariableResolver,
-    connections: IConnection[],
+    @inject("WorkflowConfig") private config: IWorkflowConfig,
+    @inject("Environment") private environment: IEnvironment,
+    @inject(VariableResolver) private variableResolver: VariableResolver,
+    @inject("ExecutionStrategy") private executionStrategy: IExecutionStrategy,
   ) {
-    this.config = config;
-    this.workflowState = {};
-    this.environment = environment;
-    this.executionStrategy = executionStrategy;
-    this.variableResolver = variableResolver;
-    this.connections = connections;
-
-    // Set initial environment variables
     this.variableResolver.setScope("environment", this.environment.variables);
+    this.connections = config.connections;
   }
 
-  async executeWorkflow(blocks: IBlockConfig[]): Promise<void> {
-    for (const blockConfig of blocks) {
+  async executeWorkflow(blockConfigs: IBlockConfig[]): Promise<void> {
+    logger.group("Executing Workflow");
+    logger.time("Workflow Execution");
+
+    for (const blockConfig of blockConfigs) {
       try {
-        await this.executeBlockWithRetry(blockConfig);
+        const inputs = this.getInputsForBlock(blockConfig);
+        const resolvedInputs = this.resolveVariables(inputs);
+        logger.debug(`Executing block: ${blockConfig.id}`, {
+          blockConfig,
+          resolvedInputs,
+        });
+
+        const updatedConfig = { ...blockConfig, inputs: resolvedInputs };
+        const outputs = await this.executeBlockWithRetry(updatedConfig);
+
+        logger.debug(`Block ${blockConfig.id} execution completed`, {
+          outputs,
+        });
+        this.handleBlockOutputs(blockConfig, outputs);
       } catch (error) {
-        if (blockConfig.onError) {
-          blockConfig.onError(error as Error, blockConfig);
-        }
-        // Additional error handling logic (logging, fallback, etc.)
+        this.handleBlockError(error as Error, blockConfig);
       }
     }
+
+    logger.timeEnd("Workflow Execution");
+    logger.groupEnd();
   }
 
   private async executeBlockWithRetry(
     blockConfig: IBlockConfig,
-  ): Promise<Record<string, any>> {
+  ): Promise<Record<string, unknown>> {
     const retryCount = blockConfig.retry || 0;
     let attempts = 0;
     while (attempts <= retryCount) {
       try {
-        const inputs = this.getInputsForBlock(blockConfig.id);
-        const resolvedInputs = this.resolveVariables(inputs);
-        const outputs = await this.executionStrategy.execute(
-          blockConfig,
-          resolvedInputs,
-        );
-        this.handleBlockOutputs(blockConfig, outputs);
-        return outputs;
+        const block = await this.executionStrategy.execute(blockConfig);
+        return block.outputs;
       } catch (error) {
         attempts++;
         if (attempts > retryCount) {
           throw error;
         }
+        // Implement retry delay logic here if needed
       }
     }
     throw new Error(
@@ -76,26 +77,33 @@ export class ExecutionEngine {
     );
   }
 
-  private getInputsForBlock(blockId: string): Record<string, any> {
-    const inputs: Record<string, any> = {};
+  private getInputsForBlock(
+    blockConfig: IBlockConfig,
+  ): Record<string, unknown> {
+    const inputs: Record<string, unknown> = {};
     this.connections
-      .filter((conn) => conn.to === blockId)
+      .filter((conn) => conn.to === blockConfig.id)
       .forEach((conn) => {
-        inputs[conn.inputKey] = this.workflowState[conn.from]?.[conn.outputKey];
+        if (conn.from && conn.outputKey && conn.inputKey) {
+          inputs[conn.inputKey] =
+            this.workflowState[conn.from]?.[conn.outputKey];
+        }
       });
+
+    // Externally provided inputs
+    if (blockConfig.inputs) {
+      Object.entries(blockConfig.inputs).forEach(([key, value]) => {
+        inputs[key] = value;
+      });
+    }
+
     return inputs;
   }
 
-  private handleBlockOutputs(
-    blockConfig: IBlockConfig,
-    outputs: Record<string, any>,
-  ): void {
-    this.updateWorkflowState(blockConfig.id, outputs);
-    // Additional logic to pass outputs to connected blocks
-  }
-
-  private resolveVariables(inputs: Record<string, any>): Record<string, any> {
-    const resolvedInputs: Record<string, any> = {};
+  private resolveVariables(
+    inputs: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const resolvedInputs: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(inputs)) {
       resolvedInputs[key] =
         typeof value === "string"
@@ -105,11 +113,39 @@ export class ExecutionEngine {
     return resolvedInputs;
   }
 
-  private updateWorkflowState(blockId: string, data: Record<string, any>) {
+  private handleBlockOutputs(
+    blockConfig: IBlockConfig,
+    outputs: Record<string, unknown>,
+  ): void {
+    this.updateWorkflowState(blockConfig.id, outputs);
+    // Additional logic to pass outputs to connected blocks could be implemented here
+  }
+
+  private handleBlockError(error: Error, blockConfig: IBlockConfig): void {
+    if (blockConfig.onError) {
+      blockConfig.onError(error, blockConfig);
+    }
+    logger.error(`Error in block ${blockConfig.id}:`, error);
+  }
+
+  private updateWorkflowState(blockId: string, data: Record<string, unknown>) {
     this.workflowState[blockId] = data;
   }
 
   getWorkflowState(): IWorkflowState {
     return this.workflowState;
+  }
+
+  // Additional methods for workflow management could be added here
+  resetWorkflow(): void {
+    this.workflowState = {};
+  }
+
+  pauseWorkflow(): void {
+    // Implement logic to pause workflow execution
+  }
+
+  resumeWorkflow(): void {
+    // Implement logic to resume workflow execution
   }
 }
