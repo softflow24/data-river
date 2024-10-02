@@ -149,3 +149,7 @@ To stop the Docker containers, use:
 ```bash
 docker-compose down
 ```
+
+### Sponsors
+[![GitBook - Icon - Light](https://github.com/user-attachments/assets/68d6700b-fcfa-4ca9-bdd5-72014c851858)](https://www.gitbook.com/)
+
