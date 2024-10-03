@@ -75,6 +75,7 @@ runs:
       if: inputs.shouldRelease == 'true'
       shell: bash
       run: |
+        IFS=',' read -r -a tag_array <<< "${{ inputs.tags }}"
         for tag in "${tag_array[@]}"
         do
           echo "Pushing image with tag $tag"
