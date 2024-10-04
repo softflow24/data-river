@@ -65,7 +65,7 @@ export default function HeroSection() {
         </p>
         <div className="space-y-4 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row">
           <a
-            href="#"
+            href="https://docs.data-river.dev"
             className="px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
           >
             Jump In and Explore
