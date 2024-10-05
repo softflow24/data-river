@@ -7,10 +7,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@data-river/shared": "workspace:*",
     "@data-river/blocks": "workspace:*",
+    "@data-river/shared": "workspace:*",
     "reflect-metadata": "^0.1.13",
-    "tsyringe": "^4.7.0"
+    "tsyringe": "^4.7.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "typescript": "^5.6.2"
