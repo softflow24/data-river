@@ -68,9 +68,14 @@ const Editor = () => {
           withHandle={true}
           hitAreaMargins={{ coarse: 10, fine: 10 }}
         />
-        <ResizablePanel id="flow-footer" order={1} minSize={10}>
+        <ResizablePanel
+          id="flow-footer"
+          order={1}
+          minSize={10}
+          defaultSize={100}
+        >
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel id="flow" ref={flowRef} defaultSize={98}>
+            <ResizablePanel id="flow" ref={flowRef} defaultSize={100}>
               <FlowChart />
             </ResizablePanel>
             <ResizableHandle
@@ -91,6 +96,7 @@ const Editor = () => {
               id="footer"
               ref={footerRef}
               collapsible
+              defaultSize={0}
               minSize={2}
               maxSize={98}
               onExpand={() => {
@@ -112,6 +118,7 @@ const Editor = () => {
           id="right-sidebar"
           ref={rightSidebarRef}
           order={2}
+          defaultSize={0}
           collapsible
         >
           <RightPanel />

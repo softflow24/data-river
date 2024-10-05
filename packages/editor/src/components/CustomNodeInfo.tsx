@@ -21,38 +21,38 @@ const CustomNodeInfo: React.FC = () => {
   };
 
   return (
-    <div className="bg-background p-2 rounded-md shadow-md max-w-sm">
+    <div className="bg-background p-2 rounded-md shadow-md max-w-sm text-muted-foreground">
       <h3 className="font-semibold mb-2">Selected Node Info</h3>
       <p>
-        <span className="font-medium">ID:</span>{" "}
+        <span className="font-medium mr-1">ID:</span>
         <span className="font-bold">{selectedNode.id}</span>
       </p>
       <p>
-        <span className="font-medium">Label:</span>{" "}
+        <span className="font-medium mr-1">Label:</span>
         <span className="font-bold">{selectedNode.data.label}</span>
       </p>
       <p>
-        <span className="font-medium">Color:</span>{" "}
+        <span className="font-medium mr-1">Color:</span>
         <span className="font-bold">{selectedNode.data.color}</span>
       </p>
       <p>
-        <span className="font-medium">Icon:</span>{" "}
+        <span className="font-medium mr-1">Icon:</span>
         <span className="font-bold">{selectedNode.data.icon}</span>
       </p>
       <p>
-        <span className="font-medium">Source Handle:</span>{" "}
+        <span className="font-medium mr-1">Source Handle:</span>
         <span className="font-bold">
           {selectedNode.data.sourceHandle ? "Yes" : "No"}
         </span>
       </p>
       <p>
-        <span className="font-medium">Target Handle:</span>{" "}
+        <span className="font-medium mr-1">Target Handle:</span>
         <span className="font-bold">
           {selectedNode.data.targetHandle ? "Yes" : "No"}
         </span>
       </p>
       <p>
-        <span className="font-medium">Is Hovered:</span>{" "}
+        <span className="font-medium mr-1">Is Hovered:</span>
         <span className="font-bold">
           {selectedNode.id === hoveredNodeId ? "Yes" : "No"}
         </span>
@@ -75,7 +75,7 @@ const CustomNodeInfo: React.FC = () => {
           </pre>
         )}
       </div>
-      <div className="mt-2">
+      <div className="">
         <button
           onClick={() => setIsOutputsExpanded(!isOutputsExpanded)}
           className="flex items-center font-medium focus:outline-none"

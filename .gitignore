@@ -131,3 +131,6 @@ dist
 
 # jetBrains IDE files
 .idea/*
+
+# MacOS
+.DS_Store
