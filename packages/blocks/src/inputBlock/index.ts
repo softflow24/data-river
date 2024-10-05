@@ -1,19 +1,23 @@
-import { IBlockConfig } from "@shared/interfaces";
+import { IBlockConfig } from "@data-river/shared/interfaces";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
 
 import { Block } from "../block";
 
 export class InputBlock extends Block {
-  constructor(config: IBlockConfig) {
-    super({
-      ...config,
-      inputConfigs: {
-        trigger: { type: "boolean", required: false },
-        input: { type: "string", required: true },
+  constructor(config: IBlockConfig, logger: ILogger) {
+    super(
+      {
+        ...config,
+        inputConfigs: {
+          trigger: { type: "boolean", required: false },
+          input: { type: "string", required: true },
+        },
+        outputConfigs: {
+          data: { type: "string" },
+        },
       },
-      outputConfigs: {
-        data: { type: "string" },
-      },
-    });
+      logger,
+    );
   }
 
   async execute(

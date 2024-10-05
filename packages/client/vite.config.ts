@@ -6,33 +6,33 @@ import path from "path";
 export default defineConfig({
   plugins: [
     // Remix Vite plugin with future flags enabled
-    remix({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-      },
-    }),
+    remix(),
     tsconfigPaths({
-      projects: ["./tsconfig.json", "../../packages/editor/tsconfig.json"],
+      projects: [
+        "./tsconfig.json",
+        "../../packages/editor/tsconfig.json",
+        "../../packages/shared/tsconfig.json",
+      ],
     }), // For resolving paths from tsconfig.json
   ],
-  server: {
-    watch: {
-      // Make sure Vite watches your local packages
-      ignored: ["!**/node_modules/**", "!../packages/**"],
-    },
-    hmr: true,
-  },
-  css: {
-    postcss: "./postcss.config.js",
-  },
   resolve: {
     alias: {
       "~": "/app", // Alias for simplifying imports
       "@data-river/editor": path.resolve(__dirname, "../editor/src"),
+      "@data-river/blocks": path.resolve(__dirname, "../blocks/src"),
+      "@data-river/shared": path.resolve(__dirname, "../shared/src"),
+      "@data-river/execution-engine": path.resolve(
+        __dirname,
+        "../execution-engine/src",
+      ),
     },
-    preserveSymlinks: true,
   },
-  clearScreen: false, // Helps keep logs clean
+  optimizeDeps: {
+    include: ["@data-river/editor", "@data-river/shared"],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/shared/, /editor/, /node_modules/],
+    },
+  },
 });

@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState, setNodes } from "../store";
-import { setIsSheetOpen } from "../store";
+import { useDispatch } from "react-redux";
+import { AppDispatch, setNodes } from "../store";
+import { setIsSheetOpen } from "../slices/reactFlowSlice";
+import { useReactFlowState } from "../hooks/useReactFlowState";
 
 import {
   Sheet,
@@ -14,15 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-interface EditNodeSheetProps {}
-
-const EditNodeSheet: React.FC<EditNodeSheetProps> = ({}) => {
+const EditNodeSheet: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const nodes = useSelector((state: RootState) => state.app.nodes);
-  const selectedNodeId = useSelector(
-    (state: RootState) => state.app.selectedNodeId,
-  );
-  const isOpen = useSelector((state: RootState) => state.app.isSheetOpen);
+  const { nodes, selectedNodeId, isSheetOpen } = useReactFlowState();
 
   const [nodeName, setNodeName] = useState("");
   const [nodeDescription, setNodeDescription] = useState("");
@@ -42,7 +37,7 @@ const EditNodeSheet: React.FC<EditNodeSheetProps> = ({}) => {
       return;
     }
 
-    const selectedNode = nodes.find((x) => x.id === selectedNodeId);
+    const selectedNode = nodes.find((node) => node.id === selectedNodeId);
     if (!selectedNode) {
       return;
     }
@@ -66,7 +61,7 @@ const EditNodeSheet: React.FC<EditNodeSheetProps> = ({}) => {
 
   return (
     <Sheet
-      open={isOpen}
+      open={isSheetOpen}
       onOpenChange={(open) => dispatch(setIsSheetOpen(open))}
     >
       <SheetContent>

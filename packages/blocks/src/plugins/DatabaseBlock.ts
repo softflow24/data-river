@@ -1,10 +1,11 @@
-import { IBlockConfig } from "@shared/interfaces";
+import { IBlockConfig } from "@data-river/shared/interfaces";
 
 import { Block } from "../block";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
 
 export class DatabaseBlock extends Block {
-  constructor(config: IBlockConfig) {
-    super(config);
+  constructor(config: IBlockConfig, logger: ILogger) {
+    super(config, logger);
     // Initialize database connection parameters
   }
 

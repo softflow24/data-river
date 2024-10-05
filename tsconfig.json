@@ -1,14 +1,24 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "@data-river/*": ["packages/*/src"],
-      "@blocks/*": ["packages/blocks/src/*"],
-      "@blocks": ["packages/blocks/src"],
-      "@shared/*": ["packages/shared/src/*"],
-      "@shared": ["packages/shared/src"],
-      "@execution-engine/*": ["packages/execution-engine/src/*"],
-      "@execution-engine": ["packages/execution-engine/src"]
+      "~/*": ["packages/www/app/*"],
+      "@data-river/shared/*": ["packages/shared/src/*"],
+      "@data-river/blocks/*": ["packages/blocks/src/*"],
+      "@data-river/execution-engine/*": ["packages/execution-engine/src/*"],
+      "@data-river/server/*": ["packages/server/src/*"],
+      "@data-river/editor/*": ["packages/editor/src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "packages/editor" },
+    { "path": "packages/execution-engine" },
+    { "path": "packages/shared" },
+    { "path": "packages/blocks" },
+    { "path": "packages/server" },
+    { "path": "packages/client" },
+    { "path": "packages/www" }
+  ]
 }
