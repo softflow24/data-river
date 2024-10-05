@@ -1,58 +1,87 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { NodeProps } from "reactflow";
-
-import { RootState } from "../store";
+import { NodeData } from "../types/NodeTypes";
 
 import SourceHandle from "./SourceHandle";
 import TargetHandle from "./TargetHandle";
 import NodeIcon from "./NodeIcon";
+import { useReactFlowState } from "@/hooks/useReactFlowState";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@data-river/shared/ui/components/ui/card";
+import NodeControls from "./nodeComponents/NodeControls";
+import { useExecutionState } from "@/hooks/useExecutionState";
+import clsx from "clsx";
+import { createBlockValidationErrorFromObject } from "@data-river/blocks/errors/blockValidationError";
 
-const CustomNode: React.FC<NodeProps> = ({ id, data }) => {
-  const minimalistic = useSelector(
-    (state: RootState) => state.app.minimalistic,
-  );
-  const selectedNodeId = useSelector(
-    (state: RootState) => state.app.selectedNodeId,
-  );
-  const hoveredNodeId = useSelector(
-    (state: RootState) => state.app.hoveredNodeId,
-  );
+const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
+  const { selectedNodeId, hoveredNodeId } = useReactFlowState();
+  const executionResult = useExecutionState((x) => x.executionResult);
+
   const isSelected = id === selectedNodeId;
-
-  const isHovered = useSelector(
-    (state: RootState) => state.app.hoveredNodeId === id,
-  );
-
+  const isHovered = hoveredNodeId === id;
   const showHandles =
     isSelected || selectedNodeId === id || hoveredNodeId === id;
 
+  const errorForNode = executionResult.errors.find(
+    (error) => error.blockId.toString() === id,
+  );
+
+  const hasError = errorForNode !== undefined;
+  const highlight = isSelected || selectedNodeId === id;
+
+  const validationError =
+    errorForNode?.error.name === "BlockValidationError"
+      ? createBlockValidationErrorFromObject(
+          errorForNode.error as unknown as {
+            message: string;
+            missingFields: string[];
+            invalidFields: string[];
+            validationType: "input" | "output";
+          },
+        )
+      : undefined;
+
+  let missingFields: string[] = [];
+  let invalidFields: string[] = [];
+
+  if (validationError) {
+    missingFields = validationError.missingFields;
+    invalidFields = validationError.invalidFields;
+  }
+
   return (
-    <div
-      className={`
-        p-5 rounded-lg min-w-[200px] flex items-center relative text-lg
-        transition-all duration-300 ease-in-out
-        ${minimalistic ? "bg-white text-black" : "text-white"}
-        ${
-          isSelected || selectedNodeId === id
-            ? "border-2 border-blue-500"
-            : "border-2 border-transparent"
-        }
+    <Card
+      className={clsx(`
+        border
         ${isHovered ? "shadow-lg" : ""}
-      `}
-      style={{ background: minimalistic ? undefined : data.color }}
+        ${highlight && "border-blue-500"}
+        ${hasError && (highlight ? "border-red-600" : "border-red-500")}
+        `)}
     >
       {data.targetHandle && <TargetHandle isVisible={showHandles} />}
-      <div className="absolute left-2.5">
+      <CardHeader className="flex flex-row justify-between items-center min-w-[9rem]">
+        <CardTitle>{data.label}</CardTitle>
         <NodeIcon
           icon={data.icon}
           color={data.color}
-          minimalistic={minimalistic}
+          useBackgroundColor={false}
+          useIconColor={false}
         />
-      </div>
-      <div className="flex-1 text-center">{data.label}</div>
+      </CardHeader>
+      <CardContent className={data.controls ? "" : "hidden"}>
+        <NodeControls
+          nodeId={id}
+          controls={data.controls}
+          fieldsMissing={missingFields}
+          invalidFields={invalidFields}
+        />
+      </CardContent>
       {data.sourceHandle && <SourceHandle isVisible={showHandles} />}
-    </div>
+    </Card>
   );
 };
 

@@ -1,95 +1,102 @@
 import chalk from "chalk";
+import { ILogger } from "../../interfaces/ILogger";
+import { LogLevel } from "../../interfaces/LogEntry";
 
-type LogLevel = "debug" | "info" | "warn" | "error" | "none";
-
-const LOG_LEVEL: LogLevel = (process.env.LOG_LEVEL as LogLevel) || "info";
-
-const LOG_PRIORITIES: Record<LogLevel, number> = {
+export const LOG_PRIORITIES: Record<LogLevel, number> = {
   debug: 0,
   info: 1,
   warn: 2,
   error: 3,
   none: 4,
-  // Start of Selection
+  group: 4,
+  groupEnd: 4,
+  time: 1,
+  timeEnd: 1,
 };
 
-const LOG_COLORS: Record<LogLevel, chalk.Chalk> = {
-  debug: chalk.cyan,
-  info: chalk.green,
-  warn: chalk.yellow,
-  error: chalk.red,
-  none: chalk.white,
+const LOG_COLORS: Record<LogLevel, (str: string) => string> = {
+  debug: (str) => (typeof chalk !== "undefined" ? chalk.cyan(str) : str),
+  info: (str) => (typeof chalk !== "undefined" ? chalk.green(str) : str),
+  warn: (str) => (typeof chalk !== "undefined" ? chalk.yellow(str) : str),
+  error: (str) => (typeof chalk !== "undefined" ? chalk.red(str) : str),
+  none: (str) => (typeof chalk !== "undefined" ? chalk.white(str) : str),
+  group: (str) => (typeof chalk !== "undefined" ? chalk.blue(str) : str),
+  groupEnd: (str) => (typeof chalk !== "undefined" ? chalk.blue(str) : str),
+  time: (str) => (typeof chalk !== "undefined" ? chalk.blue(str) : str),
+  timeEnd: (str) => (typeof chalk !== "undefined" ? chalk.blue(str) : str),
 };
 
-const shouldLog = (level: LogLevel): boolean => {
-  return LOG_PRIORITIES[level] >= LOG_PRIORITIES[LOG_LEVEL];
-};
+export default class DefaultLogger implements ILogger {
+  private logLevel: LogLevel;
 
-const formatMessage = (level: LogLevel, message: string): string => {
-  const color = LOG_COLORS[level];
-  return color(`[${level.toUpperCase()}] ${message}`);
-};
+  constructor(logLevel: LogLevel = "info") {
+    this.logLevel = logLevel;
+  }
 
-export const logger = {
-  debug: (message: string, data?: unknown) => {
-    if (shouldLog("debug")) {
-      console.log(formatMessage("debug", message));
+  group(message: string): void {
+    if (this.shouldLog("info")) {
+      console.group(chalk.bold(message)); // Using console.group for grouping
+    }
+  }
+
+  groupEnd(): void {
+    console.groupEnd(); // Ends the console group
+  }
+
+  time(message: string): void {
+    console.time(message); // Starts a timer
+  }
+
+  timeEnd(message: string): void {
+    console.timeEnd(message); // Ends the timer and logs the result
+  }
+
+  private shouldLog(level: LogLevel): boolean {
+    return LOG_PRIORITIES[level] >= LOG_PRIORITIES[this.logLevel];
+  }
+
+  private formatMessage(level: LogLevel, message: string): string {
+    const colorFunc = LOG_COLORS[level];
+    return colorFunc(`[${level.toUpperCase()}] ${message}`);
+  }
+
+  debug(message: string, data?: unknown): void {
+    if (this.shouldLog("debug")) {
+      console.log(this.formatMessage("debug", message));
       if (data !== undefined) {
         console.log(chalk.cyan(JSON.stringify(data, null, 2)));
       }
     }
-  },
-  info: (message: string, data?: unknown) => {
-    if (shouldLog("info")) {
-      console.info(formatMessage("info", message));
+  }
+
+  info(message: string, data?: unknown): void {
+    if (this.shouldLog("info")) {
+      console.info(this.formatMessage("info", message));
       if (data !== undefined) {
         console.info(chalk.green(JSON.stringify(data, null, 2)));
       }
     }
-  },
-  warn: (message: string, data?: unknown) => {
-    if (shouldLog("warn")) {
-      console.warn(formatMessage("warn", message));
+  }
+
+  warn(message: string, data?: unknown): void {
+    if (this.shouldLog("warn")) {
+      console.warn(this.formatMessage("warn", message));
       if (data !== undefined) {
         console.warn(chalk.yellow(JSON.stringify(data, null, 2)));
       }
     }
-  },
-  error: (message: string, error?: unknown) => {
-    if (shouldLog("error")) {
-      console.error(formatMessage("error", message));
+  }
+
+  error(message: string, error?: unknown): void {
+    if (this.shouldLog("error")) {
+      console.error(this.formatMessage("error", message));
       if (error instanceof Error) {
         console.error(chalk.red(error.stack));
       } else if (error !== undefined) {
         console.error(chalk.red(JSON.stringify(error, null, 2)));
       }
     }
-  },
-  table: (data: unknown[], columns?: string[]) => {
-    if (shouldLog("debug")) {
-      console.table(chalk.cyan(JSON.stringify(data)), columns);
-    }
-  },
-  group: (label: string) => {
-    if (shouldLog("debug")) {
-      console.group(chalk.magenta(label));
-    }
-  },
-  groupEnd: () => {
-    if (shouldLog("debug")) {
-      console.groupEnd();
-    }
-  },
-  time: (label: string) => {
-    if (shouldLog("debug")) {
-      console.time(chalk.magenta(label));
-    }
-  },
-  timeEnd: (label: string) => {
-    if (shouldLog("debug")) {
-      console.timeEnd(chalk.magenta(label));
-    }
-  },
-};
+  }
+}
 
-export default logger;
+export const defaultLogger = new DefaultLogger();

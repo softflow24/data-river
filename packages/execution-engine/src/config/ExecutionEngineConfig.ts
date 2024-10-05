@@ -1,4 +1,4 @@
-import { IWorkflowConfig, IEnvironment } from "@shared/interfaces";
+import { IWorkflowConfig, IEnvironment } from "@data-river/shared/interfaces";
 
 export interface IExecutionEngineConfig {
   workflowConfig: IWorkflowConfig;
@@ -18,7 +18,7 @@ export function createExecutionEngineConfig(
       supportsWebSocket: true,
       connections: [],
     },
-    environment: config.environment || { variables: {} },
+    environment: config.environment || { variables: {}, errors: {} },
     maxConcurrentTasks: config.maxConcurrentTasks || 1,
     retryOnFailure: config.retryOnFailure || false,
     supportsWebSocket: config.supportsWebSocket || false,
