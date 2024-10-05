@@ -14,6 +14,7 @@
     "tslib": "^1.14.1"
   },
   "dependencies": {
+    "reflect-metadata": "^0.1.13",
     "@data-river/editor": "workspace:*",
     "@data-river/execution-engine": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
