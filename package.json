@@ -1,9 +1,6 @@
 {
   "name": "data-river",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "pnpm --filter client dev",
     "build": "lerna run build",
