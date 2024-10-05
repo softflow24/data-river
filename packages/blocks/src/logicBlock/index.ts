@@ -1,12 +1,12 @@
-import { IBlockConfig } from "@shared/interfaces";
-
+import { IBlockConfig } from "@data-river/shared/interfaces";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
 import { Block } from "../block";
 
 export class LogicBlock extends Block {
   condition: string;
 
-  constructor(config: IBlockConfig & { condition?: string }) {
-    super(config);
+  constructor(config: IBlockConfig & { condition?: string }, logger: ILogger) {
+    super(config, logger);
     this.condition = config.condition || "";
   }
 
@@ -14,6 +14,7 @@ export class LogicBlock extends Block {
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const conditionResult = evaluateCondition(this.condition, inputs);
+    this.logger.debug(`Condition result: ${conditionResult}`);
     return { conditionResult };
   }
 }

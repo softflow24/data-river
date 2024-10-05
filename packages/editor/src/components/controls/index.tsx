@@ -1,34 +1,35 @@
-import { FC, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { FC, useCallback } from "react";
+import { useDispatch } from "react-redux";
 import { useReactFlow } from "reactflow";
 
-import {
-  RootState,
-  zoomIn,
-  zoomOut,
-  addNewNode,
-  toggleMinimalistic,
-} from "../../store";
+import { AppDispatch } from "@store";
+import { useReactFlowState } from "@hooks/useReactFlowState";
+import { toggleMinimalistic } from "@slices/reactFlowSlice";
 
 import MiniMapZoomControls from "./MiniMapZoomControls";
 import UndoRedoControls from "./UndoRedoControls";
 import ActionToolsControls from "./ActionToolsControls";
 
 const Controls: FC = () => {
-  const dispatch = useDispatch();
-  const viewport = useSelector((state: RootState) => state.app.viewport);
-  const { setViewport } = useReactFlow();
+  const dispatch = useDispatch<AppDispatch>();
+  const { viewport } = useReactFlowState();
+  const { setViewport: setReactFlowViewport } = useReactFlow();
 
-  function onZoomIn() {
+  //! Don't set viewport in redux store, it's handled by listening to reactFlow's viewport changes.
+  const onZoomIn = useCallback(() => {
     const zoom = Math.min(viewport.zoom + 0.1, 3);
-    dispatch(zoomIn());
-    setViewport({ ...viewport, zoom: zoom });
-  }
+    setReactFlowViewport({ ...viewport, zoom });
+  }, [viewport, setReactFlowViewport]);
 
-  function onZoomOut() {
+  const onZoomOut = useCallback(() => {
     const zoom = Math.max(viewport.zoom - 0.1, 0.5);
-    dispatch(zoomOut());
-    setViewport({ ...viewport, zoom: zoom });
+    setReactFlowViewport({ ...viewport, zoom });
+  }, [viewport, setReactFlowViewport]);
+
+  function addNewNode() {
+    // Implement this function in the reactFlowSlice if needed
+    // For now, we'll just log a message
+    console.log("Add new node functionality not implemented yet");
   }
 
   return (
@@ -43,7 +44,7 @@ const Controls: FC = () => {
       />
       <UndoRedoControls />
       <ActionToolsControls
-        addNewNode={() => dispatch(addNewNode())}
+        addNewNode={addNewNode}
         toggleMinimalist={() => dispatch(toggleMinimalistic())}
       />
     </div>

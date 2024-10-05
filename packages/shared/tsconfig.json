@@ -1,6 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "target": "es6",
     "module": "commonjs",
     "declaration": true,
@@ -8,10 +9,11 @@
     "strict": true,
     "esModuleInterop": true,
     "baseUrl": ".",
+    "composite": true, // Add this line
     "paths": {
-      "@data-river/shared/*": ["../shared/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

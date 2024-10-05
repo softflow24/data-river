@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
+import "reflect-metadata";
 
 import "./tailwind.css";
 
@@ -25,6 +26,7 @@ export const links: LinksFunction = () => [
 
 export function Layout({ children }: { children: ReactNode }) {
   useEffect(() => {
+    window.LOG_LEVEL = "debug";
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {

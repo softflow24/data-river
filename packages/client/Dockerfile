@@ -9,6 +9,9 @@ RUN npm install -g pnpm@9.10.0
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml lerna.json .npmrc ./
 COPY packages/client/package.json ./packages/client/
 COPY packages/editor/package.json ./packages/editor/
+COPY packages/execution-engine/package.json ./packages/execution-engine/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/blocks/package.json ./packages/blocks/
 
 # Set shamefully-hoist to true
 RUN echo "shamefully-hoist=true" >> .npmrc
@@ -36,6 +39,9 @@ RUN npm install -g pnpm@9.10.0
 COPY --from=builder /app/pnpm-workspace.yaml /app/package.json /app/pnpm-lock.yaml /app/lerna.json /app/.npmrc ./
 COPY --from=builder /app/packages/client/package.json ./packages/client/
 COPY --from=builder /app/packages/editor/package.json ./packages/editor/
+COPY --from=builder /app/packages/execution-engine/package.json ./packages/execution-engine/
+COPY --from=builder /app/packages/shared/package.json ./packages/shared/
+COPY --from=builder /app/packages/blocks/package.json ./packages/blocks/
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Copy built assets from builder stage

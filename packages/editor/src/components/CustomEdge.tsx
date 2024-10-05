@@ -1,8 +1,8 @@
 import React from "react";
 import { EdgeProps, getBezierPath } from "reactflow";
-import { useSelector, useDispatch } from "react-redux";
-
-import { RootState, setHoveredEdgeId } from "../store";
+import { useDispatch } from "react-redux";
+import { setHoveredEdgeId } from "@/store";
+import { useReactFlowState } from "@/hooks/useReactFlowState";
 
 const CustomEdge: React.FC<EdgeProps> = ({
   id,
@@ -16,18 +16,10 @@ const CustomEdge: React.FC<EdgeProps> = ({
   target,
 }) => {
   const dispatch = useDispatch();
-  const hoveredEdgeId = useSelector(
-    (state: RootState) => state.app.hoveredEdgeId,
-  );
-  const selectedEdgeId = useSelector(
-    (state: RootState) => state.app.selectedEdgeId,
-  );
-
-  const hoveredNodeId = useSelector(
-    (state: RootState) => state.app.hoveredNodeId,
-  );
+  const { hoveredNodeId, hoveredEdgeId, selectedEdgeId } = useReactFlowState();
 
   const isHovered = id === hoveredEdgeId;
+
   const isSelected = id === selectedEdgeId;
   const connectToHoveredNode =
     source === hoveredNodeId || target === hoveredNodeId;

@@ -1,12 +1,11 @@
-// server/index.ts
-import { createExecutionEngine } from "@execution-engine";
-import { createExecutionEngineConfig } from "@execution-engine/config/ExecutionEngineConfig";
-import { IEnvironment, IConnection, IBlockConfig } from "@shared/interfaces";
+import { createExecutionEngine } from "@data-river/execution-engine";
+import { createExecutionEngineConfig } from "@data-river/execution-engine/config/ExecutionEngineConfig";
+import { IEnvironment } from "@data-river/shared/interfaces";
 import WebSocket from "ws";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import logger from "@shared/utils/logger";
+import DefaultLogger from "@data-river/shared/utils/logger";
 
 const app = express();
 const port = 4123;
@@ -21,6 +20,7 @@ app.post("/run-workflow", async (req, res) => {
 
   const environment: IEnvironment = {
     variables: { apiKey: process.env.API_KEY || "env-resolver-value" },
+    errors: {},
   };
 
   const config = createExecutionEngineConfig({
@@ -34,7 +34,8 @@ app.post("/run-workflow", async (req, res) => {
     environment,
   });
 
-  const engine = createExecutionEngine(config, wss);
+  const logger = new DefaultLogger();
+  const engine = createExecutionEngine(config, logger);
 
   try {
     await engine.executeWorkflow(blockConfigs);

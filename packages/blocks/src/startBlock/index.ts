@@ -1,19 +1,22 @@
-import { IBlockConfig } from "@shared/interfaces";
-import logger from "@shared/utils/logger";
+import { IBlockConfig } from "@data-river/shared/interfaces";
 
 import { Block } from "../block";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
 
 export class StartBlock extends Block {
-  constructor(config: IBlockConfig) {
-    super({
-      ...config,
-      inputConfigs: {
-        trigger: { type: "boolean", required: false },
+  constructor(config: IBlockConfig, logger: ILogger) {
+    super(
+      {
+        ...config,
+        inputConfigs: {
+          trigger: { type: "boolean", required: false },
+        },
+        outputConfigs: {
+          started: { type: "boolean" },
+        },
       },
-      outputConfigs: {
-        started: { type: "boolean" },
-      },
-    });
+      logger,
+    );
   }
 
   async execute(
@@ -21,7 +24,7 @@ export class StartBlock extends Block {
   ): Promise<Record<string, unknown>> {
     const trigger = inputs.trigger ?? true;
 
-    logger.debug(`Workflow started with trigger: ${trigger}`);
+    this.logger.debug(`Workflow started with trigger: ${trigger}`);
     return { started: true };
   }
 }

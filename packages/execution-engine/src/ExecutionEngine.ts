@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { inject, injectable } from "tsyringe";
 import {
   IWorkflowConfig,
@@ -5,11 +6,11 @@ import {
   IConnection,
   IBlockConfig,
   IWorkflowState,
-} from "@shared/interfaces";
-import logger from "@shared/utils/logger";
-
+} from "@data-river/shared/interfaces";
+import { IExecutionResult } from "@data-river/shared/interfaces/IExecutionResult";
 import { VariableResolver } from "./VariableResolver";
 import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
 
 @injectable()
 export class ExecutionEngine {
@@ -21,20 +22,28 @@ export class ExecutionEngine {
     @inject("Environment") private environment: IEnvironment,
     @inject(VariableResolver) private variableResolver: VariableResolver,
     @inject("ExecutionStrategy") private executionStrategy: IExecutionStrategy,
+    @inject("Logger") private logger: ILogger,
   ) {
     this.variableResolver.setScope("environment", this.environment.variables);
     this.connections = config.connections;
+    this.logger = logger;
   }
 
-  async executeWorkflow(blockConfigs: IBlockConfig[]): Promise<void> {
-    logger.group("Executing Workflow");
-    logger.time("Workflow Execution");
+  async executeWorkflow(
+    blockConfigs: IBlockConfig[],
+  ): Promise<IExecutionResult> {
+    this.logger.group("Executing Workflow");
+    this.logger.time("Workflow Execution");
 
+    let output: IExecutionResult = {
+      result: [],
+      errors: [],
+    };
     for (const blockConfig of blockConfigs) {
       try {
         const inputs = this.getInputsForBlock(blockConfig);
         const resolvedInputs = this.resolveVariables(inputs);
-        logger.debug(`Executing block: ${blockConfig.id}`, {
+        this.logger.debug(`Executing block: ${blockConfig.id}`, {
           blockConfig,
           resolvedInputs,
         });
@@ -42,17 +51,27 @@ export class ExecutionEngine {
         const updatedConfig = { ...blockConfig, inputs: resolvedInputs };
         const outputs = await this.executeBlockWithRetry(updatedConfig);
 
-        logger.debug(`Block ${blockConfig.id} execution completed`, {
+        this.logger.debug(`Block ${blockConfig.id} execution completed`, {
           outputs,
         });
         this.handleBlockOutputs(blockConfig, outputs);
+        output.result.push({
+          nodeType: blockConfig.type,
+          nodeId: blockConfig.id,
+          outputs,
+          inputs: resolvedInputs,
+        });
       } catch (error) {
-        this.handleBlockError(error as Error, blockConfig);
+        const blockError = this.handleBlockError(error as Error, blockConfig);
+        this.environment.errors[blockConfig.id] = blockError.errors;
+        output.errors.push({ blockId: blockConfig.id, error: error as Error });
+        break;
       }
     }
 
-    logger.timeEnd("Workflow Execution");
-    logger.groupEnd();
+    this.logger.timeEnd("Workflow Execution");
+    this.logger.groupEnd();
+    return output;
   }
 
   private async executeBlockWithRetry(
@@ -62,14 +81,19 @@ export class ExecutionEngine {
     let attempts = 0;
     while (attempts <= retryCount) {
       try {
-        const block = await this.executionStrategy.execute(blockConfig);
+        const block = await this.executionStrategy.execute(
+          blockConfig,
+          this.logger,
+        );
         return block.outputs;
       } catch (error) {
         attempts++;
         if (attempts > retryCount) {
+          this.logger.error(`Block ${blockConfig.id} execution failed`, {
+            error,
+          });
           throw error;
         }
-        // Implement retry delay logic here if needed
       }
     }
     throw new Error(
@@ -121,11 +145,26 @@ export class ExecutionEngine {
     // Additional logic to pass outputs to connected blocks could be implemented here
   }
 
-  private handleBlockError(error: Error, blockConfig: IBlockConfig): void {
+  private handleBlockError(
+    error: Error,
+    blockConfig: IBlockConfig,
+  ): {
+    errors: Error[];
+  } {
     if (blockConfig.onError) {
-      blockConfig.onError(error, blockConfig);
+      try {
+        blockConfig.onError(error, blockConfig);
+      } catch (error) {
+        this.logger.error(
+          `Error in block ${blockConfig.id} onError function:`,
+          error,
+        );
+        return { errors: [error as Error] };
+      }
     }
-    logger.error(`Error in block ${blockConfig.id}:`, error);
+    this.logger.error(`Error in block ${blockConfig.id}:`, error);
+
+    return { errors: [error] };
   }
 
   private updateWorkflowState(blockId: string, data: Record<string, unknown>) {

@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from "express";
-import { IBlockConfig } from "@shared/interfaces";
-import { createExecutionEngine } from "@execution-engine";
+import { IBlockConfig } from "@data-river/shared/interfaces";
+import { createExecutionEngine } from "@data-river/execution-engine";
 import * as WS from "ws";
 import {
   createExecutionEngineConfig,
   IExecutionEngineConfig,
-} from "@execution-engine/config/ExecutionEngineConfig";
-import logger from "@shared/utils/logger";
+} from "@data-river/execution-engine/config/ExecutionEngineConfig";
+import { defaultLogger as logger } from "@data-river/shared/utils/logger";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -24,13 +24,13 @@ const engineConfig: IExecutionEngineConfig = createExecutionEngineConfig({
     executionContext: "server",
     connections: [],
   },
-  environment: { variables: {} },
+  environment: { variables: {}, errors: {} },
   maxConcurrentTasks: 1,
   supportsWebSocket: true,
   retryOnFailure: false,
 });
 
-const engine = createExecutionEngine(engineConfig, wss);
+const engine = createExecutionEngine(engineConfig, logger, wss);
 
 app.post("/execute", async (req: Request, res: Response) => {
   const blockConfig: IBlockConfig = req.body;
