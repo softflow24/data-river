@@ -2,7 +2,7 @@ import { LoaderFunction, json } from "@remix-run/server-runtime";
 import { useLoaderData } from "@remix-run/react";
 import setCookie, { Cookie } from "set-cookie-parser";
 import { AppSidebar } from "~/components/app-sidebar";
-import { SidebarLayout, SidebarTrigger } from "~/components/ui/sidebar";
+import { SidebarLayout } from "~/components/ui/sidebar";
 import Editor from "@data-river/editor";
 import ClientOnly from "~/components/client-only";
 

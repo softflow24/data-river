@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "rootDir": "./src", // Root directory of your TypeScript files
+    "rootDir": "../../",
     "baseUrl": ".",
     "composite": true,
     "paths": {
@@ -22,6 +22,7 @@
       "@store": ["src/store"],
       "@data-river/shared/*": ["../shared/src/*"],
       "@data-river/execution-engine/*": ["../execution-engine/src/*"],
+      "@data-river/execution-engine": ["../execution-engine/src"],
       "@data-river/blocks/*": ["../blocks/src/*"]
     }
   },

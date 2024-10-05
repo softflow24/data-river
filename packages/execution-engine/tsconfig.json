@@ -4,11 +4,13 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": ".",
-    "composite": true,
     "paths": {
       "@data-river/shared/*": ["../shared/src/*"],
       "@data-river/blocks/*": ["../blocks/src/*"]
-    }
+    },
+    "composite": true,
+    "declarationMap": true,
+    "declaration": true
   },
   "include": ["src/**/*.ts"],
   "references": [{ "path": "../shared" }, { "path": "../blocks" }]
