@@ -23,12 +23,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../..", // Changed to point to the root of the monorepo
+    "baseUrl": ".", // Added to set the base URL for non-relative imports
     "paths": {
       "~/*": ["./app/*"],
       "@data-river/shared/*": ["../shared/src/*"],
       "@data-river/blocks/*": ["../blocks/src/*"],
-      "@data-river/editor/*": ["../editor/src/*"]
+      "@data-river/editor/*": ["../editor/src/*"],
+      "@data-river/editor": ["../editor/src"]
     },
 
     // Vite takes care of building everything, not tsc.

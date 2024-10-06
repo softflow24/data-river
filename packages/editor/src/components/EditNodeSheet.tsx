@@ -11,9 +11,9 @@ import {
   SheetTitle,
   SheetDescription,
   SheetClose,
-} from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "@data-river/shared/ui/components/ui/sheet";
+import { Input } from "@data-river/shared/ui/components/ui/input";
+import { Button } from "@data-river/shared/ui/components/ui/button";
 
 const EditNodeSheet: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,0 +1,16 @@
+.miniMap {
+  position: absolute;
+  margin: 0;
+  margin-bottom: 60px;
+  background-color: hsl(var(--card));
+}
+
+:global(.react-flow__minimap-mask) {
+  fill: hsl(var(--foreground));
+  opacity: 0.1;
+}
+
+:global(.react-flow__minimap-node) {
+  fill: hsl(var(--accent));
+  stroke: none;
+}

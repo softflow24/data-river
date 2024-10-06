@@ -17,7 +17,9 @@ const InputWithLabel = ({
 }) => {
   return (
     <div className="grid gap-2">
-      <Label htmlFor={name}>{label}</Label>
+      <Label className="text-muted-foreground" htmlFor={name}>
+        {label}
+      </Label>
       <Input
         className={`w-full ${inputClassName}`}
         id={name}

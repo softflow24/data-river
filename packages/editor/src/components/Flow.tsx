@@ -7,11 +7,6 @@ import ReactFlow, {
   EdgeTypes,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Minimize2, Maximize2, Sun, Moon } from "lucide-react";
-import { useDispatch } from "react-redux";
-
-import { AppDispatch } from "@store";
-import { toggleMinimalistic, toggleLightTheme } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { useReactFlowHooks } from "@hooks/useReactFlowHooks";
 import { useReactFlowEventHandlers } from "@hooks/useReactFlowEventHandlers";
@@ -68,25 +63,11 @@ const FlowChart: React.FC = () => {
         minZoom={0.5}
         maxZoom={3}
       >
-        <Background color={lightTheme ? "#888" : "#aaa"} />
+        <Background color={"hsl(var(--foreground))"} style={{ opacity: 0.6 }} />
         <Controls />
-        {/* <Panel position="top-right">
-          <button
-            onClick={() => dispatch(toggleMinimalistic())}
-            style={{ marginRight: "10px" }}
-          >
-            {minimalistic ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
-          </button>
-          <button onClick={() => dispatch(toggleLightTheme())}>
-            {lightTheme ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-        </Panel> */}
         <Panel position="bottom-right">
           <CustomNodeInfo />
         </Panel>
-        {/* <Panel position="top-right">
-          <TopRightControls />
-        </Panel> */}
       </ReactFlow>
 
       <EditNodeSheet />

@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="512px" height="512px"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512px" height="512px" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512px" height="512px" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
 <path d="M 253.5,218.5 
          C 210.82,219.161 168.487,218.495 126.5,216.5
          C 151.826,181.262 184.159,173.095 223.5,192
@@ -91,6 +93,6 @@
          C 281.833,302.5 316.167,302.5 350.5,302.5
          C 328.257,328.644 301.257,335.144 269.5,322
          C 264.322,318.578 259.322,314.911 254.5,311
-         C 251.577,308.584 249.243,305.75 247.5,302.5" style="fill:#288cf7; fill-opacity:1; stroke:none;"></path>
-</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
-</style></svg>
+         C 251.577,308.584 249.243,305.75 247.5,302.5"
+      style="fill:#288cf7; fill-opacity:1; stroke:none;" />
+</svg>
