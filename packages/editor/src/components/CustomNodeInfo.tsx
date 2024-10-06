@@ -21,7 +21,7 @@ const CustomNodeInfo: React.FC = () => {
   };
 
   return (
-    <div className="bg-background p-2 rounded-md shadow-md max-w-sm">
+    <div className="bg-background p-2 rounded-md shadow-md max-w-sm text-muted-foreground">
       <h3 className="font-semibold mb-2">Selected Node Info</h3>
       <p>
         <span className="font-medium mr-1">ID:</span>
@@ -75,7 +75,7 @@ const CustomNodeInfo: React.FC = () => {
           </pre>
         )}
       </div>
-      <div className="mt-2">
+      <div className="">
         <button
           onClick={() => setIsOutputsExpanded(!isOutputsExpanded)}
           className="flex items-center font-medium focus:outline-none"
