@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { ZoomOut, ZoomIn } from "lucide-react";
-import { MiniMap, useReactFlow } from "reactflow";
+import Minimap from "./minimap";
 
 import ControlButton from "./ControlButton";
 
@@ -17,12 +17,7 @@ const MiniMapZoomControls: FC<MiniMapZoomControlsProps> = ({
 }) => {
   return (
     <div className="mr-2 flex flex-col items-center bg-white p-2 rounded-lg shadow-md">
-      <MiniMap
-        style={{ position: "absolute", margin: 0, marginBottom: "60px" }}
-        position="bottom-left"
-        pannable
-        zoomable
-      />
+      <Minimap />
       <div className="mt-2 flex items-center justify-between w-auto">
         <ControlButton onClick={zoomOut}>
           <ZoomOut size={20} />

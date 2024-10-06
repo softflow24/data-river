@@ -1,0 +1,45 @@
+name: Sync Development to Main
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+jobs:
+  create-sync-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+
+      - name: Create or update sync branch
+        run: |
+          git checkout -B sync-development-to-main origin/development
+          git push -f origin sync-development-to-main
+
+      - name: Create or update pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_EXISTS=$(gh pr list --base main --head sync-development-to-main --json number --jq length)
+          if [ "$PR_EXISTS" -eq "0" ]; then
+            gh pr create --base main --head sync-development-to-main \
+              --title "Sync Development to Main" \
+              --body "This PR syncs the latest changes from the development branch to the main branch."
+          else
+            gh pr edit --base main --head sync-development-to-main \
+              --title "Sync Development to Main" \
+              --body "This PR syncs the latest changes from the development branch to the main branch."
+          fi

@@ -68,7 +68,7 @@ const FlowChart: React.FC = () => {
         minZoom={0.5}
         maxZoom={3}
       >
-        <Background color={lightTheme ? "#888" : "#aaa"} />
+        <Background color={"hsl(var(--foreground))"} style={{ opacity: 0.6 }} />
         <Controls />
         {/* <Panel position="top-right">
           <button
