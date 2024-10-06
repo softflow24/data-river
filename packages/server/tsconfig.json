@@ -2,16 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "../../",
+    "rootDir": "./src",
     "baseUrl": ".",
+    "composite": true,
     "paths": {
       "@data-river/shared/*": ["../shared/src/*"],
-      "@data-river/execution-engine/*": ["../execution-engine/src/*"],
-      "@data-river/execution-engine": ["../execution-engine/src"]
-    },
-    "composite": true,
-    "declarationMap": true,
-    "declaration": true
+      "@data-river/execution-engine/*": ["../execution-engine/src/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "references": [{ "path": "../shared" }, { "path": "../execution-engine" }]

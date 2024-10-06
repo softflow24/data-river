@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc",
     "prebuild": "rm -rf dist",
     "watch": "tsc -b -w",
     "test": "jest",
