@@ -43,7 +43,7 @@ jobs:
           dockerfile: "packages/www/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/landing-page"
           ## Tag as pr-<pr-id>
-          tag: "pr-${{ github.event.pull_request.number }}"
+          tags: "pr-${{ github.event.pull_request.number }}"
           shouldRelease: false
 
   package-client:
@@ -60,5 +60,5 @@ jobs:
           dockerfile: "packages/client/Dockerfile"
           image_name: "${{ vars.DOCKER_USERNAME }}/client"
           ## Tag as pr-<pr-id>
-          tag: "pr-${{ github.event.pull_request.number }}"
+          tags: "pr-${{ github.event.pull_request.number }}"
           shouldRelease: false

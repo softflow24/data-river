@@ -1,15 +1,13 @@
 {
+  "extends": "../../tsconfig.json",
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
+    "../shared/**/*.ts",
+    "../editor/**/*.ts",
+    "../editor/**/*.tsx"
   ],
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@remix-run/node", "vite/client"],
@@ -24,10 +22,15 @@
     "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "../..",
-    "baseUrl": ".",
+    "outDir": "./dist",
+    "rootDir": "../..", // Changed to point to the root of the monorepo
+    "baseUrl": ".", // Added to set the base URL for non-relative imports
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@data-river/shared/*": ["../shared/src/*"],
+      "@data-river/blocks/*": ["../blocks/src/*"],
+      "@data-river/editor/*": ["../editor/src/*"],
+      "@data-river/editor": ["../editor/src"]
     },
 
     // Vite takes care of building everything, not tsc.

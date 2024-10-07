@@ -1,8 +1,10 @@
 import { injectable } from "tsyringe";
 
+type Scope = "global" | "collection" | "environment" | "data" | "local";
+
 @injectable()
 export class VariableResolver {
-  private scopes: Record<string, Record<string, unknown>>;
+  private scopes: Record<Scope, Record<string, unknown>>;
 
   constructor() {
     this.scopes = {
@@ -14,10 +16,7 @@ export class VariableResolver {
     };
   }
 
-  setScope(
-    scope: keyof typeof this.scopes,
-    variables: Record<string, unknown>,
-  ) {
+  setScope(scope: Scope, variables: Record<string, unknown>) {
     this.scopes[scope] = variables;
   }
 
@@ -29,7 +28,7 @@ export class VariableResolver {
         "environment",
         "collection",
         "global",
-      ]) {
+      ] as Scope[]) {
         const value = this.scopes[scope][variableName];
         if (value !== undefined) {
           return String(value); // Convert to string

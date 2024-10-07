@@ -1,17 +1,18 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "../..",
-    "baseUrl": "../..",
+    "rootDir": "../../",
+    "baseUrl": ".",
     "paths": {
-      "@blocks": ["packages/blocks/src"],
-      "@blocks/*": ["packages/blocks/src/*"],
-      "@shared/*": ["packages/shared/src/*"],
-      "@execution-engine": ["packages/execution-engine/src"],
-      "@execution-engine/*": ["packages/execution-engine/src/*"]
-    }
+      "@data-river/shared/*": ["../shared/src/*"],
+      "@data-river/execution-engine/*": ["../execution-engine/src/*"],
+      "@data-river/execution-engine": ["../execution-engine/src"]
+    },
+    "composite": true,
+    "declarationMap": true,
+    "declaration": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+  "references": [{ "path": "../shared" }, { "path": "../execution-engine" }]
 }

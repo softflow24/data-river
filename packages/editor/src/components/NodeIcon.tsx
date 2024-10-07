@@ -4,10 +4,16 @@ import * as Icons from "lucide-react";
 interface NodeIconProps {
   icon?: string;
   color: string;
-  minimalistic: boolean;
+  useBackgroundColor?: boolean;
+  useIconColor?: boolean;
 }
 
-const NodeIcon: React.FC<NodeIconProps> = ({ icon, color, minimalistic }) => {
+const NodeIcon: React.FC<NodeIconProps> = ({
+  icon,
+  color,
+  useBackgroundColor,
+  useIconColor,
+}) => {
   const IconComponent = icon
     ? (Icons[
         icon as keyof typeof Icons
@@ -20,9 +26,10 @@ const NodeIcon: React.FC<NodeIconProps> = ({ icon, color, minimalistic }) => {
         width: "30px",
         height: "30px",
         padding: "4px",
-        backgroundColor: minimalistic ? color : "transparent",
-        color: "white",
+        backgroundColor: useBackgroundColor ? color : "transparent",
+        color: useIconColor ? color : "white",
         borderRadius: "10%",
+        margin: "0",
       }}
     >
       <IconComponent style={{ height: "100%", width: "100%" }} />

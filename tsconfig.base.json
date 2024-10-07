@@ -1,20 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",
     "module": "commonjs",
-    "lib": ["es6"],
+    "lib": ["es6", "dom"],
     "allowJs": true,
-    "strict": true,
     "esModuleInterop": true,
+    "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
-    "paths": {
-      "@data-river/*": ["packages/*/src"],
-      "@blocks/*": ["packages/blocks/src/*"],
-      "@shared/*": ["packages/shared/src/*"]
-    }
-  }
+    "outDir": "./dist",
+    "target": "es6",
+    "moduleResolution": "node"
+  },
+  "exclude": ["node_modules", "dist"]
 }

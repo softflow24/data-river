@@ -1,5 +1,6 @@
-import { IBlock, IBlockConfig } from "@shared/interfaces";
-import logger from "@shared/utils/logger";
+import { IBlock, IBlockConfig } from "@data-river/shared/interfaces";
+import { ILogger } from "@data-river/shared/interfaces/ILogger";
+import BlockValidationError from "../errors/blockValidationError";
 
 export abstract class Block implements IBlock {
   readonly id: string;
@@ -11,8 +12,9 @@ export abstract class Block implements IBlock {
   readonly retry: number;
   readonly timeout: number;
   readonly onError: (error: Error, blockConfig: IBlockConfig) => void;
+  protected logger: ILogger;
 
-  constructor(config: IBlockConfig) {
+  constructor(config: IBlockConfig, logger: ILogger) {
     this.id = config.id;
     this.type = config.type;
     this.inputConfigs = config.inputConfigs ?? {};
@@ -22,6 +24,7 @@ export abstract class Block implements IBlock {
     this.retry = config.retry || 0;
     this.timeout = config.timeout || 0;
     this.onError = config.onError || (() => {});
+    this.logger = logger;
   }
 
   abstract execute(
@@ -38,53 +41,101 @@ export abstract class Block implements IBlock {
     this.outputs[key] = value;
   }
 
-  validateInputs(inputs: Record<string, unknown>): boolean {
+  validateInputs(inputs: Record<string, unknown>): {
+    valid: boolean;
+    missingFields: string[];
+    invalidFields: string[];
+  } {
     const cleanedInputs: Record<string, unknown> = {};
+    const missingFields: string[] = [];
+    const invalidFields: string[] = [];
 
     for (const [key, value] of Object.entries(inputs)) {
-      if (key in this.inputConfigs && value !== undefined && value !== null) {
+      if (
+        key in this.inputConfigs &&
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
         cleanedInputs[key] = value;
       }
     }
 
     for (const [key, config] of Object.entries(this.inputConfigs)) {
       if (config.required && !(key in cleanedInputs)) {
-        return false;
-      }
-      if (key in cleanedInputs && typeof cleanedInputs[key] !== config.type) {
-        return false;
+        missingFields.push(key);
+      } else if (
+        key in cleanedInputs &&
+        typeof cleanedInputs[key] !== config.type
+      ) {
+        invalidFields.push(key);
       }
     }
-    return true;
+
+    return {
+      valid: missingFields.length === 0 && invalidFields.length === 0,
+      missingFields,
+      invalidFields,
+    };
   }
 
-  validateOutputs(outputs: Record<string, unknown>): boolean {
+  validateOutputs(outputs: Record<string, unknown>): {
+    valid: boolean;
+    missingFields: string[];
+    invalidFields: string[];
+  } {
+    const missingFields: string[] = [];
+    const invalidFields: string[] = [];
+
     for (const [key, config] of Object.entries(this.outputConfigs)) {
       if (!(key in outputs)) {
-        return false;
-      }
-      if (typeof outputs[key] !== config.type) {
-        return false;
+        missingFields.push(key);
+      } else if (typeof outputs[key] !== config.type) {
+        invalidFields.push(key);
       }
     }
-    return true;
+
+    return {
+      valid: missingFields.length === 0 && invalidFields.length === 0,
+      missingFields,
+      invalidFields,
+    };
   }
 
   async safeExecute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    logger.debug("safeExecute", { inputs, inputConfigs: this.inputConfigs });
-    if (!this.validateInputs(inputs)) {
-      throw new Error(`Invalid inputs for block ${this.id}`);
+    this.logger.group(`Block Id:${this.id} Type:${this.type}`);
+
+    this.logger.debug("safeExecute", {
+      inputs,
+      inputConfigs: this.inputConfigs,
+    });
+
+    const inputValidation = this.validateInputs(inputs);
+    if (!inputValidation.valid) {
+      throw new BlockValidationError(
+        `Invalid inputs for block ${this.id}`,
+        inputValidation.missingFields,
+        inputValidation.invalidFields,
+        "input",
+      );
     }
 
     const outputs = await this.execute(inputs);
 
-    if (!this.validateOutputs(outputs)) {
-      throw new Error(`Invalid outputs for block ${this.id}`);
+    const outputValidation = this.validateOutputs(outputs);
+    if (!outputValidation.valid) {
+      throw new BlockValidationError(
+        `Invalid outputs for block ${this.id}`,
+        outputValidation.missingFields,
+        outputValidation.invalidFields,
+        "output",
+      );
     }
 
     this.outputs = outputs;
+    this.logger.groupEnd();
     return outputs;
   }
 

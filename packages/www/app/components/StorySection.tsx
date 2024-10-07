@@ -94,7 +94,7 @@ export default function StorySection({ stats }: StorySectionProps) {
         <div className="text-center">
           <Button asChild size="lg">
             <a
-              href="https://github.com/yourusername/data-river/projects"
+              href="https://github.com/orgs/softflow24/projects/2/views/4"
               target="_blank"
               rel="noopener noreferrer"
             >
