@@ -2,6 +2,21 @@ import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
+const quickLinks = [
+  {
+    label: "Documentation",
+    url: "https://docs.data-river.dev/",
+  },
+  {
+    label: "GitHub",
+    url: "https://github.com/softflow24/data-river",
+  },
+  {
+    label: "Discord",
+    url: "https://discord.com/invite/CmEqvZQUQn",
+  },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-background text-secondary-foreground py-20 relative pt-40">
@@ -16,30 +31,16 @@ export default function Footer() {
           <div className="w-full md:w-1/3 mb-6 md:mb-0">
             <h3 className="text-xl font-bold mb-2">Quick Links</h3>
             <ul>
-              <li>
-                <Link
-                  to="#"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Documentation
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  GitHub
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Discord
-                </Link>
-              </li>
+              {quickLinks.map((link, idx) => (
+                <li key={idx}>
+                  <Link
+                    to={link.url}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="w-full md:w-1/3">
