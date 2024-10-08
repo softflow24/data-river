@@ -3,10 +3,11 @@ import { useReactFlowState } from "@/hooks/useReactFlowState";
 import { useLayoutState } from "@/hooks/useLayoutState";
 import { updateNodesData } from "@/slices/reactFlowSlice";
 import { useDispatch } from "react-redux";
-import { GitBranch } from "lucide-react";
+import { X } from "lucide-react";
 import LogicNodePanelView from "./panelViews/LogicNodePanelView";
 import { ICondition } from "@data-river/shared/interfaces/ICondition";
-
+import { Button } from "@data-river/shared/ui/components/ui/button";
+import { toggleRightPanelVisible } from "@/store";
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
   const { nodes, selectedNodeId } = useReactFlowState();
@@ -31,11 +32,6 @@ const RightPanel = () => {
     );
   };
 
-  const handleDeleteNode = () => {
-    // Implement node deletion logic here
-    console.log("Delete node:", selectedNode?.id);
-  };
-
   const renderPanelView = () => {
     switch (selectedNode.data.block) {
       case "logic@0.1":
@@ -50,7 +46,6 @@ const RightPanel = () => {
             }
             onConfigChange={handleConfigChange}
             inputs={selectedNode.data.inputs || {}}
-            onDeleteNode={handleDeleteNode}
           />
         );
       // Add cases for other node types here
@@ -61,11 +56,17 @@ const RightPanel = () => {
 
   return (
     <div className="bg-background h-full w-full p-4 border-l border-border overflow-y-auto">
-      <div className="flex items-center mb-4">
-        <GitBranch className="w-5 h-5 mr-2 text-blue-500" />
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">
           {selectedNode.data.label} Settings
         </h2>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => dispatch(toggleRightPanelVisible())}
+        >
+          <X />
+        </Button>
       </div>
       {renderPanelView()}
     </div>

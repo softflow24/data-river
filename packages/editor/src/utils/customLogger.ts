@@ -10,7 +10,6 @@ function serializeData(data: unknown): any {
       name: data.name,
       message: data.message,
       stack: data.stack,
-      // Add any custom properties
       ...(data as any),
     };
   } else if (typeof data === "object" && data !== null) {
