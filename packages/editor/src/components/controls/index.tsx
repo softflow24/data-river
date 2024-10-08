@@ -26,6 +26,10 @@ const Controls: FC = () => {
     setReactFlowViewport({ ...viewport, zoom });
   }, [viewport, setReactFlowViewport]);
 
+  const onResetZoom = useCallback(() => {
+    setReactFlowViewport({ ...viewport, zoom: 1 });
+  }, [viewport, setReactFlowViewport]);
+
   function addNewNode() {
     // Implement this function in the reactFlowSlice if needed
     // For now, we'll just log a message
@@ -40,6 +44,7 @@ const Controls: FC = () => {
       <MiniMapZoomControls
         zoomOut={onZoomOut}
         zoomIn={onZoomIn}
+        resetZoom={onResetZoom}
         zoom={viewport.zoom}
       />
       <UndoRedoControls />
