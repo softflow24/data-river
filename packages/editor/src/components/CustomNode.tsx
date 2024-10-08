@@ -49,8 +49,8 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
   let invalidFields: string[] = [];
 
   if (validationError) {
-    missingFields = validationError.missingFields;
-    invalidFields = validationError.invalidFields;
+    missingFields = validationError.missingFields ?? [];
+    invalidFields = validationError.invalidFields ?? [];
   }
 
   return (
@@ -58,11 +58,14 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
       className={clsx(`
         border
         ${isHovered ? "shadow-lg" : ""}
-        ${highlight && "border-blue-500"}
-        ${hasError && (highlight ? "border-red-600" : "border-red-500")}
+        ${highlight && "border-focus"}
+        ${hasError && "border-destructive"}
         `)}
+      data-custom-node-id={id}
     >
-      {data.targetHandle && <TargetHandle isVisible={showHandles} />}
+      {data.targetHandle && (
+        <TargetHandle handleId={`${id}-target`} isVisible={showHandles} />
+      )}
       <CardHeader className="flex flex-row justify-between items-center min-w-[9rem]">
         <CardTitle>{data.label}</CardTitle>
         <NodeIcon
@@ -76,11 +79,15 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
         <NodeControls
           nodeId={id}
           controls={data.controls}
+          configuration={data.config}
           fieldsMissing={missingFields}
           invalidFields={invalidFields}
+          isSelected={isSelected}
         />
       </CardContent>
-      {data.sourceHandle && <SourceHandle isVisible={showHandles} />}
+      {data.sourceHandle && (
+        <SourceHandle handleId={`${id}-source`} isVisible={showHandles} />
+      )}
     </Card>
   );
 };

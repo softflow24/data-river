@@ -11,5 +11,6 @@ export interface ISharedBlock {
     outputConfigs?: Record<string, { type: string }>;
     inputs?: Record<string, any>;
     outputs?: Record<string, any>;
+    config?: Record<string, any>;
   };
 }
