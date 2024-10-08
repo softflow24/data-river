@@ -9,7 +9,7 @@
     "strict": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "composite": true, // Add this line
+    "composite": true,
     "paths": {
       "@/*": ["./src/*"]
     }

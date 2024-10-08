@@ -23,7 +23,7 @@ export class ServerExecutionStrategy implements IExecutionStrategy {
 
   async execute(blockConfig: IBlockConfig, logger: ILogger): Promise<IBlock> {
     const block = this.createBlockInstance(blockConfig, logger);
-    await block.safeExecute(blockConfig.inputs ?? {});
+    await block.safeExecute(blockConfig.inputs ?? {}, blockConfig.config ?? {});
 
     // Send real-time updates via WebSocket if available
     if (this.wss && this.wss.clients) {

@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "@data-river/shared/tailwind.css";
 import { Provider } from "react-redux";
 import { ReactFlowProvider } from "reactflow";
 import store from "./store";

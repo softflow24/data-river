@@ -11,6 +11,6 @@
 }
 
 :global(.react-flow__minimap-node) {
-  fill: hsl(var(--accent));
+  fill: hsl(var(--primary));
   stroke: none;
 }

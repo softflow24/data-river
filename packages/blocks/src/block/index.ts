@@ -50,25 +50,26 @@ export abstract class Block implements IBlock {
     const missingFields: string[] = [];
     const invalidFields: string[] = [];
 
-    for (const [key, value] of Object.entries(inputs)) {
-      if (
-        key in this.inputConfigs &&
-        value !== undefined &&
-        value !== null &&
-        value !== ""
-      ) {
-        cleanedInputs[key] = value;
-      }
-    }
-
     for (const [key, config] of Object.entries(this.inputConfigs)) {
-      if (config.required && !(key in cleanedInputs)) {
+      if (
+        config.required &&
+        (!(key in inputs) ||
+          inputs[key] === undefined ||
+          inputs[key] === null ||
+          inputs[key] === "")
+      ) {
         missingFields.push(key);
       } else if (
-        key in cleanedInputs &&
-        typeof cleanedInputs[key] !== config.type
+        key in inputs &&
+        inputs[key] !== undefined &&
+        inputs[key] !== null &&
+        inputs[key] !== ""
       ) {
-        invalidFields.push(key);
+        if (typeof inputs[key] !== config.type) {
+          invalidFields.push(key);
+        } else {
+          cleanedInputs[key] = inputs[key];
+        }
       }
     }
 
@@ -104,15 +105,19 @@ export abstract class Block implements IBlock {
 
   async safeExecute(
     inputs: Record<string, unknown>,
+    config: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     this.logger.group(`Block Id:${this.id} Type:${this.type}`);
 
+    // Merge inputs with config
+    const mergedInputs = { ...config, ...inputs };
+
     this.logger.debug("safeExecute", {
-      inputs,
+      mergedInputs,
       inputConfigs: this.inputConfigs,
     });
 
-    const inputValidation = this.validateInputs(inputs);
+    const inputValidation = this.validateInputs(mergedInputs);
     if (!inputValidation.valid) {
       throw new BlockValidationError(
         `Invalid inputs for block ${this.id}`,
@@ -122,7 +127,7 @@ export abstract class Block implements IBlock {
       );
     }
 
-    const outputs = await this.execute(inputs);
+    const outputs = await this.execute(mergedInputs);
 
     const outputValidation = this.validateOutputs(outputs);
     if (!outputValidation.valid) {

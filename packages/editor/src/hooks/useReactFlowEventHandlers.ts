@@ -21,9 +21,9 @@ import {
   setHoveredEdgeId,
   setHoveredNodeId,
   setSelectedNodeId,
-  setIsSheetOpen,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
+import { setIsRightSidebarVisible } from "@slices/layoutSlice";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -93,7 +93,7 @@ export const useReactFlowEventHandlers = () => {
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setSelectedNodeId(node.id));
-      dispatch(setIsSheetOpen(true));
+      dispatch(setIsRightSidebarVisible(true));
     },
     [dispatch],
   );

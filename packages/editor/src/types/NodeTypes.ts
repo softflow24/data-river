@@ -1,10 +1,11 @@
 import Icons from "lucide-react";
 
 interface Control {
-  type: "text" | "text-area";
+  type: "text" | "text-area" | "select" | "conditions-summary";
   label: string;
   name: string;
   placeholder?: string;
+  options?: { value: string; label: string }[];
 }
 
 export interface NodeData {
@@ -18,4 +19,5 @@ export interface NodeData {
   controls?: Control[];
   inputs?: Record<string, unknown>;
   outputs?: Record<string, unknown>;
+  config?: Record<string, unknown>;
 }

@@ -6,7 +6,8 @@
     "baseUrl": ".",
     "composite": true,
     "paths": {
-      "@data-river/shared/*": ["../shared/src/*"]
+      "@data-river/shared/*": ["../shared/src/*"],
+      "@/*": ["src/*"]
     },
     "declaration": true,
     "declarationMap": true

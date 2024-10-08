@@ -3,9 +3,10 @@ import { Handle, Position } from "reactflow";
 
 interface TargetHandleProps {
   isVisible: boolean;
+  handleId: string;
 }
 
-const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible }) => {
+const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible, handleId }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -33,6 +34,7 @@ const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible }) => {
       }}
     >
       <Handle
+        id={handleId}
         type="target"
         position={Position.Left}
         style={{

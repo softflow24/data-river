@@ -9,7 +9,7 @@ import type { LinksFunction } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
 import "reflect-metadata";
 
-import "./tailwind.css";
+import "@data-river/shared/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
