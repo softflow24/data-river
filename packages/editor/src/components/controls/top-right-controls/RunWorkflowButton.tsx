@@ -47,11 +47,19 @@ const RunWorkflowButton: React.FC = () => {
       errors: {},
     };
 
+    const logic = blockConfigs.find((x) => x.type.match("logic"));
+
+    if (!logic) {
+      throw new Error("No logic block found");
+    }
+
     const connections: IConnection[] = edges.map((edge) => ({
       from: edge.source,
       to: edge.target,
       inputKey: "data",
       outputKey: "data",
+      sourceHandle: edge.sourceHandle ?? undefined,
+      targetHandle: edge.targetHandle ?? undefined,
     }));
 
     const config = createExecutionEngineConfig({

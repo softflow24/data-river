@@ -1,0 +1,15 @@
+export type ComparisonOperator =
+  | "=="
+  | "==="
+  | "!="
+  | "!=="
+  | ">"
+  | ">="
+  | "<"
+  | "<="
+  | "contains"
+  | "not_contains"
+  | "starts_with"
+  | "ends_with"
+  | "is_empty"
+  | "is_not_empty";
