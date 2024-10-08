@@ -93,7 +93,7 @@ export const useReactFlowEventHandlers = () => {
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setSelectedNodeId(node.id));
-      //dispatch(setIsSheetOpen(true));
+      dispatch(setIsSheetOpen(true));
     },
     [dispatch],
   );
