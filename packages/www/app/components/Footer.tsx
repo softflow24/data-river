@@ -31,8 +31,8 @@ export default function Footer() {
           <div className="w-full md:w-1/3 mb-6 md:mb-0">
             <h3 className="text-xl font-bold mb-2">Quick Links</h3>
             <ul>
-              {quickLinks.map((link, index) => (
-                <li key={index}>
+              {quickLinks.map((link, idx) => (
+                <li key={idx}>
                   <Link
                     to={link.url}
                     className="text-muted-foreground hover:text-primary"
