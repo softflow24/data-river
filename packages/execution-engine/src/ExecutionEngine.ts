@@ -236,7 +236,6 @@ export class ExecutionEngine {
     outputs: Record<string, unknown>,
   ): void {
     this.updateWorkflowState(blockConfig.id, outputs);
-    // Additional logic to pass outputs to connected blocks could be implemented here
   }
 
   private handleBlockError(
