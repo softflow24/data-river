@@ -3,4 +3,6 @@ export interface IConnection {
   to: string;
   inputKey: string;
   outputKey: string;
+  sourceHandle: string | undefined;
+  targetHandle: string | undefined;
 }

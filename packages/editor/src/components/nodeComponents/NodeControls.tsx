@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { NodeData } from "../../types/NodeTypes";
 import InputWithLabel from "./InputWithLabel";
 import TextAreaWithLabel from "./TextAreaWithLabel";
+import SelectWithLabel from "./SelectWithLabel";
 import { Label } from "@data-river/shared/ui/components/ui/label";
 import NodeIcon from "../NodeIcon";
 import { updateExecutionBlockInputs } from "@/slices/executionSlice";
@@ -9,12 +10,16 @@ import { useDispatch } from "react-redux";
 import { useExecutionState } from "@/hooks/useExecutionState";
 import { updateNodesData } from "@/slices/reactFlowSlice";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
+import { LogicBlock } from "./LogicBlock";
+import { ConditionsSummaryProps } from "./LogicBlock/ConditionsSummary";
 
 interface NodeControlsProps {
   nodeId: string;
   controls: NodeData["controls"];
+  configuration: NodeData["config"];
   fieldsMissing: string[];
   invalidFields: string[];
+  isSelected: boolean;
 }
 
 const NodeControls: React.FC<NodeControlsProps> = ({
@@ -22,6 +27,8 @@ const NodeControls: React.FC<NodeControlsProps> = ({
   controls,
   fieldsMissing,
   invalidFields,
+  configuration,
+  isSelected,
 }) => {
   const dispatch = useDispatch();
 
@@ -57,7 +64,30 @@ const NodeControls: React.FC<NodeControlsProps> = ({
     if (result.nodeType.includes("output")) {
       return Object.values(result.outputs)[0];
     }
-  }, [result, node]);
+  }, [result]);
+
+  const handleValueChange = (name: string, value: string) => {
+    dispatch(
+      updateExecutionBlockInputs({
+        id: nodeId,
+        inputs: { [name]: value },
+      }),
+    );
+
+    dispatch(
+      updateNodesData([
+        {
+          id: nodeId,
+          data: {
+            config: {
+              ...(node?.data.config || {}),
+              [name]: value,
+            },
+          },
+        },
+      ]),
+    );
+  };
 
   if (!controls || controls.length === 0 || !executionBlock || !node)
     return null;
@@ -71,9 +101,11 @@ const NodeControls: React.FC<NodeControlsProps> = ({
             fieldsMissingMap.has(control.name);
 
           const value =
-            node.data.inputs && node.data.inputs[control.name]
-              ? node.data.inputs[control.name]
-              : (outputValue ?? "");
+            configuration && configuration[control.name]
+              ? configuration[control.name]
+              : node.data.inputs && node.data.inputs[control.name]
+                ? node.data.inputs[control.name]
+                : (outputValue ?? "");
 
           switch (control.type) {
             case "text":
@@ -85,25 +117,7 @@ const NodeControls: React.FC<NodeControlsProps> = ({
                   placeholder={control.placeholder}
                   inputClassName={`nodrag nowheel ${invalidValue ? "border-red-500" : ""}`}
                   value={value as string}
-                  onChange={(value) => {
-                    dispatch(
-                      updateExecutionBlockInputs({
-                        id: nodeId,
-                        inputs: { [control.name]: value },
-                      }),
-                    );
-
-                    dispatch(
-                      updateNodesData([
-                        {
-                          id: nodeId,
-                          data: {
-                            inputs: { [control.name]: value },
-                          },
-                        },
-                      ]),
-                    );
-                  }}
+                  onChange={(value) => handleValueChange(control.name, value)}
                 />
               );
             case "text-area":
@@ -114,12 +128,32 @@ const NodeControls: React.FC<NodeControlsProps> = ({
                   name={control.name}
                   placeholder={control.placeholder}
                   value={value as string}
+                  onChange={(value) => handleValueChange(control.name, value)}
                 />
               );
-            //TODO Add more cases for other control types as needed
+            case "select":
+              return (
+                <SelectWithLabel
+                  key={index}
+                  label={control.label}
+                  name={control.name}
+                  value={value as string}
+                  options={control.options || []}
+                  onChange={(value) => handleValueChange(control.name, value)}
+                />
+              );
+            case "conditions-summary":
+              return (
+                <LogicBlock
+                  key={index}
+                  nodeId={nodeId}
+                  config={configuration as unknown as ConditionsSummaryProps}
+                  isSelected={isSelected}
+                />
+              );
             default:
               return (
-                <div className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-2">
                   <NodeIcon
                     icon={"OctagonAlert"}
                     color={"rgb(234 179 8)"}
