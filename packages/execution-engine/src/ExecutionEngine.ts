@@ -11,7 +11,6 @@ import { IExecutionResult } from "@data-river/shared/interfaces/IExecutionResult
 import { VariableResolver } from "./VariableResolver";
 import { IExecutionStrategy } from "./strategies/IExecutionStrategy";
 import { ILogger } from "@data-river/shared/interfaces/ILogger";
-import { forEach } from "lodash";
 
 @injectable()
 export class ExecutionEngine {
@@ -244,6 +243,8 @@ export class ExecutionEngine {
   ): {
     errors: Error[];
   } {
+    this.logger.error(`Error in block ${blockConfig.id}:`, error);
+
     if (blockConfig.onError) {
       try {
         blockConfig.onError(error, blockConfig);
@@ -255,7 +256,6 @@ export class ExecutionEngine {
         return { errors: [error as Error] };
       }
     }
-    this.logger.error(`Error in block ${blockConfig.id}:`, error);
 
     return { errors: [error] };
   }
