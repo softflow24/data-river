@@ -35,7 +35,7 @@ export default class DefaultLogger implements ILogger {
 
   group(message: string): void {
     if (this.shouldLog("info")) {
-      console.group(chalk.bold(message)); // Using console.group for grouping
+      console.group(chalk.bold(message));
     }
   }
 
