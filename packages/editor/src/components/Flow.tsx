@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactFlow, {
   ConnectionMode,
   Background,
@@ -29,6 +29,13 @@ const FlowChart: React.FC = () => {
   const { lightTheme, nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
+
+  useEffect(() => {
+    window.addEventListener("keydown", eventHandlers.handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", eventHandlers.handleKeyDown);
+    };
+  }, [eventHandlers.handleKeyDown]);
 
   return (
     <div
