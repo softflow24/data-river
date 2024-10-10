@@ -10,6 +10,9 @@ import {
 } from "reactflow";
 import { NodeData } from "../types/NodeTypes";
 import { applyDataChanges, NodeDataChange } from "../utils/nodesUpdates";
+import _ from "lodash";
+import { nodeConfigs, NodeType } from "../nodes";
+
 type CustomNode = Node<NodeData>;
 
 export interface ReactFlowState {
@@ -303,20 +306,27 @@ const reactFlowSlice = createSlice({
     zoomOut: (state) => {
       state.viewport = { ...state.viewport, zoom: state.viewport.zoom - 0.1 };
     },
-    addNewNode: (state) => {
+    addNewNode: (
+      state,
+      action: PayloadAction<{
+        type: NodeType;
+        position: { x: number; y: number };
+      }>,
+    ) => {
+      const { type, position } = action.payload;
+      const nodeConfig = nodeConfigs[type];
+
+      if (!nodeConfig) {
+        throw new Error(`Unknown node type: ${type}`);
+      }
+
       const newNode: CustomNode = {
-        id: `${state.nodes.length + 1}`,
-        type: "custom",
-        position: { x: Math.random() * 500, y: Math.random() * 500 },
-        data: {
-          block: "newNode@0.1",
-          label: `Node ${state.nodes.length + 1}`,
-          color: "rgb(107 114 128)",
-          sourceHandle: true,
-          targetHandle: true,
-          icon: "Circle",
-        },
+        id: _.uniqueId("node-"),
+        type: nodeConfig.type,
+        position,
+        data: { ...nodeConfig.data },
       };
+
       state.nodes.push(newNode);
     },
     setViewport: (state, action: PayloadAction<Viewport>) => {
@@ -350,6 +360,7 @@ export const {
   setViewport,
   setIsSheetOpen,
   updateNodesData,
+  addNewNode,
 } = reactFlowSlice.actions;
 
 export default reactFlowSlice.reducer;
