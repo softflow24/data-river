@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@store";
 import {
@@ -11,6 +11,8 @@ import {
   EdgeMouseHandler,
   addEdge,
   Node,
+  useReactFlow,
+  NodePositionChange,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -27,13 +29,53 @@ import { setIsRightSidebarVisible } from "@slices/layoutSlice";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { edges } = useReactFlowState();
+  const { screenToFlowPosition } = useReactFlow();
+
+  const { draggingNodeId, nodes, edges } = useReactFlowState((x) => ({
+    draggingNodeId: x.draggingNodeId,
+    nodes: x.nodes,
+    edges: x.edges,
+  }));
 
   const debouncedUpdateNodes = useMemo(
     () =>
       _.debounce((changes: NodeChange[]) => dispatch(updateNodes(changes)), 1),
     [dispatch],
   );
+
+  // const draggingNode = useMemo(() => {
+  //   return nodes.find((x) => x.id === draggingNodeId);
+  // }, [draggingNodeId, nodes]);
+
+  // useEffect(() => {
+  //   if (!draggingNode) return;
+
+  //   const { x, y } = draggingNode.position;
+
+  //   const mouseMoveHandler = (e: MouseEvent) => {
+  //     console.log("mousemove", e);
+  //   };
+
+  //   document.addEventListener("mousemove", mouseMoveHandler);
+
+  //   if (x === 0 && y === 0) return;
+
+  //   const nodeChange: NodePositionChange = {
+  //     id: draggingNode.id,
+  //     type: "position",
+  //     position: { x: 0, y: 0 },
+  //     positionAbsolute: { x: 0, y: 0 },
+  //     dragging: true,
+  //   };
+
+  //   dispatch(updateNodes([nodeChange]));
+
+  //   // const { x, y } = screenToFlowPosition(draggingNode.position);
+
+  //   return () => {
+  //     document.removeEventListener("mousemove", mouseMoveHandler);
+  //   };
+  // }, [draggingNode]);
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
