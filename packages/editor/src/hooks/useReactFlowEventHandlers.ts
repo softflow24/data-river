@@ -34,9 +34,8 @@ export const useReactFlowEventHandlers = () => {
   const { screenToFlowPosition } = useReactFlow();
   const rafRef = useRef<number | null>(null);
 
-  const { draggingNodeId, nodes, edges } = useReactFlowState((x) => ({
+  const { draggingNodeId, edges } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
-    nodes: x.nodes,
     edges: x.edges,
   }));
 
@@ -144,13 +143,6 @@ export const useReactFlowEventHandlers = () => {
     [draggingNodeId, screenToFlowPosition, dispatch],
   );
 
-  const handleMouseUp = useCallback(() => {
-    console.log("handleMouseUp");
-    if (draggingNodeId) {
-      dispatch(finishDraggingNode());
-    }
-  }, [draggingNodeId, dispatch]);
-
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Escape" && draggingNodeId) {
@@ -173,7 +165,7 @@ export const useReactFlowEventHandlers = () => {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [draggingNodeId, handleMouseMove, handleMouseUp, handleKeyDown]);
+  }, [draggingNodeId, handleMouseMove, handleKeyDown]);
 
   return {
     onNodesChangeHandler,
@@ -188,7 +180,5 @@ export const useReactFlowEventHandlers = () => {
     onNodeClick,
     onNodeDragStart,
     handleMouseMove,
-    handleMouseUp,
-    handleKeyDown,
   };
 };

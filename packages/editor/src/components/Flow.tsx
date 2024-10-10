@@ -15,7 +15,6 @@ import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
-import EditNodeSheet from "./EditNodeSheet";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -29,13 +28,6 @@ const FlowChart: React.FC = () => {
   const { lightTheme, nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
-
-  useEffect(() => {
-    window.addEventListener("keydown", eventHandlers.handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", eventHandlers.handleKeyDown);
-    };
-  }, [eventHandlers.handleKeyDown]);
 
   return (
     <div
@@ -76,7 +68,6 @@ const FlowChart: React.FC = () => {
           <CustomNodeInfo />
         </Panel>
       </ReactFlow>
-      <EditNodeSheet />
     </div>
   );
 };
