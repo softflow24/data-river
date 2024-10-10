@@ -308,28 +308,6 @@ const reactFlowSlice = createSlice({
     zoomOut: (state) => {
       state.viewport = { ...state.viewport, zoom: state.viewport.zoom - 0.1 };
     },
-    addNewNode: (
-      state,
-      action: PayloadAction<{
-        type: NodeType;
-        position: { x: number; y: number };
-      }>,
-    ) => {
-      // const { type, position } = action.payload;
-      // const nodeConfig = nodeConfigs[type];
-      // if (!nodeConfig) {
-      //   throw new Error(`Unknown node type: ${type}`);
-      // }
-      // const newNode: CustomNode = {
-      //   id: _.uniqueId("node-"),
-      //   type: nodeConfig.type,
-      //   position,
-      //   data: { ...nodeConfig.data },
-      // };
-      // state.selectedNodeId = newNode.id;
-      // state.hoveredNodeId = newNode.id;
-      // state.nodes.push(newNode);
-    },
     setViewport: (state, action: PayloadAction<Viewport>) => {
       if (action.payload.x !== undefined) {
         state.viewport.x = action.payload.x;
@@ -363,7 +341,7 @@ const reactFlowSlice = createSlice({
         type: nodeConfig.type,
         position,
         dragging: true,
-        data: { ...nodeConfig.data },
+        data: { ...nodeConfig.data! },
       };
 
       state.nodes.push(newNode);
@@ -415,7 +393,6 @@ export const {
   setViewport,
   setIsSheetOpen,
   updateNodesData,
-  addNewNode,
   startDraggingNode,
   finishDraggingNode,
   cancelDraggingNode,

@@ -24,6 +24,7 @@ import {
   setHoveredNodeId,
   setSelectedNodeId,
   finishDraggingNode,
+  cancelDraggingNode,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightSidebarVisible } from "@slices/layoutSlice";
@@ -144,25 +145,35 @@ export const useReactFlowEventHandlers = () => {
   );
 
   const handleMouseUp = useCallback(() => {
+    console.log("handleMouseUp");
     if (draggingNodeId) {
       dispatch(finishDraggingNode());
     }
   }, [draggingNodeId, dispatch]);
 
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "Escape" && draggingNodeId) {
+        dispatch(cancelDraggingNode());
+      }
+    },
+    [draggingNodeId, dispatch],
+  );
+
   useEffect(() => {
     if (draggingNodeId) {
       window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("keydown", handleKeyDown);
     }
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("keydown", handleKeyDown);
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [draggingNodeId, handleMouseMove, handleMouseUp]);
+  }, [draggingNodeId, handleMouseMove, handleMouseUp, handleKeyDown]);
 
   return {
     onNodesChangeHandler,
@@ -178,5 +189,6 @@ export const useReactFlowEventHandlers = () => {
     onNodeDragStart,
     handleMouseMove,
     handleMouseUp,
+    handleKeyDown,
   };
 };
