@@ -1,19 +1,15 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React from "react";
 import ReactFlow, {
   ConnectionMode,
   Background,
   Panel,
   NodeTypes,
   EdgeTypes,
-  useReactFlow,
-  NodePositionChange,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { useReactFlowHooks } from "@hooks/useReactFlowHooks";
 import { useReactFlowEventHandlers } from "@hooks/useReactFlowEventHandlers";
-import { useDispatch } from "react-redux";
-import { updateNodes, finishDraggingNode } from "@/slices/reactFlowSlice";
 
 import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
@@ -30,59 +26,9 @@ const edgeTypes: EdgeTypes = {
 };
 
 const FlowChart: React.FC = () => {
-  const dispatch = useDispatch();
-  const { lightTheme, nodes, edges, draggingNodeId } = useReactFlowState();
-  const { screenToFlowPosition } = useReactFlow();
+  const { lightTheme, nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
-
-  const rafRef = useRef<number | null>(null);
-
-  const handleMouseMove = useCallback(
-    (event: MouseEvent) => {
-      if (draggingNodeId) {
-        if (rafRef.current !== null) {
-          cancelAnimationFrame(rafRef.current);
-        }
-
-        rafRef.current = requestAnimationFrame(() => {
-          const flowPosition = screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY,
-          });
-          const nodeChange: NodePositionChange = {
-            id: draggingNodeId,
-            type: "position",
-            position: flowPosition,
-            dragging: true,
-          };
-          dispatch(updateNodes([nodeChange]));
-        });
-      }
-    },
-    [draggingNodeId, screenToFlowPosition, dispatch],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    if (draggingNodeId) {
-      dispatch(finishDraggingNode());
-    }
-  }, [draggingNodeId, dispatch]);
-
-  useEffect(() => {
-    if (draggingNodeId) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [draggingNodeId, handleMouseMove, handleMouseUp]);
 
   return (
     <div
@@ -94,16 +40,6 @@ const FlowChart: React.FC = () => {
       }}
     >
       <ReactFlow
-        onClick={() => {
-          // ! Race condition making this work, the click will fire when you click on AddBlockDropdown.
-          // We need to check if draggingNodeId is set, if it is, we need to finish the dragging node.
-          // This here is solely for the AddBlockDropdown.
-          if (!draggingNodeId) {
-            return;
-          }
-
-          dispatch(finishDraggingNode());
-        }}
         nodes={nodes}
         edges={edges}
         onNodesChange={eventHandlers.onNodesChangeHandler}

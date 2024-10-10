@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@store";
 import {
@@ -23,6 +23,7 @@ import {
   setHoveredEdgeId,
   setHoveredNodeId,
   setSelectedNodeId,
+  finishDraggingNode,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightSidebarVisible } from "@slices/layoutSlice";
@@ -30,6 +31,7 @@ import { setIsRightSidebarVisible } from "@slices/layoutSlice";
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { screenToFlowPosition } = useReactFlow();
+  const rafRef = useRef<number | null>(null);
 
   const { draggingNodeId, nodes, edges } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
@@ -42,40 +44,6 @@ export const useReactFlowEventHandlers = () => {
       _.debounce((changes: NodeChange[]) => dispatch(updateNodes(changes)), 1),
     [dispatch],
   );
-
-  // const draggingNode = useMemo(() => {
-  //   return nodes.find((x) => x.id === draggingNodeId);
-  // }, [draggingNodeId, nodes]);
-
-  // useEffect(() => {
-  //   if (!draggingNode) return;
-
-  //   const { x, y } = draggingNode.position;
-
-  //   const mouseMoveHandler = (e: MouseEvent) => {
-  //     console.log("mousemove", e);
-  //   };
-
-  //   document.addEventListener("mousemove", mouseMoveHandler);
-
-  //   if (x === 0 && y === 0) return;
-
-  //   const nodeChange: NodePositionChange = {
-  //     id: draggingNode.id,
-  //     type: "position",
-  //     position: { x: 0, y: 0 },
-  //     positionAbsolute: { x: 0, y: 0 },
-  //     dragging: true,
-  //   };
-
-  //   dispatch(updateNodes([nodeChange]));
-
-  //   // const { x, y } = screenToFlowPosition(draggingNode.position);
-
-  //   return () => {
-  //     document.removeEventListener("mousemove", mouseMoveHandler);
-  //   };
-  // }, [draggingNode]);
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -119,7 +87,10 @@ export const useReactFlowEventHandlers = () => {
 
   const onPaneClick = useCallback(() => {
     dispatch(setSelectedEdgeId(null));
-  }, [dispatch]);
+    if (draggingNodeId) {
+      dispatch(finishDraggingNode());
+    }
+  }, [dispatch, draggingNodeId]);
 
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
@@ -147,6 +118,52 @@ export const useReactFlowEventHandlers = () => {
     [dispatch],
   );
 
+  const handleMouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (draggingNodeId) {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+        }
+
+        rafRef.current = requestAnimationFrame(() => {
+          const flowPosition = screenToFlowPosition({
+            x: event.clientX,
+            y: event.clientY + 5,
+          });
+          const nodeChange: NodePositionChange = {
+            id: draggingNodeId,
+            type: "position",
+            position: flowPosition,
+            dragging: true,
+          };
+          dispatch(updateNodes([nodeChange]));
+        });
+      }
+    },
+    [draggingNodeId, screenToFlowPosition, dispatch],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    if (draggingNodeId) {
+      dispatch(finishDraggingNode());
+    }
+  }, [draggingNodeId, dispatch]);
+
+  useEffect(() => {
+    if (draggingNodeId) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [draggingNodeId, handleMouseMove, handleMouseUp]);
+
   return {
     onNodesChangeHandler,
     onEdgesChangeHandler,
@@ -159,5 +176,7 @@ export const useReactFlowEventHandlers = () => {
     onNodeMouseLeave,
     onNodeClick,
     onNodeDragStart,
+    handleMouseMove,
+    handleMouseUp,
   };
 };
