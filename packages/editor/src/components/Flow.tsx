@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useCallback } from "react";
 import ReactFlow, {
   ConnectionMode,
   Background,
   Panel,
   NodeTypes,
   EdgeTypes,
+  Edge,
+  Connection,
+  addEdge,
+  useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useReactFlowState } from "@hooks/useReactFlowState";
@@ -16,6 +20,9 @@ import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
 import EditNodeSheet from "./EditNodeSheet";
+import { addNewNode } from "@/slices/reactFlowSlice";
+import { useDispatch } from "react-redux";
+import _ from "lodash";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -26,9 +33,57 @@ const edgeTypes: EdgeTypes = {
 };
 
 const FlowChart: React.FC = () => {
+  const dispatch = useDispatch();
   const { lightTheme, nodes, edges } = useReactFlowState();
+  const { screenToFlowPosition } = useReactFlow();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
+
+  const onDragOver = useCallback((event: DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (event: DragEvent) => {
+      event.preventDefault();
+
+      // const reactFlowBounds = (
+      //   event.currentTarget as HTMLElement
+      // ).getBoundingClientRect();
+      // const type = event.dataTransfer?.getData("application/reactflow");
+
+      // const position = project({
+      //   x: event.clientX - reactFlowBounds.left,
+      //   y: event.clientY - reactFlowBounds.top,
+      // });
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      console.log("ondrop yallah");
+      dispatch(
+        addNewNode({
+          id: _.uniqueId("node-"),
+          type: "custom",
+          position,
+          //data: { label: "Custom Node" },
+        }),
+      );
+
+      // const newNode = {
+      //   id: `${type}-${nodes.length + 1}`,
+      //   type: "custom",
+      //   position,
+      //   data: { label: `${type} node` },
+      // };
+
+      // setNodes((nds) => [...nds, newNode]);
+    },
+    [nodes, addNewNode],
+  );
 
   return (
     <div
@@ -40,6 +95,9 @@ const FlowChart: React.FC = () => {
       }}
     >
       <ReactFlow
+        fitView
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         nodes={nodes}
         edges={edges}
         onNodesChange={eventHandlers.onNodesChangeHandler}
