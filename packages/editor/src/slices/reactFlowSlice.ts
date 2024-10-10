@@ -25,7 +25,6 @@ export interface ReactFlowState {
   nodes: CustomNode[];
   edges: Edge[];
   viewport: Viewport;
-  isSheetOpen: boolean;
   draggingNodeId: string | null;
 }
 
@@ -257,7 +256,6 @@ const initialState: ReactFlowState = {
   nodes: initialNodes,
   edges: initialEdges,
   viewport: { x: 0, y: 0, zoom: 1 },
-  isSheetOpen: false,
   draggingNodeId: null,
 };
 
@@ -318,9 +316,6 @@ const reactFlowSlice = createSlice({
       if (action.payload.zoom !== undefined) {
         state.viewport.zoom = action.payload.zoom;
       }
-    },
-    setIsSheetOpen: (state, action: PayloadAction<boolean>) => {
-      state.isSheetOpen = action.payload;
     },
     startDraggingNode: (
       state,
@@ -391,7 +386,6 @@ export const {
   setSelectedEdgeId,
   setHoveredEdgeId,
   setViewport,
-  setIsSheetOpen,
   updateNodesData,
   startDraggingNode,
   finishDraggingNode,
