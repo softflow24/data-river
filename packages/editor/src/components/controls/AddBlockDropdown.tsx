@@ -7,7 +7,7 @@ import {
   Flag,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { addNewNode } from "../../slices/reactFlowSlice";
+import { startDraggingNode } from "../../slices/reactFlowSlice";
 import { NodeType } from "../../nodes";
 import { useReactFlow } from "reactflow";
 
@@ -44,7 +44,7 @@ export function AddBlockDropdownMenu({
   const dispatch = useDispatch();
   const { screenToFlowPosition } = useReactFlow();
 
-  const handleAddNode = (
+  const handleStartDraggingNode = (
     event: React.MouseEvent<HTMLDivElement>,
     type: NodeType,
   ) => {
@@ -53,7 +53,7 @@ export function AddBlockDropdownMenu({
       y: event.clientY,
     });
 
-    dispatch(addNewNode({ type, position }));
+    dispatch(startDraggingNode({ type, position }));
   };
 
   return (
@@ -76,24 +76,28 @@ export function AddBlockDropdownMenu({
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem
-                onClick={(event) => handleAddNode(event, "input")}
+                onClick={(event) => handleStartDraggingNode(event, "input")}
               >
                 <TextCursorInput className="mr-2 h-4 w-4" />
                 <span>Input Node</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={(event) => handleAddNode(event, "input")}
+                onClick={(event) => handleStartDraggingNode(event, "input")}
               >
                 <Square className="mr-2 h-4 w-4" />
                 <span>Simple Input</span>
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
-          <DropdownMenuItem onClick={(event) => handleAddNode(event, "logic")}>
+          <DropdownMenuItem
+            onClick={(event) => handleStartDraggingNode(event, "logic")}
+          >
             <GitBranch className="mr-2 h-4 w-4" />
             <span>Logic</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={(event) => handleAddNode(event, "output")}>
+          <DropdownMenuItem
+            onClick={(event) => handleStartDraggingNode(event, "output")}
+          >
             <Square className="mr-2 h-4 w-4" />
             <span>Output</span>
           </DropdownMenuItem>

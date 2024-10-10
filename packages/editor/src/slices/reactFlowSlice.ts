@@ -26,6 +26,7 @@ export interface ReactFlowState {
   edges: Edge[];
   viewport: Viewport;
   isSheetOpen: boolean;
+  draggingNodeId: string | null;
 }
 
 const initialNodes: CustomNode[] = [
@@ -257,6 +258,7 @@ const initialState: ReactFlowState = {
   edges: initialEdges,
   viewport: { x: 0, y: 0, zoom: 1 },
   isSheetOpen: false,
+  draggingNodeId: null,
 };
 
 const reactFlowSlice = createSlice({
@@ -313,21 +315,20 @@ const reactFlowSlice = createSlice({
         position: { x: number; y: number };
       }>,
     ) => {
-      const { type, position } = action.payload;
-      const nodeConfig = nodeConfigs[type];
-
-      if (!nodeConfig) {
-        throw new Error(`Unknown node type: ${type}`);
-      }
-
-      const newNode: CustomNode = {
-        id: _.uniqueId("node-"),
-        type: nodeConfig.type,
-        position,
-        data: { ...nodeConfig.data },
-      };
-
-      state.nodes.push(newNode);
+      // const { type, position } = action.payload;
+      // const nodeConfig = nodeConfigs[type];
+      // if (!nodeConfig) {
+      //   throw new Error(`Unknown node type: ${type}`);
+      // }
+      // const newNode: CustomNode = {
+      //   id: _.uniqueId("node-"),
+      //   type: nodeConfig.type,
+      //   position,
+      //   data: { ...nodeConfig.data },
+      // };
+      // state.selectedNodeId = newNode.id;
+      // state.hoveredNodeId = newNode.id;
+      // state.nodes.push(newNode);
     },
     setViewport: (state, action: PayloadAction<Viewport>) => {
       if (action.payload.x !== undefined) {
@@ -342,6 +343,60 @@ const reactFlowSlice = createSlice({
     },
     setIsSheetOpen: (state, action: PayloadAction<boolean>) => {
       state.isSheetOpen = action.payload;
+    },
+    startDraggingNode: (
+      state,
+      action: PayloadAction<{
+        type: NodeType;
+        position: { x: number; y: number };
+      }>,
+    ) => {
+      const { type, position } = action.payload;
+      const nodeConfig = nodeConfigs[type];
+
+      if (!nodeConfig) {
+        throw new Error(`Unknown node type: ${type}`);
+      }
+
+      const newNode: CustomNode = {
+        id: _.uniqueId("node-"),
+        type: nodeConfig.type,
+        position,
+        dragging: true,
+        data: { ...nodeConfig.data },
+      };
+
+      state.nodes.push(newNode);
+      state.draggingNodeId = newNode.id;
+      state.selectedNodeId = newNode.id;
+      state.hoveredNodeId = newNode.id;
+    },
+
+    finishDraggingNode: (state) => {
+      state.draggingNodeId = null;
+    },
+
+    cancelDraggingNode: (state) => {
+      if (state.draggingNodeId) {
+        state.nodes = state.nodes.filter(
+          (node) => node.id !== state.draggingNodeId,
+        );
+        state.draggingNodeId = null;
+      }
+    },
+
+    updateDraggingNodePosition: (
+      state,
+      action: PayloadAction<{ x: number; y: number }>,
+    ) => {
+      if (state.draggingNodeId) {
+        const nodeIndex = state.nodes.findIndex(
+          (node) => node.id === state.draggingNodeId,
+        );
+        if (nodeIndex !== -1) {
+          state.nodes[nodeIndex].position = action.payload;
+        }
+      }
     },
   },
 });
@@ -361,6 +416,10 @@ export const {
   setIsSheetOpen,
   updateNodesData,
   addNewNode,
+  startDraggingNode,
+  finishDraggingNode,
+  cancelDraggingNode,
+  updateDraggingNodePosition,
 } = reactFlowSlice.actions;
 
 export default reactFlowSlice.reducer;
