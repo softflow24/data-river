@@ -1,8 +1,6 @@
-// app/routes/api.email-subscription.ts
 import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import pkg from "pg";
-
 const { Pool } = pkg;
 
 const pool = new Pool({
@@ -24,8 +22,13 @@ async function saveEmailToDatabase(email: string): Promise<DatabaseResult> {
   try {
     const query = "INSERT INTO email_subscribers(email) VALUES($1) RETURNING *";
     const values = [email];
-    const result = await client.query<DatabaseResult>(query, values);
+    const result = await client.query(query, values);
     return result.rows[0];
+  } catch (error) {
+    if (isUniqueViolationError(error)) {
+      throw new Error("Email already exists");
+    }
+    throw error;
   } finally {
     client.release();
   }
@@ -36,7 +39,7 @@ async function deleteEmailFromDatabase(email: string): Promise<DatabaseResult> {
   try {
     const query = "DELETE FROM email_subscribers WHERE email = $1 RETURNING *";
     const values = [email];
-    const result = await client.query<DatabaseResult>(query, values);
+    const result = await client.query(query, values);
     if (result.rows.length === 0) {
       throw new Error("Email not found");
     }
@@ -44,6 +47,15 @@ async function deleteEmailFromDatabase(email: string): Promise<DatabaseResult> {
   } finally {
     client.release();
   }
+}
+
+function isUniqueViolationError(error: unknown): error is { code: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: string }).code === "23505"
+  );
 }
 
 export const action: ActionFunction = async ({ request }) => {
@@ -67,6 +79,13 @@ export const action: ActionFunction = async ({ request }) => {
     }
   } catch (error) {
     console.error("Database operation failed:", error);
+    if (error instanceof Error) {
+      if (error.message === "Email already exists") {
+        return json({ error: "Email is already subscribed" }, { status: 409 });
+      } else if (error.message === "Email not found") {
+        return json({ error: "Email not found" }, { status: 404 });
+      }
+    }
     return json(
       { error: "An error occurred. Please try again." },
       { status: 500 },

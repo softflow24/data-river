@@ -1,4 +1,3 @@
-// app/components/Footer.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useFetcher } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
@@ -25,9 +24,14 @@ const quickLinks: QuickLink[] = [
   },
 ];
 
+interface FetcherData {
+  message?: string;
+  error?: string;
+}
+
 export default function Footer(): React.ReactElement {
   const [email, setEmail] = useState<string>("");
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<FetcherData>();
   const { toast } = useToast();
 
   const validateEmail = (email: string): boolean => {
@@ -64,11 +68,18 @@ export default function Footer(): React.ReactElement {
         });
         setEmail("");
       } else if ("error" in fetcher.data) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: fetcher.data.error,
-        });
+        if (fetcher.data.error === "Email is already subscribed") {
+          toast({
+            title: "Already Subscribed",
+            description: "This email is already subscribed.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: fetcher.data.error,
+          });
+        }
       }
     }
   }, [fetcher.data, toast]);
