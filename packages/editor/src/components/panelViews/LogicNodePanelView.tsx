@@ -10,7 +10,6 @@ interface LogicNodePanelViewProps {
   };
   onConfigChange: (config: any) => void;
   inputs: Record<string, unknown>;
-  onDeleteNode: () => void;
 }
 
 const LogicNodePanelView: React.FC<LogicNodePanelViewProps> = ({
@@ -18,7 +17,6 @@ const LogicNodePanelView: React.FC<LogicNodePanelViewProps> = ({
   config,
   onConfigChange,
   inputs,
-  onDeleteNode,
 }) => {
   const handleConditionsChange = (conditions: ICondition[]) => {
     onConfigChange({ ...config, conditions });
