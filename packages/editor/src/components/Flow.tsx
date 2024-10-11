@@ -5,11 +5,13 @@ import ReactFlow, {
   Panel,
   NodeTypes,
   EdgeTypes,
+  SelectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { useReactFlowHooks } from "@hooks/useReactFlowHooks";
 import { useReactFlowEventHandlers } from "@hooks/useReactFlowEventHandlers";
+import useEditorState from "@/hooks/useEditorState";
 
 import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
@@ -28,10 +30,11 @@ const FlowChart: React.FC = () => {
   const { lightTheme, nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
+  const isPanning = useEditorState((state) => state.isPanning);
 
   return (
     <div
-      className="w-full h-full min-h-full"
+      className="w-full h-full min-h-full cursor-default"
       style={{
         backgroundColor: lightTheme
           ? "#f0f0f0"
@@ -61,13 +64,25 @@ const FlowChart: React.FC = () => {
         minZoom={0.5}
         maxZoom={3}
         fitView
+        selectNodesOnDrag={true}
+        selectionOnDrag={true}
+        selectionMode={SelectionMode.Partial}
+        panOnDrag={[1, 2]}
+        panOnScroll
       >
-        <Background color={"hsl(var(--foreground))"} style={{ opacity: 0.6 }} />
+        <Background
+          className="cursor-default"
+          color={"hsl(var(--foreground))"}
+          style={{ opacity: 0.6 }}
+        />
         <Controls />
         <Panel position="bottom-right">
           <CustomNodeInfo />
         </Panel>
       </ReactFlow>
+      <span className="absolute top-20 left-20">
+        {isPanning ? "true" : "false"}
+      </span>
     </div>
   );
 };
