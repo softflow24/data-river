@@ -37,7 +37,7 @@ const layoutSlice = createSlice({
     toggleBottomPanelVisible: (state) => {
       state.isBottomPanelVisible = !state.isBottomPanelVisible;
     },
-    setIsRightSidebarVisible: (state, action: PayloadAction<boolean>) => {
+    setIsRightPanelVisible: (state, action: PayloadAction<boolean>) => {
       state.isRightPanelVisible = action.payload;
     },
     toggleRightPanelVisible: (state) => {
@@ -58,7 +58,7 @@ export const {
   setBottomPanelSize,
   setIsBottomPanelVisible,
   toggleBottomPanelVisible,
-  setIsRightSidebarVisible,
+  setIsRightPanelVisible,
   toggleRightPanelVisible,
   setLeftPanelVisible,
   toggleLeftPanelVisible,

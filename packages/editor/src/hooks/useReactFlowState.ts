@@ -1,5 +1,9 @@
 import { useSelector } from "react-redux";
 import { ReactFlowState, RootState } from "@/store";
+import { createSelector } from "@reduxjs/toolkit";
+
+// Create a memoized selector for the entire ReactFlowState
+const selectReactFlowState = (state: RootState) => state.reactFlow;
 
 // Overload 1: No selector provided, returns entire ReactFlowState
 export function useReactFlowState(): ReactFlowState;
@@ -11,10 +15,19 @@ export function useReactFlowState<T>(selector: (state: ReactFlowState) => T): T;
 export function useReactFlowState<T>(
   selector?: (state: ReactFlowState) => T,
 ): ReactFlowState | T {
-  return useSelector((state: RootState) => {
-    const reactFlow = state.reactFlow;
-    return selector ? selector(reactFlow) : reactFlow;
-  });
+  // If no selector is provided, use the memoized selector for the entire state
+  if (!selector) {
+    return useSelector(selectReactFlowState);
+  }
+
+  // Create a memoized selector for the specific selection
+  const memoizedSelector = createSelector(
+    [selectReactFlowState],
+    (reactFlowState) => selector(reactFlowState),
+  );
+
+  // Use the memoized selector
+  return useSelector(memoizedSelector);
 }
 
 export default useReactFlowState;
