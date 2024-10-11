@@ -27,10 +27,8 @@ import {
   cancelDraggingNode,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
-import {
-  setIsRightPanelVisible,
-  toggleRightPanelVisible,
-} from "@slices/layoutSlice";
+import { setIsRightPanelVisible } from "@slices/layoutSlice";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -146,33 +144,31 @@ export const useReactFlowEventHandlers = () => {
     [draggingNodeId, screenToFlowPosition, dispatch],
   );
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        if (draggingNodeId) {
-          dispatch(cancelDraggingNode());
-        } else {
-          dispatch(setIsRightPanelVisible(false));
-        }
+  useHotkeys(
+    "esc",
+    () => {
+      if (draggingNodeId) {
+        dispatch(cancelDraggingNode());
+      } else {
+        dispatch(setIsRightPanelVisible(false));
       }
     },
     [draggingNodeId, dispatch],
   );
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
     if (draggingNodeId) {
       window.addEventListener("mousemove", handleMouseMove);
     }
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("keydown", handleKeyDown);
+
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [draggingNodeId, handleMouseMove, handleKeyDown]);
+  }, [draggingNodeId, handleMouseMove]);
 
   return {
     onNodesChangeHandler,
