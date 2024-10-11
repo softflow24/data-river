@@ -4,7 +4,7 @@ import { logicNode } from "./logicNode";
 import { outputNode } from "./outputNode";
 import { endNode } from "./endNode";
 
-export const nodeConfigs = {
+export const blockConfigs = {
   start: startNode,
   input: inputNode,
   logic: logicNode,
@@ -12,4 +12,4 @@ export const nodeConfigs = {
   end: endNode,
 };
 
-export type NodeType = keyof typeof nodeConfigs;
+export type BlockType = keyof typeof blockConfigs;

@@ -5,7 +5,7 @@ export const inputNode: Partial<Node<NodeData>> = {
   type: "custom",
   data: {
     block: "input@0.1",
-    label: "Input node",
+    label: "Input",
     color: "rgb(234 179 8)",
     sourceHandle: true,
     targetHandle: true,

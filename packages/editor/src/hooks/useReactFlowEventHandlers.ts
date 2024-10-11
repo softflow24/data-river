@@ -27,7 +27,10 @@ import {
   cancelDraggingNode,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
-import { setIsRightSidebarVisible } from "@slices/layoutSlice";
+import {
+  setIsRightPanelVisible,
+  toggleRightPanelVisible,
+} from "@slices/layoutSlice";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -106,7 +109,7 @@ export const useReactFlowEventHandlers = () => {
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setSelectedNodeId(node.id));
-      dispatch(setIsRightSidebarVisible(true));
+      dispatch(setIsRightPanelVisible(true));
     },
     [dispatch],
   );
@@ -145,17 +148,21 @@ export const useReactFlowEventHandlers = () => {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "Escape" && draggingNodeId) {
-        dispatch(cancelDraggingNode());
+      if (event.key === "Escape") {
+        if (draggingNodeId) {
+          dispatch(cancelDraggingNode());
+        } else {
+          dispatch(setIsRightPanelVisible(false));
+        }
       }
     },
     [draggingNodeId, dispatch],
   );
 
   useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
     if (draggingNodeId) {
       window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("keydown", handleKeyDown);
     }
 
     return () => {
