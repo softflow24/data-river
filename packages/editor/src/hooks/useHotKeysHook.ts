@@ -10,7 +10,6 @@ export const useHotKeysHook = () => {
   useHotkeys(
     "mousedown.2",
     () => {
-      console.log("mousedown.2");
       dispatch(setIsPanning(true));
     },
     {
