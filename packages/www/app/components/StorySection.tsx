@@ -9,7 +9,7 @@ interface StorySectionProps {
   stats: {
     stars: number;
     contributors: number;
-    nodes: number;
+    blocks: number;
     workflows: number;
   };
 }
@@ -18,7 +18,7 @@ export default function StorySection({ stats }: StorySectionProps) {
   const statIcons = {
     stars: <Star className="w-8 h-8 mb-2" />,
     contributors: <Users className="w-8 h-8 mb-2" />,
-    nodes: <Box className="w-8 h-8 mb-2" />,
+    blocks: <Box className="w-8 h-8 mb-2" />,
     workflows: <Workflow className="w-8 h-8 mb-2" />,
   };
 

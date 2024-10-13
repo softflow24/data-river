@@ -22,9 +22,44 @@ export default function Index() {
   const [stats, setStats] = useState({
     stars: 123,
     contributors: 123,
-    nodes: 123,
+    blocks: 123,
     workflows: 123,
   });
+
+  useEffect(() => {
+    console.log("Execute useEffect");
+    const fetchRepoData = async () => {
+      try {
+        const repoUrl = "https://api.github.com/repos/softflow24/data-river";
+
+        const repoResponse = await fetch(repoUrl);
+        if (!repoResponse.ok) {
+          throw new Error(
+            "Error fetching repository data: ${repoResponse.statusText}",
+          );
+        }
+
+        const contributorsResponse = await fetch(repoUrl + "/contributors");
+        if (!contributorsResponse.ok) {
+          throw new Error(
+            "Error fetching repository data: ${contributorsResponse.statusText}",
+          );
+        }
+        const repoData = await repoResponse.json();
+        const contributorsData = await contributorsResponse.json();
+        setStats({
+          stars: repoData.stargazers_count,
+          contributors: contributorsData.length,
+          blocks: 5,
+          workflows: 0,
+        });
+      } catch (error: any) {
+        console.log(error.message);
+      }
+    };
+
+    fetchRepoData();
+  }, []);
 
   return (
     <>
