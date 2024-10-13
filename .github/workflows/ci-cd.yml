@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - 'main'
-      - 'feature/*'
+      - 'feature/*'  # Short-lived feature branches
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +29,6 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -55,11 +54,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          TAG="latest"  # You can adjust the tag (e.g., based on version, commit, etc.)
-          docker build -t ${{ vars.DOCKER_USERNAME }}/my-app:$TAG .
-          docker tag ${{ vars.DOCKER_USERNAME }}/my-app:$TAG ${{ vars.DOCKER_USERNAME }}/my-app:latest
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)  # Shorten commit SHA for tagging
+          docker build -t ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA .
+          docker tag ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/client:latest
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push ${{ vars.DOCKER_USERNAME }}/my-app:$TAG
-          docker push ${{ vars.DOCKER_USERNAME }}/my-app:latest
+          docker push ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA
+          docker push ${{ vars.DOCKER_USERNAME }}/client:latest
