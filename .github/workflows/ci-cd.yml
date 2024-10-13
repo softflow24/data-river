@@ -1,16 +1,15 @@
 name: CI/CD Workflow
 
-# Trigger the workflow on push to feature branches and main branch
 on:
   push:
     branches:
       - 'main'
-      - 'feature/*'  # Adjust this based on your feature branch naming convention
+      - 'feature/*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -18,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Using Node.js version 20 as referred from other workflows
+          node-version: '20'
 
       - name: Install dependencies using pnpm
         run: |
@@ -29,7 +28,6 @@ jobs:
         run: pnpm test
 
   deploy:
-    # Deploy only on main branch
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
@@ -51,27 +49,17 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Deploy to production
+      - name: Log in to Docker Hub
         run: |
-          echo "Deployment step here."
-          # Add your deployment script here
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-  release:
-    # Release only on push to main branch
-    if: github.ref == 'refs/heads/main'
-    needs: deploy
-    runs-on: ubuntu-latest
+      - name: Build Docker image
+        run: |
+          TAG="latest"  # You can adjust the tag (e.g., based on version, commit, etc.)
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: 'Release ${{ github.sha }}'
-          body: |
-            ## Release Notes
-            - Auto-generated release for commit ${{ github.sha }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub provides this
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
