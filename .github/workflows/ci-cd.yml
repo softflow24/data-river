@@ -1,0 +1,75 @@
+name: CI/CD Workflow
+
+# Trigger the workflow on push to feature branches and main branch
+on:
+  push:
+    branches:
+      - "main"
+      - "feat/*" # You can modify this based on your naming convention for feature branches
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20" # Based on other files added node version as 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  deploy:
+    # Deploy only on main branch
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to production
+        run: |
+          echo "Deployment step here."
+          # Add your deployment script here
+
+  release:
+    # Release only on push to main branch
+    if: github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Release ${{ github.sha }}"
+          body: |
+            ## Release Notes
+            - Auto-generated release for commit ${{ github.sha }}
+          files: |
+            path/to/your/build/artifacts/* # If you have files to include in the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret
