@@ -4,13 +4,13 @@ name: CI/CD Workflow
 on:
   push:
     branches:
-      - "main"
-      - "feat/*" # You can modify this based on your naming convention for feature branches
+      - 'main'
+      - 'feature/*'  # Adjust this based on your feature branch naming convention
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -18,13 +18,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20" # Based on other files added node version as 20
+          node-version: '20'  # Using Node.js version 20 as referred from other workflows
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies using pnpm
+        run: |
+          corepack enable
+          pnpm install
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
 
   deploy:
     # Deploy only on main branch
@@ -39,13 +41,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies using pnpm
+        run: |
+          corepack enable
+          pnpm install
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
 
       - name: Deploy to production
         run: |
@@ -65,11 +69,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: "Release ${{ github.sha }}"
+          name: 'Release ${{ github.sha }}'
           body: |
             ## Release Notes
             - Auto-generated release for commit ${{ github.sha }}
-          files: |
-            path/to/your/build/artifacts/* # If you have files to include in the release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub provides this
