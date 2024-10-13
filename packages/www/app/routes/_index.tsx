@@ -20,10 +20,10 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const [stats, setStats] = useState({
-    stars: 123,
-    contributors: 123,
-    blocks: 123,
-    workflows: 123,
+    stars: 0,
+    contributors: 0,
+    blocks: 0,
+    workflows: 0,
   });
 
   useEffect(() => {
