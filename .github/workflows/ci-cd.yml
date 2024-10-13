@@ -1,0 +1,84 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/*'
+
+jobs:
+  build-and-deploy-client:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies using pnpm
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: Build client project
+        run: |
+          cd packages/client
+          pnpm run build
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ vars.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image for client
+        run: |
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          docker build -t ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA -f packages/client/Dockerfile .
+          docker tag ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/client:latest
+
+      - name: Push Docker image for client
+        run: |
+          docker push ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA
+          docker push ${{ vars.DOCKER_USERNAME }}/client:latest
+
+  build-and-deploy-landing-page:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies using pnpm
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: Build landing page project
+        run: |
+          cd packages/www
+          pnpm run build
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ vars.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image for landing page
+        run: |
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          docker build -t ${{ vars.DOCKER_USERNAME }}/landing-page:$COMMIT_SHA -f packages/www/Dockerfile .
+          docker tag ${{ vars.DOCKER_USERNAME }}/landing-page:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/landing-page:latest
+
+      - name: Push Docker image for landing page
+        run: |
+          docker push ${{ vars.DOCKER_USERNAME }}/landing-page:$COMMIT_SHA
+          docker push ${{ vars.DOCKER_USERNAME }}/landing-page:latest
