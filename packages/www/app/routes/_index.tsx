@@ -27,7 +27,6 @@ export default function Index() {
   });
 
   useEffect(() => {
-    console.log("Execute useEffect");
     const fetchRepoData = async () => {
       try {
         const repoUrl = "https://api.github.com/repos/softflow24/data-river";
