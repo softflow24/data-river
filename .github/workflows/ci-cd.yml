@@ -36,7 +36,8 @@ jobs:
 
       - name: Build Docker image for client
         run: |
-          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          # Ensure that the commit SHA is valid and sanitized
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7 | tr -cd '[:alnum:]')  # Shorten and sanitize commit SHA
           docker build -t ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA -f packages/client/Dockerfile .
           docker tag ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/client:latest
 
@@ -74,7 +75,7 @@ jobs:
 
       - name: Build Docker image for landing page
         run: |
-          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7 | tr -cd '[:alnum:]')  # Shorten and sanitize commit SHA
           docker build -t ${{ vars.DOCKER_USERNAME }}/landing-page:$COMMIT_SHA -f packages/www/Dockerfile .
           docker tag ${{ vars.DOCKER_USERNAME }}/landing-page:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/landing-page:latest
 
