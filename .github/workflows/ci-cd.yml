@@ -51,15 +51,15 @@ jobs:
 
       - name: Log in to Docker Hub
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ vars.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
         run: |
           TAG="latest"  # You can adjust the tag (e.g., based on version, commit, etc.)
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG .
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+          docker build -t ${{ vars.DOCKER_USERNAME }}/my-app:$TAG .
+          docker tag ${{ vars.DOCKER_USERNAME }}/my-app:$TAG ${{ vars.DOCKER_USERNAME }}/my-app:latest
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:$TAG
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+          docker push ${{ vars.DOCKER_USERNAME }}/my-app:$TAG
+          docker push ${{ vars.DOCKER_USERNAME }}/my-app:latest
