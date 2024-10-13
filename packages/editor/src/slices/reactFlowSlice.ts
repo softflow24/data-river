@@ -8,8 +8,12 @@ import {
   applyEdgeChanges,
   Viewport,
 } from "reactflow";
-import { NodeData } from "../types/NodeTypes";
-import { applyDataChanges, NodeDataChange } from "../utils/nodesUpdates";
+import _ from "lodash";
+import { NodeData } from "@/types/NodeTypes";
+import { applyDataChanges, NodeDataChange } from "@/utils/nodesUpdates";
+import { blockConfigs, BlockType } from "@/blocks";
+import { initialEdges, initialNodes } from "@/workflows/initial";
+
 type CustomNode = Node<NodeData>;
 
 export interface ReactFlowState {
@@ -22,226 +26,8 @@ export interface ReactFlowState {
   nodes: CustomNode[];
   edges: Edge[];
   viewport: Viewport;
-  isSheetOpen: boolean;
+  draggingNodeId: string | null;
 }
-
-const initialNodes: CustomNode[] = [
-  {
-    id: "1",
-    type: "custom",
-    position: { x: 100, y: 100 },
-    data: {
-      block: "start@0.1",
-      label: "Start",
-      color: "rgb(34 197 94)",
-      sourceHandle: true,
-      targetHandle: false,
-      icon: "Play",
-    },
-  },
-  {
-    id: "2",
-    type: "custom",
-    position: { x: 400, y: 100 },
-    data: {
-      block: "input@0.1",
-      label: "Input node",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "TextCursorInput",
-      inputs: {},
-      config: {
-        input: "100",
-      },
-      outputs: {
-        output: "",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
-    },
-  },
-  {
-    id: "3",
-    type: "custom",
-    position: { x: 1300, y: 0 },
-    data: {
-      block: "input@0.1",
-      label: "Input",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      config: {
-        input: "logic was resolved to TRUE",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
-    },
-  },
-  {
-    id: "5",
-    type: "custom",
-    position: { x: 800, y: 100 },
-    data: {
-      block: "logic@0.1",
-      label: "Logic",
-      color: "rgb(59 130 246)",
-      sourceHandle: false,
-      targetHandle: true,
-      icon: "GitBranch",
-      inputs: { value: "" },
-      outputs: {
-        result: "",
-      },
-      config: {
-        logicOperator: "AND",
-        conditions: [],
-      },
-      controls: [
-        {
-          type: "conditions-summary",
-          label: "Conditions summary",
-          name: "conditions",
-        },
-      ],
-    },
-  },
-
-  {
-    id: "6",
-    type: "custom",
-    position: { x: 1300, y: 300 },
-    data: {
-      block: "input@0.1",
-      label: "Input",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      config: {
-        input: "logic was resolved to FALSE",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
-    },
-  },
-
-  {
-    id: "9",
-    type: "custom",
-    position: { x: 1800, y: 150 },
-    data: {
-      block: "output@0.1",
-      label: "Output",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      controls: [
-        {
-          label: "",
-          type: "text-area",
-          name: "output",
-          placeholder:
-            "Value from input will be displayed here after execution",
-        },
-      ],
-    },
-  },
-
-  {
-    id: "4",
-    type: "custom",
-    position: { x: 2300, y: 200 },
-    data: {
-      block: "end@0.1",
-      label: "End",
-      color: "rgb(239 68 68)",
-      sourceHandle: false,
-      targetHandle: true,
-      icon: "Flag",
-    },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    type: "custom",
-    sourceHandle: "1-source",
-    targetHandle: "2-target",
-  },
-
-  {
-    id: "e2-5",
-    source: "2",
-    target: "5",
-    type: "custom",
-    sourceHandle: "2-source",
-    targetHandle: "5-target",
-  },
-  {
-    id: "e5-3",
-    source: "5",
-    target: "3",
-    type: "custom",
-    sourceHandle: "5-if-handle",
-    targetHandle: "3-target",
-  },
-  {
-    id: "e6-3",
-    source: "5",
-    target: "6",
-    type: "custom",
-    sourceHandle: "5-else-handle",
-    targetHandle: "6-target",
-  },
-  {
-    id: "e6-9",
-    source: "6",
-    target: "9",
-    type: "custom",
-    sourceHandle: "6-source",
-    targetHandle: "9-target",
-  },
-  {
-    id: "e3-4",
-    source: "3",
-    target: "9",
-    type: "custom",
-    sourceHandle: "9-source",
-    targetHandle: "9-target",
-  },
-  {
-    id: "e9-4",
-    source: "9",
-    target: "4",
-    type: "custom",
-    sourceHandle: "9-source",
-    targetHandle: "4-target",
-  },
-];
 
 const initialState: ReactFlowState = {
   minimalistic: false,
@@ -253,7 +39,7 @@ const initialState: ReactFlowState = {
   nodes: initialNodes,
   edges: initialEdges,
   viewport: { x: 0, y: 0, zoom: 1 },
-  isSheetOpen: false,
+  draggingNodeId: null,
 };
 
 const reactFlowSlice = createSlice({
@@ -303,22 +89,6 @@ const reactFlowSlice = createSlice({
     zoomOut: (state) => {
       state.viewport = { ...state.viewport, zoom: state.viewport.zoom - 0.1 };
     },
-    addNewNode: (state) => {
-      const newNode: CustomNode = {
-        id: `${state.nodes.length + 1}`,
-        type: "custom",
-        position: { x: Math.random() * 500, y: Math.random() * 500 },
-        data: {
-          block: "newNode@0.1",
-          label: `Node ${state.nodes.length + 1}`,
-          color: "rgb(107 114 128)",
-          sourceHandle: true,
-          targetHandle: true,
-          icon: "Circle",
-        },
-      };
-      state.nodes.push(newNode);
-    },
     setViewport: (state, action: PayloadAction<Viewport>) => {
       if (action.payload.x !== undefined) {
         state.viewport.x = action.payload.x;
@@ -330,8 +100,59 @@ const reactFlowSlice = createSlice({
         state.viewport.zoom = action.payload.zoom;
       }
     },
-    setIsSheetOpen: (state, action: PayloadAction<boolean>) => {
-      state.isSheetOpen = action.payload;
+    startDraggingNode: (
+      state,
+      action: PayloadAction<{
+        type: BlockType;
+        position: { x: number; y: number };
+      }>,
+    ) => {
+      const { type, position } = action.payload;
+      const blockConfig = blockConfigs[type];
+
+      if (!blockConfig) {
+        throw new Error(`Unknown node type: ${type}`);
+      }
+
+      const newNode: CustomNode = {
+        id: _.uniqueId("node-"),
+        type: blockConfig.type,
+        position,
+        dragging: true,
+        data: { ...blockConfig.data! },
+      };
+
+      state.nodes.push(newNode);
+      state.draggingNodeId = newNode.id;
+      state.selectedNodeId = newNode.id;
+      state.hoveredNodeId = newNode.id;
+    },
+
+    finishDraggingNode: (state) => {
+      state.draggingNodeId = null;
+    },
+
+    cancelDraggingNode: (state) => {
+      if (state.draggingNodeId) {
+        state.nodes = state.nodes.filter(
+          (node) => node.id !== state.draggingNodeId,
+        );
+        state.draggingNodeId = null;
+      }
+    },
+
+    updateDraggingNodePosition: (
+      state,
+      action: PayloadAction<{ x: number; y: number }>,
+    ) => {
+      if (state.draggingNodeId) {
+        const nodeIndex = state.nodes.findIndex(
+          (node) => node.id === state.draggingNodeId,
+        );
+        if (nodeIndex !== -1) {
+          state.nodes[nodeIndex].position = action.payload;
+        }
+      }
     },
   },
 });
@@ -348,8 +169,11 @@ export const {
   setSelectedEdgeId,
   setHoveredEdgeId,
   setViewport,
-  setIsSheetOpen,
   updateNodesData,
+  startDraggingNode,
+  finishDraggingNode,
+  cancelDraggingNode,
+  updateDraggingNodePosition,
 } = reactFlowSlice.actions;
 
 export default reactFlowSlice.reducer;

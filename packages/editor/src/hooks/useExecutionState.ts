@@ -1,6 +1,10 @@
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ExecutionState } from "@/slices/executionSlice";
+import { createSelector } from "@reduxjs/toolkit";
+
+// Create a memoized selector for the entire ExecutionState
+const selectExecutionState = (state: RootState) => state.execution;
 
 // Overload 1: No selector provided, returns entire ExecutionState
 export function useExecutionState(): ExecutionState;
@@ -12,10 +16,19 @@ export function useExecutionState<T>(selector: (state: ExecutionState) => T): T;
 export function useExecutionState<T>(
   selector?: (state: ExecutionState) => T,
 ): ExecutionState | T {
-  return useSelector((state: RootState) => {
-    const execution = state.execution;
-    return selector ? selector(execution) : execution;
-  });
+  // If no selector is provided, use the memoized selector for the entire state
+  if (!selector) {
+    return useSelector(selectExecutionState);
+  }
+
+  // Create a memoized selector for the specific selection
+  const memoizedSelector = createSelector(
+    [selectExecutionState],
+    (executionState) => selector(executionState),
+  );
+
+  // Use the memoized selector
+  return useSelector(memoizedSelector);
 }
 
 export default useExecutionState;

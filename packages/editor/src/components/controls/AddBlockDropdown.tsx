@@ -1,4 +1,10 @@
-import { TextCursorInput, Square, GitBranch, Plus } from "lucide-react";
+import React from "react";
+import { Plus } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { startDraggingNode } from "../../slices/reactFlowSlice";
+import { blockConfigs, BlockType } from "../../blocks";
+import { useReactFlow } from "reactflow";
+import NodeIcon from "../NodeIcon";
 
 import {
   DropdownMenu,
@@ -7,9 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@data-river/shared/ui/components/ui/dropdown-menu";
 
@@ -22,6 +25,40 @@ export function AddBlockDropdownMenu({
   direction = "down",
   children,
 }: AddBlockDropdownMenuProps) {
+  const dispatch = useDispatch();
+  const { screenToFlowPosition } = useReactFlow();
+
+  const handleStartDraggingNode = (
+    event: React.MouseEvent<HTMLDivElement>,
+    type: BlockType,
+  ) => {
+    const position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    dispatch(startDraggingNode({ type, position }));
+  };
+
+  const renderMenuItems = () => {
+    return Object.entries(blockConfigs)
+      .filter(([_, config]) => config.data?.addable ?? true)
+      .map(([type, config]) => (
+        <DropdownMenuItem
+          key={type}
+          onClick={(event) => handleStartDraggingNode(event, type as BlockType)}
+        >
+          <NodeIcon
+            icon={config.data!.icon}
+            color={config.data!.color}
+            useBackgroundColor={false}
+            useIconColor={false}
+          />
+          <span className="ml-2">{config.data!.label}</span>
+        </DropdownMenuItem>
+      ));
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -34,34 +71,9 @@ export function AddBlockDropdownMenu({
       >
         <DropdownMenuLabel>Add Block to Flow</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <TextCursorInput className="mr-2 h-4 w-4 " />
-              <span>Input</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem>
-                <TextCursorInput className="mr-2 h-4 w-4 " />
-                <span>Input Node</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Square className="mr-2 h-4 w-4 " />
-                <span>Simple Input</span>
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            <GitBranch className="mr-2 h-4 w-4 " />
-            <span>Logic</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Square className="mr-2 h-4 w-4 " />
-            <span>Output</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        <DropdownMenuGroup>{renderMenuItems()}</DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem disabled>
           <Plus className="mr-2 h-4 w-4" />
           <span>Add Custom Block</span>
         </DropdownMenuItem>

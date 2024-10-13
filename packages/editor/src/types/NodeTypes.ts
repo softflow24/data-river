@@ -9,6 +9,7 @@ interface Control {
 }
 
 export interface NodeData {
+  addable?: boolean; // Whether the block can be added to the flow manually.
   block: string;
   label: string;
   description?: string;

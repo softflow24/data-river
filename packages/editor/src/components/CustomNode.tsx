@@ -17,11 +17,11 @@ import { useExecutionState } from "@/hooks/useExecutionState";
 import clsx from "clsx";
 import { createBlockValidationErrorFromObject } from "@data-river/blocks/errors/blockValidationError";
 
-const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
+const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
   const { selectedNodeId, hoveredNodeId } = useReactFlowState();
   const executionResult = useExecutionState((x) => x.executionResult);
 
-  const isSelected = id === selectedNodeId;
+  const isSelected = id === selectedNodeId || selected;
   const isHovered = hoveredNodeId === id;
   const showHandles =
     isSelected || selectedNodeId === id || hoveredNodeId === id;
