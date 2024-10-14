@@ -29,6 +29,7 @@ import {
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
 import { useHotkeys } from "react-hotkeys-hook";
+import { isValidConnection } from "@/utils/validation";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -63,6 +64,9 @@ export const useReactFlowEventHandlers = () => {
   const onConnect: OnConnect = useCallback(
     (connection) => {
       const newEdges = addEdge(connection, edges);
+
+      if (!isValidConnection(connection, newEdges)) return;
+
       dispatch(setEdges(newEdges));
     },
     [edges, dispatch],
