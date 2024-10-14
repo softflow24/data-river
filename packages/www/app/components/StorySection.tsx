@@ -5,7 +5,7 @@ import MagicCard from "~/components/ui/magic-card";
 import FlickeringGrid from "./ui/flickering-grid";
 import DotPattern from "./ui/dot-pattern";
 
-interface StorySectionProps {
+export interface StorySectionProps {
   stats: {
     stars: number;
     contributors: number;

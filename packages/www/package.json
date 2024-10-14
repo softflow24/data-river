@@ -61,6 +61,7 @@
     "input-otp": "^1.2.4",
     "isbot": "^5.1.17",
     "lucide-react": "^0.452.0",
+    "lru-cache": "^11.0.1",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-day-picker": "9.1.3",
