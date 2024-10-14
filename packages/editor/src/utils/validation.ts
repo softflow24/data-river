@@ -7,8 +7,7 @@ export function isValidConnection(
   const circularConnectionExists = newEdges.some(
     (edge) =>
       edge.sourceHandle === connection.targetHandle ||
-      edge.targetHandle === connection.sourceHandle ||
-      connection.sourceHandle === connection.targetHandle,
+      edge.targetHandle === connection.sourceHandle,
   );
 
   return (
