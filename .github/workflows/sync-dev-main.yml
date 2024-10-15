@@ -7,11 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-sync-pr:
+  rebase-development-onto-main:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -24,22 +23,25 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
 
-      - name: Create or update sync branch
-        run: |
-          git checkout -B sync-development-to-main origin/development
-          git push -f origin sync-development-to-main
+      - name: Fetch all branches
+        run: git fetch origin
 
-      - name: Create or update pull request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout main branch
+        run: git checkout main
+
+      - name: Rebase development onto main
         run: |
-          PR_EXISTS=$(gh pr list --base main --head sync-development-to-main --json number --jq length)
-          if [ "$PR_EXISTS" -eq "0" ]; then
-            gh pr create --base main --head sync-development-to-main \
-              --title "Sync Development to Main" \
-              --body "This PR syncs the latest changes from the development branch to the main branch."
-          else
-            gh pr edit --base main --head sync-development-to-main \
-              --title "Sync Development to Main" \
-              --body "This PR syncs the latest changes from the development branch to the main branch."
-          fi
+          git checkout development
+          git rebase main
+
+      - name: Push changes to main
+        run: |
+          git checkout main
+          git merge development --ff-only
+          git push origin main
+
+      - name: Handle rebase conflicts
+        if: failure()
+        run: |
+          echo "⚠️  There was a conflict during the rebase. Please resolve it manually."
+          exit 1
