@@ -10,9 +10,6 @@
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
   },
-  "resolutions": {
-    "tslib": "^1.14.1"
-  },
   "dependencies": {
     "@data-river/editor": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
