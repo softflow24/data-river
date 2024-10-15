@@ -1,14 +1,13 @@
 name: "PR Build"
 on:
-  # Runs on pull-requests against the develop / main branch
+  # Runs on pull-requests against the development branch
   pull_request:
     branches:
       - development
-      - main
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm
