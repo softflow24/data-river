@@ -1,0 +1,2 @@
+./scripts/setup-merge-driver.sh
+./scripts/check-lockfile-change.sh "$1" "$2"
