@@ -1,1 +1,2 @@
+./scripts/check-pnpm-version.sh
 npx lint-staged
