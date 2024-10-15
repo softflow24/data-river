@@ -20,6 +20,26 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
+
+      # Check if pnpm-lock.yaml has changed and commit the change
+      - name: Check for pnpm-lock.yaml changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ $(git status --porcelain pnpm-lock.yaml) ]]; then
+            git add pnpm-lock.yaml
+            git commit -m "ci: fix pnpm-lock.yaml"
+
+            # Fetch the latest changes from the remote to check for conflicts
+            git fetch origin development
+
+            # Attempt to rebase the changes onto the latest development branch
+            git rebase origin/development || git rebase --abort
+
+            # Force push the changes if the rebase was successful
+            git push --force-with-lease
+          fi
+
       - name: Run linter
         run: npm run lint:all
       - name: Build
