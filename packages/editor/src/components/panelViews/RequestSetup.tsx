@@ -70,6 +70,11 @@ export default function RequestBlock() {
     },
   });
 
+  const saveHeaders = () => {
+    const data = watch();
+    onSubmit(data);
+  };
+
   const onSubmit = (data: FormData) => {
     // dispatch(updateRequestBlock(data));
     setIsOpen(false);
@@ -109,7 +114,7 @@ export default function RequestBlock() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto min-w-[26rem]">
       <div className="bg-background shadow-sm rounded-lg px-4 mb-4">
         <div className="flex items-center space-x-2">
           <span
@@ -203,15 +208,26 @@ export default function RequestBlock() {
                   </Button>
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addHeader}
-                className="mt-2"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Header
-              </Button>
+              <div className="flex justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addHeader}
+                  className="mt-2"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Header
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={saveHeaders}
+                  className="mt-2"
+                >
+                  Save
+                </Button>
+              </div>
             </div>
 
             <div>
