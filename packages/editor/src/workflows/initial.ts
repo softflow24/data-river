@@ -44,6 +44,19 @@ const initialNodes: Node<NodeData>[] = [
     },
   },
   {
+    id: "99",
+    type: "custom",
+    position: { x: 400, y: 300 },
+    data: {
+      block: "request@0.1",
+      label: "Request",
+      color: "rgb(234 179 8)",
+      sourceHandle: true,
+      targetHandle: true,
+      icon: "Square",
+    },
+  },
+  {
     id: "3",
     type: "custom",
     position: { x: 1300, y: 0 },

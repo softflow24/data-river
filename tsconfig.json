@@ -2,6 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "paths": {
       "~/*": ["packages/www/app/*"],
       "@data-river/shared/*": ["packages/shared/src/*"],
