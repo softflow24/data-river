@@ -1,0 +1,54 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/*'
+
+jobs:
+  build-and-deploy-client:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies using pnpm
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: Build client project
+        run: |
+          cd packages/client
+          pnpm run build
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ vars.DOCKER_USERNAME }}" --password-stdin
+
+      # Debug: Print out the COMMIT_SHA
+      - name: Debug commit SHA
+        run: |
+          echo "GitHub SHA: ${{ github.sha }}"
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7 | tr -cd '[:alnum:]')  # Shorten and sanitize commit SHA
+          echo "Sanitized Commit SHA: $COMMIT_SHA"
+
+      - name: Build Docker image for client
+        run: |
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7 | tr -cd '[:alnum:]')  # Ensure commit SHA is alphanumeric
+          docker build -t ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA -f packages/client/Dockerfile .
+          docker tag ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA ${{ vars.DOCKER_USERNAME }}/client:latest
+
+      - name: Push Docker image for client
+        run: |
+          COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7 | tr -cd '[:alnum:]')  # Ensure commit SHA is alphanumeric
+          docker push ${{ vars.DOCKER_USERNAME }}/client:$COMMIT_SHA
+          docker push ${{ vars.DOCKER_USERNAME }}/client:latest
