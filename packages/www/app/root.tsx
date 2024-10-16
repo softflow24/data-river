@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
+import { Toaster } from "~/components/ui/toaster";
 
 import "./tailwind.css";
 
@@ -55,6 +56,7 @@ export function Layout({ children }: { children: ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );
