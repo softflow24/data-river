@@ -1,6 +1,6 @@
-name: Feature request 🚀  
+name: Feature request 🚀
 description: Suggest a new idea for data-river
-labels: ['status: needs triage']  
+labels: ["status: needs triage", "feature"]
 
 body:
   - type: markdown

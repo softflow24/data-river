@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "@data-river/shared/tailwind.css";
 import { Provider } from "react-redux";
 import { ReactFlowProvider } from "reactflow";
 import store from "./store";
@@ -26,6 +27,7 @@ import TopRightControls from "./components/controls/top-right-controls";
 import RightPanel from "./components/RightPanel";
 import LeftPanel from "./components/LeftPanel";
 import { Toaster } from "@data-river/shared/ui/components/ui/toaster";
+import useHotKeysHook from "./hooks/useHotKeysHook";
 const Editor = () => {
   const dispatch = useDispatch();
   const {
@@ -34,6 +36,9 @@ const Editor = () => {
     isBottomPanelVisible,
     isRightPanelVisible,
   } = useLayoutState();
+
+  useHotKeysHook();
+
   const flowRef = useRef<ImperativePanelHandle>(null);
   const footerRef = useRef<ImperativePanelHandle>(null);
   const rightSidebarRef = useRef<ImperativePanelHandle>(null);
@@ -68,9 +73,14 @@ const Editor = () => {
           withHandle={true}
           hitAreaMargins={{ coarse: 10, fine: 10 }}
         />
-        <ResizablePanel id="flow-footer" order={1} minSize={10}>
+        <ResizablePanel
+          id="flow-footer"
+          order={1}
+          minSize={10}
+          defaultSize={100}
+        >
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel id="flow" ref={flowRef} defaultSize={98}>
+            <ResizablePanel id="flow" ref={flowRef} defaultSize={100}>
               <FlowChart />
             </ResizablePanel>
             <ResizableHandle
@@ -91,6 +101,7 @@ const Editor = () => {
               id="footer"
               ref={footerRef}
               collapsible
+              defaultSize={0}
               minSize={2}
               maxSize={98}
               onExpand={() => {
@@ -112,6 +123,7 @@ const Editor = () => {
           id="right-sidebar"
           ref={rightSidebarRef}
           order={2}
+          defaultSize={0}
           collapsible
         >
           <RightPanel />

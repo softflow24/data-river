@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm@9.10.0
+RUN npm install -g pnpm@9.12.1
 
 # Copy package files
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml lerna.json .npmrc ./
@@ -12,9 +12,6 @@ COPY packages/editor/package.json ./packages/editor/
 COPY packages/execution-engine/package.json ./packages/execution-engine/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/blocks/package.json ./packages/blocks/
-
-# Set shamefully-hoist to true
-RUN echo "shamefully-hoist=true" >> .npmrc
 
 # Install all dependencies at the project level, skipping the prepare script
 RUN pnpm install --frozen-lockfile --ignore-scripts
@@ -33,7 +30,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm@9.10.0
+RUN npm install -g pnpm@9.12.1
 
 # Copy package files and install dependencies
 COPY --from=builder /app/pnpm-workspace.yaml /app/package.json /app/pnpm-lock.yaml /app/lerna.json /app/.npmrc ./

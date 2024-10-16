@@ -17,8 +17,6 @@
     { "path": "packages/execution-engine" },
     { "path": "packages/shared" },
     { "path": "packages/blocks" },
-    { "path": "packages/server" },
-    { "path": "packages/client" },
-    { "path": "packages/www" }
+    { "path": "packages/server" }
   ]
 }

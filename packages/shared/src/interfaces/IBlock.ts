@@ -12,6 +12,7 @@ export interface IBlock {
   execute(inputs: Record<string, unknown>): Promise<Record<string, unknown>>;
   safeExecute(
     inputs: Record<string, unknown>,
+    config: Record<string, unknown>,
   ): Promise<Record<string, unknown>>;
   handleError(error: Error): void;
 }

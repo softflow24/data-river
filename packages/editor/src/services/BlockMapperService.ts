@@ -19,6 +19,7 @@ export class BlockMapperService {
         outputConfigs: node.data.outputConfigs,
         inputs: node.data.inputs,
         outputs: node.data.outputs,
+        config: node.data.config,
       },
     };
   }
@@ -30,6 +31,7 @@ export class BlockMapperService {
       inputConfigs: block.data.inputConfigs,
       outputConfigs: block.data.outputConfigs,
       inputs: block.data.inputs,
+      config: block.data.config,
     };
   }
 

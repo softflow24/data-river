@@ -39,39 +39,129 @@ export class ExecutionEngine {
       result: [],
       errors: [],
     };
-    for (const blockConfig of blockConfigs) {
-      try {
-        const inputs = this.getInputsForBlock(blockConfig);
-        const resolvedInputs = this.resolveVariables(inputs);
-        this.logger.debug(`Executing block: ${blockConfig.id}`, {
-          blockConfig,
-          resolvedInputs,
-        });
 
-        const updatedConfig = { ...blockConfig, inputs: resolvedInputs };
-        const outputs = await this.executeBlockWithRetry(updatedConfig);
+    const executedBlocks = new Set<string>();
+    const startBlock = blockConfigs.find((block) =>
+      block.type.startsWith("blocks/start@"),
+    );
 
-        this.logger.debug(`Block ${blockConfig.id} execution completed`, {
-          outputs,
-        });
-        this.handleBlockOutputs(blockConfig, outputs);
-        output.result.push({
-          nodeType: blockConfig.type,
-          nodeId: blockConfig.id,
-          outputs,
-          inputs: resolvedInputs,
-        });
-      } catch (error) {
-        const blockError = this.handleBlockError(error as Error, blockConfig);
-        this.environment.errors[blockConfig.id] = blockError.errors;
-        output.errors.push({ blockId: blockConfig.id, error: error as Error });
-        break;
-      }
+    if (!startBlock) {
+      throw new Error("No start block found in the workflow");
     }
+
+    await this.executeBlock(
+      startBlock.id,
+      blockConfigs,
+      executedBlocks,
+      output,
+    );
 
     this.logger.timeEnd("Workflow Execution");
     this.logger.groupEnd();
     return output;
+  }
+
+  private async executeBlock(
+    blockId: string,
+    blockConfigs: IBlockConfig[],
+    executedBlocks: Set<string>,
+    output: IExecutionResult,
+  ): Promise<void> {
+    if (executedBlocks.has(blockId)) return;
+
+    const blockConfig = blockConfigs.find((block) => block.id === blockId);
+    if (!blockConfig) return;
+
+    try {
+      const inputs = this.getInputsForBlock(blockConfig);
+      const resolvedInputs = this.resolveVariables(inputs);
+
+      this.logger.debug(`Executing block: ${blockConfig.id}`, {
+        blockConfig,
+        resolvedInputs,
+      });
+
+      const updatedConfig = { ...blockConfig, inputs: resolvedInputs };
+      const outputs = await this.executeBlockWithRetry(updatedConfig);
+
+      this.logger.info(`Block ${blockConfig.id} execution completed`, {
+        outputs,
+      });
+      this.handleBlockOutputs(blockConfig, outputs);
+      output.result.push({
+        nodeType: blockConfig.type,
+        nodeId: blockConfig.id,
+        outputs,
+        inputs: resolvedInputs,
+      });
+
+      executedBlocks.add(blockId);
+
+      // Handle logic blocks
+      if (blockConfig.type.startsWith("blocks/logic@")) {
+        const nextBlockId = await this.evaluateLogicBlock(blockConfig, outputs);
+        if (nextBlockId) {
+          await this.executeBlock(
+            nextBlockId,
+            blockConfigs,
+            executedBlocks,
+            output,
+          );
+        }
+      } else {
+        // For non-logic blocks, execute all connected blocks
+        const connectedBlocks = this.getConnectedBlocks(blockConfig.id);
+        for (const connectedBlock of connectedBlocks) {
+          await this.executeBlock(
+            connectedBlock,
+            blockConfigs,
+            executedBlocks,
+            output,
+          );
+        }
+      }
+    } catch (error) {
+      const blockError = this.handleBlockError(error as Error, blockConfig);
+      this.environment.errors[blockConfig.id] = blockError.errors;
+      output.errors.push({ blockId: blockConfig.id, error: error as Error });
+    }
+  }
+
+  private getConnectedBlocks(blockId: string): string[] {
+    return this.connections
+      .filter((conn) => conn.from === blockId)
+      .map((conn) => conn.to);
+  }
+
+  private async evaluateLogicBlock(
+    blockConfig: IBlockConfig,
+    outputs: Record<string, unknown>,
+  ): Promise<string | null> {
+    const result = outputs.result as boolean;
+
+    const trueConnection = this.connections.find(
+      (conn) => conn.from === blockConfig.id && conn.sourceHandle?.match("if"),
+    );
+    const falseConnection = this.connections.find(
+      (conn) =>
+        conn.from === blockConfig.id && conn.sourceHandle?.match("else"),
+    );
+
+    this.logger.debug("Evaluating logic block", {
+      connections: this.connections,
+      blockConfig,
+      outputs,
+      trueConnection,
+      falseConnection,
+    });
+
+    if (result && trueConnection) {
+      return trueConnection.to;
+    } else if (!result && falseConnection) {
+      return falseConnection.to;
+    }
+
+    return null;
   }
 
   private async executeBlockWithRetry(
@@ -105,14 +195,17 @@ export class ExecutionEngine {
     blockConfig: IBlockConfig,
   ): Record<string, unknown> {
     const inputs: Record<string, unknown> = {};
-    this.connections
-      .filter((conn) => conn.to === blockConfig.id)
-      .forEach((conn) => {
-        if (conn.from && conn.outputKey && conn.inputKey) {
-          inputs[conn.inputKey] =
-            this.workflowState[conn.from]?.[conn.outputKey];
-        }
-      });
+    const connectionsBlocks = this.connections.filter(
+      (conn) => conn.to === blockConfig.id,
+    );
+
+    for (const conn of connectionsBlocks) {
+      if (conn.from && conn.outputKey && conn.inputKey) {
+        inputs[conn.inputKey] = this.workflowState[conn.from]?.[conn.outputKey];
+
+        if (inputs[conn.inputKey]) break;
+      }
+    }
 
     // Externally provided inputs
     if (blockConfig.inputs) {
@@ -142,7 +235,6 @@ export class ExecutionEngine {
     outputs: Record<string, unknown>,
   ): void {
     this.updateWorkflowState(blockConfig.id, outputs);
-    // Additional logic to pass outputs to connected blocks could be implemented here
   }
 
   private handleBlockError(
@@ -151,6 +243,8 @@ export class ExecutionEngine {
   ): {
     errors: Error[];
   } {
+    this.logger.error(`Error in block ${blockConfig.id}:`, error);
+
     if (blockConfig.onError) {
       try {
         blockConfig.onError(error, blockConfig);
@@ -162,7 +256,6 @@ export class ExecutionEngine {
         return { errors: [error as Error] };
       }
     }
-    this.logger.error(`Error in block ${blockConfig.id}:`, error);
 
     return { errors: [error] };
   }

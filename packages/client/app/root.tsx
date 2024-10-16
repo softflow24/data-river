@@ -9,7 +9,7 @@ import type { LinksFunction } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
 import "reflect-metadata";
 
-import "./tailwind.css";
+import "@data-river/shared/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,7 +41,6 @@ export const links: LinksFunction = () => [
 
 export function Layout({ children }: { children: ReactNode }) {
   useEffect(() => {
-    window.LOG_LEVEL = "debug";
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {

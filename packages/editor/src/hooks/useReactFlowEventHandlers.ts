@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@store";
 import {
@@ -11,6 +11,8 @@ import {
   EdgeMouseHandler,
   addEdge,
   Node,
+  useReactFlow,
+  NodePositionChange,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -21,13 +23,23 @@ import {
   setHoveredEdgeId,
   setHoveredNodeId,
   setSelectedNodeId,
-  setIsSheetOpen,
+  finishDraggingNode,
+  cancelDraggingNode,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
+import { setIsRightPanelVisible } from "@slices/layoutSlice";
+import { useHotkeys } from "react-hotkeys-hook";
+import { isValidConnection } from "@/utils/validation";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { edges } = useReactFlowState();
+  const { screenToFlowPosition } = useReactFlow();
+  const rafRef = useRef<number | null>(null);
+
+  const { draggingNodeId, edges } = useReactFlowState((x) => ({
+    draggingNodeId: x.draggingNodeId,
+    edges: x.edges,
+  }));
 
   const debouncedUpdateNodes = useMemo(
     () =>
@@ -52,6 +64,9 @@ export const useReactFlowEventHandlers = () => {
   const onConnect: OnConnect = useCallback(
     (connection) => {
       const newEdges = addEdge(connection, edges);
+
+      if (!isValidConnection(connection, newEdges)) return;
+
       dispatch(setEdges(newEdges));
     },
     [edges, dispatch],
@@ -77,7 +92,10 @@ export const useReactFlowEventHandlers = () => {
 
   const onPaneClick = useCallback(() => {
     dispatch(setSelectedEdgeId(null));
-  }, [dispatch]);
+    if (draggingNodeId) {
+      dispatch(finishDraggingNode());
+    }
+  }, [dispatch, draggingNodeId]);
 
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
@@ -93,7 +111,7 @@ export const useReactFlowEventHandlers = () => {
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setSelectedNodeId(node.id));
-      //dispatch(setIsSheetOpen(true));
+      dispatch(setIsRightPanelVisible(true));
     },
     [dispatch],
   );
@@ -104,6 +122,57 @@ export const useReactFlowEventHandlers = () => {
     },
     [dispatch],
   );
+
+  const handleMouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (draggingNodeId) {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+        }
+
+        rafRef.current = requestAnimationFrame(() => {
+          const flowPosition = screenToFlowPosition({
+            x: event.clientX,
+            y: event.clientY + 5,
+          });
+          const nodeChange: NodePositionChange = {
+            id: draggingNodeId,
+            type: "position",
+            position: flowPosition,
+            dragging: true,
+          };
+          dispatch(updateNodes([nodeChange]));
+        });
+      }
+    },
+    [draggingNodeId, screenToFlowPosition, dispatch],
+  );
+
+  useHotkeys(
+    "esc",
+    () => {
+      if (draggingNodeId) {
+        dispatch(cancelDraggingNode());
+      } else {
+        dispatch(setIsRightPanelVisible(false));
+      }
+    },
+    [draggingNodeId, dispatch],
+  );
+
+  useEffect(() => {
+    if (draggingNodeId) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [draggingNodeId, handleMouseMove]);
 
   return {
     onNodesChangeHandler,
@@ -117,5 +186,6 @@ export const useReactFlowEventHandlers = () => {
     onNodeMouseLeave,
     onNodeClick,
     onNodeDragStart,
+    handleMouseMove,
   };
 };

@@ -25,7 +25,7 @@ const CustomEdge: React.FC<EdgeProps> = ({
     source === hoveredNodeId || target === hoveredNodeId;
 
   const [edgePath] = getBezierPath({
-    sourceX: sourceX - 10,
+    sourceX,
     sourceY,
     sourcePosition,
     targetX,
@@ -34,7 +34,9 @@ const CustomEdge: React.FC<EdgeProps> = ({
   });
 
   const activeStroke =
-    isSelected || isHovered || connectToHoveredNode ? "#3b82f6" : "#888";
+    isSelected || isHovered || connectToHoveredNode
+      ? "hsl(var(--focus))"
+      : "hsl(var(--muted-foreground))";
 
   return (
     <>

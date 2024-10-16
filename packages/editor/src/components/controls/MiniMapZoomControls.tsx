@@ -2,11 +2,12 @@ import { FC } from "react";
 import { ZoomOut, ZoomIn } from "lucide-react";
 import Minimap from "./minimap";
 
-import ControlButton from "./ControlButton";
+import { Button } from "@data-river/shared/ui/components/ui/button";
 
 interface MiniMapZoomControlsProps {
   zoomOut: () => void;
   zoomIn: () => void;
+  resetZoom: () => void;
   zoom: number;
 }
 
@@ -14,20 +15,26 @@ const MiniMapZoomControls: FC<MiniMapZoomControlsProps> = ({
   zoomOut,
   zoomIn,
   zoom,
+  resetZoom,
 }) => {
   return (
-    <div className="mr-2 flex flex-col items-center bg-white p-2 rounded-lg shadow-md">
+    <div className="mx-2 flex flex-col items-center bg-background border rounded-lg shadow-md relative justify-center p-2">
       <Minimap />
-      <div className="mt-2 flex items-center justify-between w-auto">
-        <ControlButton onClick={zoomOut}>
-          <ZoomOut size={20} />
-        </ControlButton>
-        <span className="mx-2 text-sm font-medium text-gray-500">
+
+      <div className="flex items-center justify-between w-full">
+        <Button variant="ghost" size="icon" onClick={zoomOut}>
+          <ZoomOut className="h-1/2 w-1/2" />
+        </Button>
+        <Button
+          variant="ghost"
+          className="select-none w-14"
+          onClick={resetZoom}
+        >
           {Math.round(zoom * 100)}%
-        </span>
-        <ControlButton onClick={zoomIn}>
-          <ZoomIn size={20} />
-        </ControlButton>
+        </Button>
+        <Button variant="ghost" size="icon" onClick={zoomIn}>
+          <ZoomIn className="h-1/2 w-1/2" />
+        </Button>
       </div>
     </div>
   );
