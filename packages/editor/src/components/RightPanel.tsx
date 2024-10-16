@@ -8,6 +8,7 @@ import LogicNodePanelView from "./panelViews/LogicNodePanelView";
 import { ICondition } from "@data-river/shared/interfaces/ICondition";
 import { Button } from "@data-river/shared/ui/components/ui/button";
 import { toggleRightPanelVisible } from "@/store";
+import RequestSetup from "./panelViews/RequestSetup";
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
   const { nodes, selectedNodeId } = useReactFlowState();
@@ -47,6 +48,11 @@ const RightPanel = () => {
             onConfigChange={handleConfigChange}
             inputs={selectedNode.data.inputs || {}}
           />
+        );
+
+      case "request@0.1":
+        return (
+          <RequestSetup nodeId={selectedNode.id} data={selectedNode.data} />
         );
       // Add cases for other node types here
       default:

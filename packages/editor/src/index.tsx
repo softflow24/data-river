@@ -43,7 +43,7 @@ const Editor = () => {
   const footerRef = useRef<ImperativePanelHandle>(null);
   const rightSidebarRef = useRef<ImperativePanelHandle>(null);
   const debouncedSetBottomPanelSize = useMemo(
-    () => _.debounce((size: number) => dispatch(setBottomPanelSize(size)), 100),
+    () => _.debounce((size: number) => dispatch(setBottomPanelSize(size)), 1),
     [dispatch],
   );
 
