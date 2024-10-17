@@ -20,7 +20,7 @@ export const requestNode: Omit<Node<RequestNodeData>, "position"> = {
           value: "application/json",
         },
       ],
-      body: "{}",
+      bodyType: "none",
     },
     controls: [
       {

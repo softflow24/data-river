@@ -207,7 +207,7 @@ export class ExecutionEngine {
       }
     }
 
-    this.logger.info("Inputs for block", { inputs });
+    this.logger.debug("Inputs for block", { inputs });
 
     // Externally provided inputs
     if (blockConfig.inputs) {
