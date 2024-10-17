@@ -9,7 +9,10 @@ export class EndBlock extends Block {
       {
         ...config,
         inputConfigs: {
-          data: { type: "string", required: false },
+          data: {
+            type: ["string", "number", "boolean", "object", "array"],
+            required: false,
+          },
         },
         outputConfigs: {},
       },

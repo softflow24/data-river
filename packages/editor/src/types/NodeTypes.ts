@@ -1,7 +1,8 @@
+import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
 import Icons from "lucide-react";
 
 interface Control {
-  type: "text" | "text-area" | "select" | "conditions-summary";
+  type: "text" | "text-area" | "select" | "conditions-summary" | "request-info";
   label: string;
   name: string;
   placeholder?: string;
@@ -22,3 +23,7 @@ export interface NodeData {
   outputs?: Record<string, unknown>;
   config?: Record<string, unknown>;
 }
+
+export type RequestNodeData = Omit<NodeData, "config"> & {
+  config: RequestFormData;
+};

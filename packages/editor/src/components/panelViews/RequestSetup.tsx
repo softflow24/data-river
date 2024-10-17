@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { z } from "zod";
 import { PlusCircle, Trash2 } from "lucide-react";
 import {
   Select,
@@ -15,39 +13,42 @@ import {
   SelectValue,
 } from "@data-river/shared/ui";
 import MonacoEditorWrapper from "../MonacoEditorWrapper";
+import {
+  RequestFormSchema,
+  RequestFormData,
+} from "@data-river/shared/contracts/blocks/request";
+import { QueryParamsTable, QueryParam } from "./Request/QueryParamsTable";
+import { AddQueryParam } from "./Request/AddQueryParam";
+import _ from "lodash";
 
-const HeaderSchema = z.object({
-  key: z.string().nonempty("Header key is required"),
-  value: z.string().nonempty("Header value is required"),
-});
-
-const RequestFormSchema = z.object({
-  httpMethod: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
-  route: z.string().url("Invalid URL"),
-  headers: z.array(HeaderSchema).optional(),
-  body: z
-    .string()
-    .optional()
-    .refine(
-      (value) => {
-        if (!value) return true;
-        try {
-          JSON.parse(value);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      { message: "Invalid JSON format" },
-    ),
-});
-
-type FormData = z.infer<typeof RequestFormSchema>;
-
-export default function RequestBlock() {
-  const dispatch = useDispatch();
-  const [isOpen, setIsOpen] = useState(false);
+export default function RequestSetup({
+  nodeId,
+  config,
+  onConfigChange,
+}: {
+  nodeId: string;
+  config: RequestFormData;
+  onConfigChange: (config: RequestFormData) => void;
+}) {
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [existingQueryParams, setExistingQueryParams] = useState<QueryParam[]>(
+    () => {
+      if (Array.isArray(config.queryParams)) {
+        return config.queryParams;
+      } else if (
+        typeof config.queryParams === "object" &&
+        config.queryParams !== null
+      ) {
+        return Object.entries(config.queryParams).map(([key, value]) => ({
+          id: _.uniqueId("query-param-"),
+          key,
+          value,
+        }));
+      }
+      return [];
+    },
+  );
+
   const {
     control,
     register,
@@ -55,34 +56,34 @@ export default function RequestBlock() {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<FormData>({
+  } = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
     defaultValues: {
-      httpMethod: "GET",
-      route: "https://",
-      headers: [
-        { key: "Content-Type", value: "application/json" },
-        { key: "Accept", value: "application/json" },
-      ],
-      body: `{
-
-}`,
+      httpMethod: config.httpMethod,
+      url: config.url,
+      headers: config.headers,
+      body: config.body,
+      queryParams: config.queryParams,
     },
   });
 
-  const saveHeaders = () => {
-    const data = watch();
-    onSubmit(data);
+  const onSubmit = (data: RequestFormData) => {
+    onConfigChange({
+      ...data,
+      queryParams: Object.fromEntries(
+        existingQueryParams.map((param) => [param.key, param.value]),
+      ),
+    });
   };
 
-  const onSubmit = (data: FormData) => {
-    // dispatch(updateRequestBlock(data));
-    setIsOpen(false);
-  };
-
-  const httpMethod = watch("httpMethod");
-  const route = watch("route");
   const body = watch("body");
+  const headers = watch("headers");
+
+  useEffect(() => {
+    if (!headers || headers.length === 0) {
+      setValue("headers", [{ key: "", value: "" }]);
+    }
+  }, [headers]);
 
   useEffect(() => {
     if (body) {
@@ -113,28 +114,26 @@ export default function RequestBlock() {
     setValue("body", value || "{}");
   };
 
+  const handleAddQueryParams = (newParams: QueryParam[]) => {
+    setExistingQueryParams([...existingQueryParams, ...newParams]);
+    updateFormQueryParams([...existingQueryParams, ...newParams]);
+  };
+
+  const handleQueryParamsChange = (updatedParams: QueryParam[]) => {
+    setExistingQueryParams(updatedParams);
+    updateFormQueryParams(updatedParams);
+  };
+
+  const updateFormQueryParams = (params: QueryParam[]) => {
+    setValue(
+      "queryParams",
+      Object.fromEntries(params.map((param) => [param.key, param.value])),
+    );
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto min-w-[26rem]">
       <div className="bg-background shadow-sm rounded-lg px-4 mb-4">
-        <div className="flex items-center space-x-2">
-          <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${
-              httpMethod === "GET"
-                ? "bg-blue-100 text-blue-800"
-                : httpMethod === "POST"
-                  ? "bg-green-100 text-green-800"
-                  : httpMethod === "PUT"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : httpMethod === "DELETE"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-purple-100 text-purple-800"
-            }`}
-          >
-            {httpMethod}
-          </span>
-          <span className="font-semibold">{route || "/path"}</span>
-        </div>
-
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-background shadow-sm rounded-lg py-4"
@@ -170,14 +169,14 @@ export default function RequestBlock() {
               <div className="w-40 grow">
                 <Label htmlFor="route">Route</Label>
                 <Input
-                  id="route"
-                  {...register("route")}
+                  id="url"
+                  {...register("url")}
                   placeholder="https://api.example.com/users"
                   className="min-w-64 truncate"
                 />
-                {errors.route && (
+                {errors.url && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.route.message}
+                    {errors.url.message}
                   </p>
                 )}
               </div>
@@ -202,6 +201,7 @@ export default function RequestBlock() {
                     type="button"
                     variant="outline"
                     size="icon"
+                    disabled={headers?.length === 1}
                     onClick={() => removeHeader(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -217,15 +217,6 @@ export default function RequestBlock() {
                 >
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Add Header
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={saveHeaders}
-                  className="mt-2"
-                >
-                  Save
                 </Button>
               </div>
             </div>
@@ -253,6 +244,15 @@ export default function RequestBlock() {
                 <p className="text-red-500 text-sm mt-1">{jsonError}</p>
               )}
             </div>
+          </div>
+
+          <div className="mt-6">
+            <Label>Query Parameters</Label>
+            <AddQueryParam onAdd={handleAddQueryParams} />
+            <QueryParamsTable
+              data={existingQueryParams}
+              setData={handleQueryParamsChange}
+            />
           </div>
 
           <Button type="submit" className="mt-4" disabled={!!jsonError}>
