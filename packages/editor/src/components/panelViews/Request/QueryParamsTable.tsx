@@ -70,10 +70,12 @@ export function KeyValueTable({
         return (
           <Button
             variant="ghost"
+            className="p-0 w-full"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Key
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <span className="flex flex-1 items-start justify-start flex-row gap-2 text-left">
+              Key <ArrowUpDown className="ml-2 h-4 w-4" />
+            </span>
           </Button>
         );
       },
@@ -271,7 +273,7 @@ export function KeyValueTable({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-12 text-center"
                 >
                   No results.
                 </TableCell>
