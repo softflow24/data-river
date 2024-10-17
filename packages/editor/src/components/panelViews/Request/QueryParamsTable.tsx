@@ -65,6 +65,7 @@ export function QueryParamsTable({
   const columns: ColumnDef<QueryParam>[] = [
     {
       accessorKey: "key",
+      maxSize: 50,
       header: ({ column }) => {
         return (
           <Button
@@ -86,28 +87,32 @@ export function QueryParamsTable({
     {
       id: "actions",
       enableHiding: false,
+      size: 0, // This will make the column as small as possible
+      maxSize: 10, // This will limit the maximum width of the column
       cell: ({ row }) => {
         const param = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleEditParam(param)}>
-                Edit param
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDeleteParam(param.id)}>
-                Delete param
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleEditParam(param)}>
+                  Edit param
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDeleteParam(param.id)}>
+                  Delete param
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     },
