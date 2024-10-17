@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactFlow, {
   ConnectionMode,
   Background,
@@ -11,7 +11,6 @@ import "reactflow/dist/style.css";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { useReactFlowHooks } from "@hooks/useReactFlowHooks";
 import { useReactFlowEventHandlers } from "@hooks/useReactFlowEventHandlers";
-import useEditorState from "@/hooks/useEditorState";
 
 import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
@@ -30,7 +29,6 @@ const FlowChart: React.FC = () => {
   const { lightTheme, nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
   useReactFlowHooks();
-  const isPanning = useEditorState((state) => state.isPanning);
 
   return (
     <div
@@ -80,9 +78,6 @@ const FlowChart: React.FC = () => {
           <CustomNodeInfo />
         </Panel>
       </ReactFlow>
-      <span className="absolute top-20 left-20">
-        {isPanning ? "true" : "false"}
-      </span>
     </div>
   );
 };

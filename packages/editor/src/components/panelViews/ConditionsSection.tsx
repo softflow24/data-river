@@ -1,11 +1,5 @@
 import React from "react";
 import { ICondition } from "@data-river/shared/interfaces/ICondition";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@data-river/shared/ui/components/ui/card";
 import ConditionSetup from "./ConditionSetup";
 
 interface ConditionsSectionProps {

@@ -9,7 +9,10 @@ export class OutputBlock extends Block {
       {
         ...config,
         inputConfigs: {
-          data: { type: "string", required: true },
+          data: {
+            type: ["string", "number", "boolean", "object", "array"],
+            required: true,
+          },
         },
         outputConfigs: {},
       },

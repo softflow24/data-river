@@ -207,10 +207,12 @@ export class ExecutionEngine {
       }
     }
 
+    this.logger.debug("Inputs for block", { inputs });
+
     // Externally provided inputs
     if (blockConfig.inputs) {
       Object.entries(blockConfig.inputs).forEach(([key, value]) => {
-        inputs[key] = value;
+        if (inputs[key] === undefined) inputs[key] = value;
       });
     }
 

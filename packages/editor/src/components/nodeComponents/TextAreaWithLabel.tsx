@@ -26,7 +26,7 @@ const TextAreaWithLabel: React.FC<TextAreaWithLabelProps> = ({
         className="nodrag nowheel min-w-[20rem]"
         id={name}
         placeholder={placeholder}
-        value={value}
+        value={typeof value === "object" ? JSON.stringify(value) : value}
         onChange={(e) => onChange?.(e.target.value)}
         onBlur={(e) => onBlur?.(e.target.value)}
       />

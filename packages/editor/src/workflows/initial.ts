@@ -1,5 +1,6 @@
 import { Edge, Node } from "reactflow";
 import { NodeData } from "@/types/NodeTypes";
+import { blockConfigs } from "@/blocks";
 
 const initialNodes: Node<NodeData>[] = [
   {
@@ -42,6 +43,11 @@ const initialNodes: Node<NodeData>[] = [
         },
       ],
     },
+  },
+  {
+    ...blockConfigs.request,
+    id: "99",
+    position: { x: 400, y: 300 },
   },
   {
     id: "3",

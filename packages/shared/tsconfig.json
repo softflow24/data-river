@@ -3,7 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "target": "es6",
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
     "strict": true,
