@@ -78,7 +78,6 @@ const initialNodes: Node<NodeData>[] = [
       sourceHandle: false,
       targetHandle: true,
       icon: "GitBranch",
-      inputs: { value: "" },
       outputs: {
         result: "",
       },
