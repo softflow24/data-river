@@ -13,7 +13,6 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
-  ChevronDown,
   MoreHorizontal,
   PlusCircle,
   Save,
@@ -40,18 +39,20 @@ import {
 } from "@data-river/shared/ui/components/ui/table";
 import _ from "lodash";
 
-export type QueryParam = {
+export type KeyValuePair = {
   id: string;
   key: string;
   value: string;
 };
 
-export function QueryParamsTable({
+export function KeyValueTable({
   data,
   setData,
+  title,
 }: {
-  data: QueryParam[];
-  setData: (data: QueryParam[]) => void;
+  data: KeyValuePair[];
+  setData: (data: KeyValuePair[]) => void;
+  title: string;
 }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -60,12 +61,11 @@ export function QueryParamsTable({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [newParams, setNewParams] = React.useState<QueryParam[]>([]);
+  const [newItems, setNewItems] = React.useState<KeyValuePair[]>([]);
 
-  const columns: ColumnDef<QueryParam>[] = [
+  const columns: ColumnDef<KeyValuePair>[] = [
     {
       accessorKey: "key",
-      maxSize: 50,
       header: ({ column }) => {
         return (
           <Button
@@ -87,10 +87,10 @@ export function QueryParamsTable({
     {
       id: "actions",
       enableHiding: false,
-      size: 0, // This will make the column as small as possible
-      maxSize: 10, // This will limit the maximum width of the column
+      size: 0,
+      maxSize: 10,
       cell: ({ row }) => {
-        const param = row.original;
+        const item = row.original;
 
         return (
           <div className="flex justify-end">
@@ -104,11 +104,11 @@ export function QueryParamsTable({
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleEditParam(param)}>
-                  Edit param
+                <DropdownMenuItem onClick={() => handleEditItem(item)}>
+                  Edit {title}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDeleteParam(param.id)}>
-                  Delete param
+                <DropdownMenuItem onClick={() => handleDeleteItem(item.id)}>
+                  Delete {title}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -137,43 +137,39 @@ export function QueryParamsTable({
     },
   });
 
-  const addNewParam = () => {
-    setNewParams([
-      ...newParams,
-      { id: _.uniqueId("new-param-"), key: "", value: "" },
+  const addNewItem = () => {
+    setNewItems([
+      ...newItems,
+      { id: _.uniqueId("new-item-"), key: "", value: "" },
     ]);
   };
 
-  const updateNewParam = (
-    id: string,
-    field: "key" | "value",
-    value: string,
-  ) => {
-    setNewParams(
-      newParams.map((param) =>
-        param.id === id ? { ...param, [field]: value } : param,
+  const updateNewItem = (id: string, field: "key" | "value", value: string) => {
+    setNewItems(
+      newItems.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item,
       ),
     );
   };
 
-  const removeNewParam = (id: string) => {
-    setNewParams(newParams.filter((param) => param.id !== id));
+  const removeNewItem = (id: string) => {
+    setNewItems(newItems.filter((item) => item.id !== id));
   };
 
-  const handleSaveNewParams = () => {
-    const validParams = newParams.filter((param) => param.key.trim() !== "");
-    if (validParams.length > 0) {
-      setData([...data, ...validParams]);
-      setNewParams([]);
+  const handleSaveNewItems = () => {
+    const validItems = newItems.filter((item) => item.key.trim() !== "");
+    if (validItems.length > 0) {
+      setData([...data, ...validItems]);
+      setNewItems([]);
     }
   };
 
-  const handleEditParam = (param: QueryParam) => {
-    setNewParams([...newParams, { ...param }]);
-    setData(data.filter((p) => p.id !== param.id));
+  const handleEditItem = (item: KeyValuePair) => {
+    setNewItems([...newItems, { ...item }]);
+    setData(data.filter((p) => p.id !== item.id));
   };
 
-  const handleDeleteParam = (id: string) => {
+  const handleDeleteItem = (id: string) => {
     setData(data.filter((p) => p.id !== id));
   };
 
@@ -181,7 +177,7 @@ export function QueryParamsTable({
     <div className="w-full">
       <div className="flex items-center py-4 justify-between">
         <Input
-          placeholder="Filter keys..."
+          placeholder={`Filter ${title}...`}
           value={(table.getColumn("key")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("key")?.setFilterValue(event.target.value)
@@ -191,11 +187,11 @@ export function QueryParamsTable({
         <div className="flex items-center space-x-2 ml-2">
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              newParams.length > 0 ? "w-9 opacity-100" : "w-0 opacity-0"
+              newItems.length > 0 ? "w-9 opacity-100" : "w-0 opacity-0"
             }`}
           >
             <Button
-              onClick={handleSaveNewParams}
+              onClick={handleSaveNewItems}
               variant="default"
               size="icon"
               className="w-9 h-9"
@@ -203,26 +199,24 @@ export function QueryParamsTable({
               <Save size={16} />
             </Button>
           </div>
-          <Button onClick={addNewParam} variant="outline">
+          <Button onClick={addNewItem} variant="outline">
             <PlusCircle className="mr-2 h-4 w-4" />
-            Add New Param
+            Add New {title}
           </Button>
         </div>
       </div>
       <div className="space-y-2 mt-2 mb-4">
-        {newParams.map((param) => (
-          <div key={param.id} className="flex items-center space-x-2">
+        {newItems.map((item) => (
+          <div key={item.id} className="flex items-center space-x-2">
             <Input
-              value={param.key}
-              onChange={(e) => updateNewParam(param.id, "key", e.target.value)}
+              value={item.key}
+              onChange={(e) => updateNewItem(item.id, "key", e.target.value)}
               placeholder="Key"
               className="w-40 grow-0 truncate"
             />
             <Input
-              value={param.value}
-              onChange={(e) =>
-                updateNewParam(param.id, "value", e.target.value)
-              }
+              value={item.value}
+              onChange={(e) => updateNewItem(item.id, "value", e.target.value)}
               placeholder="Value"
               className="w-40 grow truncate"
             />
@@ -231,7 +225,7 @@ export function QueryParamsTable({
               type="button"
               variant="outline"
               size="icon"
-              onClick={() => removeNewParam(param.id)}
+              onClick={() => removeNewItem(item.id)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

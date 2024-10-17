@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusCircle, Trash2 } from "lucide-react";
 import {
   Select,
   Input,
@@ -22,7 +21,7 @@ import {
   RequestFormSchema,
   RequestFormData,
 } from "@data-river/shared/contracts/blocks/request";
-import { QueryParamsTable, QueryParam } from "./Request/QueryParamsTable";
+import { KeyValueTable, KeyValuePair } from "./Request/QueryParamsTable";
 import _ from "lodash";
 
 export default function RequestSetup({
@@ -35,25 +34,23 @@ export default function RequestSetup({
   onConfigChange: (config: RequestFormData) => void;
 }) {
   const [jsonError, setJsonError] = useState<string | null>(null);
-  const [existingQueryParams, setExistingQueryParams] = useState<QueryParam[]>(
-    () => {
-      if (Array.isArray(config.queryParams)) {
-        return config.queryParams;
-      } else if (
-        typeof config.queryParams === "object" &&
-        config.queryParams !== null
-      ) {
-        return Object.entries(config.queryParams).map(([key, value]) => ({
-          id: _.uniqueId("query-param-"),
-          key,
-          value,
-        }));
-      }
-      return [];
-    },
-  );
-  const [headers, setHeaders] = useState(
-    config.headers || [{ key: "", value: "" }],
+  const [queryParams, setQueryParams] = useState<KeyValuePair[]>(() => {
+    if (Array.isArray(config.queryParams)) {
+      return config.queryParams;
+    } else if (
+      typeof config.queryParams === "object" &&
+      config.queryParams !== null
+    ) {
+      return Object.entries(config.queryParams).map(([key, value]) => ({
+        id: _.uniqueId("query-param-"),
+        key,
+        value,
+      }));
+    }
+    return [];
+  });
+  const [headers, setHeaders] = useState<KeyValuePair[]>(
+    config.headers?.map((h) => ({ ...h, id: _.uniqueId("header-") })) || [],
   );
 
   const {
@@ -68,7 +65,7 @@ export default function RequestSetup({
     defaultValues: {
       httpMethod: config.httpMethod,
       url: config.url,
-      headers: headers,
+      headers: config.headers,
       body: config.body,
       queryParams: config.queryParams,
     },
@@ -81,9 +78,9 @@ export default function RequestSetup({
     console.log("Saving configuration", formData);
     onConfigChange({
       ...formData,
-      headers: headers,
+      headers: headers.map(({ key, value }) => ({ key, value })),
       queryParams: Object.fromEntries(
-        existingQueryParams.map((param) => [param.key, param.value]),
+        queryParams.map((param) => [param.key, param.value]),
       ),
     });
 
@@ -108,32 +105,8 @@ export default function RequestSetup({
     }
   }, [body]);
 
-  const addHeader = () => {
-    setHeaders([...headers, { key: "", value: "" }]);
-  };
-
-  const removeHeader = (index: number) => {
-    const newHeaders = [...headers];
-    newHeaders.splice(index, 1);
-    setHeaders(newHeaders);
-  };
-
-  const updateHeader = (
-    index: number,
-    field: "key" | "value",
-    value: string,
-  ) => {
-    const newHeaders = [...headers];
-    newHeaders[index][field] = value;
-    setHeaders(newHeaders);
-  };
-
   const handleEditorChange = (value: string | undefined) => {
     setValue("body", value || "{}");
-  };
-
-  const handleQueryParamsChange = (updatedParams: QueryParam[]) => {
-    setExistingQueryParams(updatedParams);
   };
 
   return (
@@ -193,59 +166,21 @@ export default function RequestSetup({
               <TabsContent value="params">
                 <div className="mt-6">
                   <Label>Query Parameters</Label>
-                  <QueryParamsTable
-                    data={existingQueryParams}
-                    setData={handleQueryParamsChange}
+                  <KeyValueTable
+                    data={queryParams}
+                    setData={setQueryParams}
+                    title="Param"
                   />
                 </div>
               </TabsContent>
               <TabsContent value="headers">
                 <div>
                   <Label>Headers</Label>
-                  {headers.map((header, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-2 mt-2"
-                    >
-                      <Input
-                        value={header.key}
-                        onChange={(e) =>
-                          updateHeader(index, "key", e.target.value)
-                        }
-                        placeholder="Key"
-                        className="w-40 grow-0 truncate"
-                      />
-                      <Input
-                        value={header.value}
-                        onChange={(e) =>
-                          updateHeader(index, "value", e.target.value)
-                        }
-                        placeholder="Value"
-                        className="w-40 grow truncate"
-                      />
-                      <Button
-                        className="shrink-0"
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        disabled={headers.length === 1}
-                        onClick={() => removeHeader(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  <div className="flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addHeader}
-                      className="mt-2"
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add Header
-                    </Button>
-                  </div>
+                  <KeyValueTable
+                    data={headers}
+                    setData={setHeaders}
+                    title="Header"
+                  />
                 </div>
               </TabsContent>
               <TabsContent value="body">
