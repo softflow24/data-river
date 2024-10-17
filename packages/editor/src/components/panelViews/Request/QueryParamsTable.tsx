@@ -99,11 +99,6 @@ export function QueryParamsTable({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(param.id)}
-              >
-                Copy param ID
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => handleEditParam(param)}>
                 Edit param
@@ -186,12 +181,12 @@ export function QueryParamsTable({
           onChange={(event) =>
             table.getColumn("key")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-full"
         />
         <div className="flex items-center space-x-2 ml-2">
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              newParams.length > 0 ? "w-10 opacity-100" : "w-0 opacity-0"
+              newParams.length > 0 ? "w-9 opacity-100" : "w-0 opacity-0"
             }`}
           >
             <Button

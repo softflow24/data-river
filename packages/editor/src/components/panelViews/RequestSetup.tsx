@@ -11,6 +11,7 @@ import {
   SelectItem,
   SelectContent,
   SelectValue,
+  useToast,
 } from "@data-river/shared/ui";
 import MonacoEditorWrapper from "../MonacoEditorWrapper";
 import {
@@ -67,12 +68,19 @@ export default function RequestSetup({
     },
   });
 
+  const { toast } = useToast();
+
   const onSubmit = (data: RequestFormData) => {
     onConfigChange({
       ...data,
       queryParams: Object.fromEntries(
         existingQueryParams.map((param) => [param.key, param.value]),
       ),
+    });
+
+    toast({
+      title: "Request configuration saved",
+      description: "Your request configuration has been saved",
     });
   };
 
