@@ -12,6 +12,10 @@ import {
   SelectContent,
   SelectValue,
   useToast,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "@data-river/shared/ui";
 import MonacoEditorWrapper from "../MonacoEditorWrapper";
 import {
@@ -19,7 +23,6 @@ import {
   RequestFormData,
 } from "@data-river/shared/contracts/blocks/request";
 import { QueryParamsTable, QueryParam } from "./Request/QueryParamsTable";
-import { AddQueryParam } from "./Request/AddQueryParam";
 import _ from "lodash";
 
 export default function RequestSetup({
@@ -49,20 +52,23 @@ export default function RequestSetup({
       return [];
     },
   );
+  const [headers, setHeaders] = useState(
+    config.headers || [{ key: "", value: "" }],
+  );
 
   const {
     control,
     register,
-    handleSubmit,
     formState: { errors },
     watch,
     setValue,
+    getValues,
   } = useForm<RequestFormData>({
     resolver: zodResolver(RequestFormSchema),
     defaultValues: {
       httpMethod: config.httpMethod,
       url: config.url,
-      headers: config.headers,
+      headers: headers,
       body: config.body,
       queryParams: config.queryParams,
     },
@@ -70,9 +76,12 @@ export default function RequestSetup({
 
   const { toast } = useToast();
 
-  const onSubmit = (data: RequestFormData) => {
+  const saveConfiguration = () => {
+    const formData = getValues();
+    console.log("Saving configuration", formData);
     onConfigChange({
-      ...data,
+      ...formData,
+      headers: headers,
       queryParams: Object.fromEntries(
         existingQueryParams.map((param) => [param.key, param.value]),
       ),
@@ -85,13 +94,6 @@ export default function RequestSetup({
   };
 
   const body = watch("body");
-  const headers = watch("headers");
-
-  useEffect(() => {
-    if (!headers || headers.length === 0) {
-      setValue("headers", [{ key: "", value: "" }]);
-    }
-  }, [headers]);
 
   useEffect(() => {
     if (body) {
@@ -107,45 +109,37 @@ export default function RequestSetup({
   }, [body]);
 
   const addHeader = () => {
-    const headers = watch("headers") || [];
-    headers.push({ key: "", value: "" });
-    setValue("headers", headers);
+    setHeaders([...headers, { key: "", value: "" }]);
   };
 
   const removeHeader = (index: number) => {
-    const headers = watch("headers") || [];
-    headers.splice(index, 1);
-    setValue("headers", headers);
+    const newHeaders = [...headers];
+    newHeaders.splice(index, 1);
+    setHeaders(newHeaders);
+  };
+
+  const updateHeader = (
+    index: number,
+    field: "key" | "value",
+    value: string,
+  ) => {
+    const newHeaders = [...headers];
+    newHeaders[index][field] = value;
+    setHeaders(newHeaders);
   };
 
   const handleEditorChange = (value: string | undefined) => {
     setValue("body", value || "{}");
   };
 
-  const handleAddQueryParams = (newParams: QueryParam[]) => {
-    setExistingQueryParams([...existingQueryParams, ...newParams]);
-    updateFormQueryParams([...existingQueryParams, ...newParams]);
-  };
-
   const handleQueryParamsChange = (updatedParams: QueryParam[]) => {
     setExistingQueryParams(updatedParams);
-    updateFormQueryParams(updatedParams);
-  };
-
-  const updateFormQueryParams = (params: QueryParam[]) => {
-    setValue(
-      "queryParams",
-      Object.fromEntries(params.map((param) => [param.key, param.value])),
-    );
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto min-w-[26rem]">
       <div className="bg-background shadow-sm rounded-lg px-4 mb-4">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="bg-background shadow-sm rounded-lg py-4"
-        >
+        <div className="bg-background shadow-sm rounded-lg py-4">
           <div className="space-y-4">
             <div className="flex flex-row gap-2 animate">
               <div className="flex-none hover:grow w-24 max-w-28 transition-[flex-grow] duration-300">
@@ -190,83 +184,106 @@ export default function RequestSetup({
               </div>
             </div>
 
-            <div>
-              <Label>Headers</Label>
-              {watch("headers")?.map((_, index) => (
-                <div key={index} className="flex items-center space-x-2 mt-2">
-                  <Input
-                    {...register(`headers.${index}.key`)}
-                    placeholder="Key"
-                    className="w-40 grow-0 truncate"
+            <Tabs defaultValue="params" className="w-full">
+              <TabsList>
+                <TabsTrigger value="params">Params</TabsTrigger>
+                <TabsTrigger value="headers">Headers</TabsTrigger>
+                <TabsTrigger value="body">Body</TabsTrigger>
+              </TabsList>
+              <TabsContent value="params">
+                <div className="mt-6">
+                  <Label>Query Parameters</Label>
+                  <QueryParamsTable
+                    data={existingQueryParams}
+                    setData={handleQueryParamsChange}
                   />
-                  <Input
-                    {...register(`headers.${index}.value`)}
-                    placeholder="Value"
-                    className="w-40 grow truncate"
-                  />
-                  <Button
-                    className="shrink-0"
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    disabled={headers?.length === 1}
-                    onClick={() => removeHeader(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
-              ))}
-              <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={addHeader}
-                  className="mt-2"
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Header
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="body">Body (JSON)</Label>
-              <div className="border rounded-md">
-                <MonacoEditorWrapper
-                  height="150px"
-                  defaultLanguage="json"
-                  defaultValue={body}
-                  onChange={handleEditorChange}
-                  options={{
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    folding: false,
-                    lineNumbers: "off",
-                    wordWrap: "on",
-                    wrappingIndent: "deepIndent",
-                    automaticLayout: true,
-                  }}
-                />
-              </div>
-              {jsonError && (
-                <p className="text-red-500 text-sm mt-1">{jsonError}</p>
-              )}
-            </div>
+              </TabsContent>
+              <TabsContent value="headers">
+                <div>
+                  <Label>Headers</Label>
+                  {headers.map((header, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-2 mt-2"
+                    >
+                      <Input
+                        value={header.key}
+                        onChange={(e) =>
+                          updateHeader(index, "key", e.target.value)
+                        }
+                        placeholder="Key"
+                        className="w-40 grow-0 truncate"
+                      />
+                      <Input
+                        value={header.value}
+                        onChange={(e) =>
+                          updateHeader(index, "value", e.target.value)
+                        }
+                        placeholder="Value"
+                        className="w-40 grow truncate"
+                      />
+                      <Button
+                        className="shrink-0"
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        disabled={headers.length === 1}
+                        onClick={() => removeHeader(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex justify-between">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addHeader}
+                      className="mt-2"
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Header
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="body">
+                <div>
+                  <Label htmlFor="body">Body (JSON)</Label>
+                  <div className="border rounded-md">
+                    <MonacoEditorWrapper
+                      height="150px"
+                      defaultLanguage="json"
+                      defaultValue={body}
+                      onChange={handleEditorChange}
+                      options={{
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        folding: false,
+                        lineNumbers: "off",
+                        wordWrap: "on",
+                        wrappingIndent: "deepIndent",
+                        automaticLayout: true,
+                      }}
+                    />
+                  </div>
+                  {jsonError && (
+                    <p className="text-red-500 text-sm mt-1">{jsonError}</p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
-          <div className="mt-6">
-            <Label>Query Parameters</Label>
-            <AddQueryParam onAdd={handleAddQueryParams} />
-            <QueryParamsTable
-              data={existingQueryParams}
-              setData={handleQueryParamsChange}
-            />
-          </div>
-
-          <Button type="submit" className="mt-4" disabled={!!jsonError}>
+          <Button
+            onClick={saveConfiguration}
+            className="mt-4"
+            disabled={!!jsonError}
+          >
             Save Configuration
           </Button>
-        </form>
+        </div>
       </div>
     </div>
   );
