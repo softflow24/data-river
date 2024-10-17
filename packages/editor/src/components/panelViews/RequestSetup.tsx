@@ -25,7 +25,7 @@ import { KeyValuePair } from "./Request/QueryParamsTable";
 import _ from "lodash";
 import { ParamsTab } from "./Request/ParamsTab";
 import { HeadersTab } from "./Request/HeadersTab";
-import { BodyTab } from "./Request/BodyTab";
+import { BodyTab, RequestBodyType } from "./Request/BodyTab";
 
 export default function RequestSetup({
   nodeId,
@@ -36,7 +36,7 @@ export default function RequestSetup({
   config: RequestFormData;
   onConfigChange: (config: RequestFormData) => void;
 }) {
-  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [queryParams, setQueryParams] = useState<KeyValuePair[]>(() => {
     if (Array.isArray(config.queryParams)) {
       return config.queryParams;
@@ -55,7 +55,9 @@ export default function RequestSetup({
   const [headers, setHeaders] = useState<KeyValuePair[]>(
     config.headers?.map((h) => ({ ...h, id: _.uniqueId("header-") })) || [],
   );
-
+  const [bodyType, setBodyType] = useState<RequestBodyType>(
+    config.bodyType || "none",
+  );
   const {
     control,
     register,
@@ -71,6 +73,7 @@ export default function RequestSetup({
       headers: config.headers,
       body: config.body,
       queryParams: config.queryParams,
+      bodyType: config.bodyType || "none",
     },
   });
 
@@ -78,13 +81,13 @@ export default function RequestSetup({
 
   const saveConfiguration = () => {
     const formData = getValues();
-    console.log("Saving configuration", formData);
     onConfigChange({
       ...formData,
       headers: headers.map(({ key, value }) => ({ key, value })),
       queryParams: Object.fromEntries(
         queryParams.map((param) => [param.key, param.value]),
       ),
+      bodyType,
     });
 
     toast({
@@ -94,22 +97,53 @@ export default function RequestSetup({
   };
 
   const body = watch("body");
+  const watchedBodyType = watch("bodyType");
 
   useEffect(() => {
-    if (body) {
+    setBodyType(watchedBodyType as RequestBodyType);
+  }, [watchedBodyType]);
+
+  useEffect(() => {
+    if (body && bodyType) {
       try {
-        JSON.parse(body);
-        setJsonError(null);
+        switch (bodyType) {
+          case "json":
+            JSON.parse(body);
+            setValidationError(null);
+            break;
+          case "form-data":
+          case "x-www-form-urlencoded":
+            // Basic validation for form data
+            if (!/^(.+=.+(&.+=.+)*)?$/.test(body)) {
+              setValidationError("Invalid form data format");
+            } else {
+              setValidationError(null);
+            }
+            break;
+          case "none":
+            setValidationError(null);
+            break;
+        }
       } catch (error) {
-        setJsonError("Invalid JSON format");
+        setValidationError("Invalid format for selected body type");
       }
     } else {
-      setJsonError(null);
+      setValidationError(null);
     }
-  }, [body]);
+  }, [body, bodyType]);
 
-  const handleEditorChange = (value: string | undefined) => {
-    setValue("body", value || "{}");
+  const handleBodyChange = (value: string | undefined) => {
+    setValue("body", value || "");
+  };
+
+  const handleBodyTypeChange = (value: RequestBodyType) => {
+    setValue("bodyType", value);
+    setBodyType(value);
+    if (value === "none") {
+      setValue("body", "");
+    } else if (value === "json" && (!body || body === "")) {
+      setValue("body", "{}");
+    }
   };
 
   return (
@@ -184,8 +218,10 @@ export default function RequestSetup({
               <TabsContent value="body">
                 <BodyTab
                   body={body || ""}
-                  handleEditorChange={handleEditorChange}
-                  jsonError={jsonError}
+                  bodyType={bodyType}
+                  handleBodyChange={handleBodyChange}
+                  handleBodyTypeChange={handleBodyTypeChange}
+                  validationError={validationError}
                 />
               </TabsContent>
             </Tabs>
@@ -194,7 +230,7 @@ export default function RequestSetup({
           <Button
             onClick={saveConfiguration}
             className="mt-4"
-            disabled={!!jsonError}
+            disabled={!!validationError}
           >
             Save Configuration
           </Button>

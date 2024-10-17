@@ -11,7 +11,9 @@ export const RequestFormSchema = z
     url: z.string().url("Invalid URL"),
     headers: z.array(HeaderSchema).optional(),
     queryParams: z.record(z.string(), z.string()).optional(),
-    bodyType: z.enum(["json", "form-data", "x-www-form-urlencoded"]).optional(),
+    bodyType: z
+      .enum(["none", "json", "form-data", "x-www-form-urlencoded"])
+      .optional(),
     body: z.string().optional(),
   })
   .superRefine((data, ctx) => {

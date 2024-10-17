@@ -18,6 +18,8 @@ export * from "./components/ui/tooltip";
 export * from "./components/ui/accordion";
 export * from "./components/ui/form";
 export * from "./components/ui/radio-group";
+export * from "./components/ui/skeleton";
+
 // Re-export utilities
 export * from "./utils";
 
