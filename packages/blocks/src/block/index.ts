@@ -7,7 +7,10 @@ export abstract class Block implements IBlock {
   readonly type: string;
   inputs: Record<string, unknown>;
   outputs: Record<string, unknown>;
-  private inputConfigs: Record<string, { type: string; required: boolean }>;
+  private inputConfigs: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
   private outputConfigs: Record<string, { type: string }>;
   readonly retry: number;
   readonly timeout: number;
@@ -65,12 +68,24 @@ export abstract class Block implements IBlock {
         inputs[key] !== null &&
         inputs[key] !== ""
       ) {
-        if (typeof inputs[key] !== config.type) {
+        if (
+          Array.isArray(config.type) &&
+          !config.type.includes(typeof inputs[key])
+        ) {
+          invalidFields.push(key);
+        } else if (
+          !Array.isArray(config.type) &&
+          typeof inputs[key] !== config.type
+        ) {
           invalidFields.push(key);
         } else {
           cleanedInputs[key] = inputs[key];
         }
       }
+    }
+
+    if (missingFields.length > 0 || invalidFields.length > 0) {
+      debugger;
     }
 
     return {

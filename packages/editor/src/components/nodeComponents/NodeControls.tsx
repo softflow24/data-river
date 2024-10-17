@@ -12,6 +12,8 @@ import { updateNodesData } from "@/slices/reactFlowSlice";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
 import { LogicBlock } from "./LogicBlock";
 import { ConditionsSummaryProps } from "./LogicBlock/ConditionsSummary";
+import RequestBlock from "./RequestBlock";
+import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
 
 interface NodeControlsProps {
   nodeId: string;
@@ -148,6 +150,15 @@ const NodeControls: React.FC<NodeControlsProps> = ({
                   key={index}
                   nodeId={nodeId}
                   config={configuration as unknown as ConditionsSummaryProps}
+                  isSelected={isSelected}
+                />
+              );
+            case "request-info":
+              return (
+                <RequestBlock
+                  key={index}
+                  nodeId={nodeId}
+                  config={configuration as unknown as RequestFormData}
                   isSelected={isSelected}
                 />
               );
