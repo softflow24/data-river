@@ -7,10 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  rebase-development-onto-main:
+  sync-branches:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
@@ -22,6 +20,15 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
+
+      - name: Setup SSH Keys and known_hosts
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Fetch all branches
         run: git fetch origin
@@ -38,7 +45,7 @@ jobs:
         run: |
           git checkout main
           git merge development --ff-only
-          git push origin main
+          git push git@github.com:${GITHUB_REPOSITORY}.git main
 
       - name: Handle rebase conflicts
         if: failure()
