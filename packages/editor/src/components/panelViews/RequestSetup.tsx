@@ -15,14 +15,17 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Badge,
 } from "@data-river/shared/ui";
-import MonacoEditorWrapper from "../MonacoEditorWrapper";
 import {
   RequestFormSchema,
   RequestFormData,
 } from "@data-river/shared/contracts/blocks/request";
-import { KeyValueTable, KeyValuePair } from "./Request/QueryParamsTable";
+import { KeyValuePair } from "./Request/QueryParamsTable";
 import _ from "lodash";
+import { ParamsTab } from "./Request/ParamsTab";
+import { HeadersTab } from "./Request/HeadersTab";
+import { BodyTab } from "./Request/BodyTab";
 
 export default function RequestSetup({
   nodeId,
@@ -110,7 +113,13 @@ export default function RequestSetup({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto min-w-[26rem]">
+    <div className="w-full max-w-4xl mx-auto min-w-[26rem] relative">
+      <Badge
+        variant="outline"
+        className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
+      >
+        Experimental
+      </Badge>
       <div className="bg-background shadow-sm rounded-lg px-4 mb-4">
         <div className="bg-background shadow-sm rounded-lg py-4">
           <div className="space-y-4">
@@ -164,49 +173,20 @@ export default function RequestSetup({
                 <TabsTrigger value="body">Body</TabsTrigger>
               </TabsList>
               <TabsContent value="params">
-                <div className="mt-6">
-                  <Label>Query Parameters</Label>
-                  <KeyValueTable
-                    data={queryParams}
-                    setData={setQueryParams}
-                    title="Param"
-                  />
-                </div>
+                <ParamsTab
+                  queryParams={queryParams}
+                  setQueryParams={setQueryParams}
+                />
               </TabsContent>
               <TabsContent value="headers">
-                <div>
-                  <Label>Headers</Label>
-                  <KeyValueTable
-                    data={headers}
-                    setData={setHeaders}
-                    title="Header"
-                  />
-                </div>
+                <HeadersTab headers={headers} setHeaders={setHeaders} />
               </TabsContent>
               <TabsContent value="body">
-                <div>
-                  <Label htmlFor="body">Body (JSON)</Label>
-                  <div className="border rounded-md">
-                    <MonacoEditorWrapper
-                      height="150px"
-                      defaultLanguage="json"
-                      defaultValue={body}
-                      onChange={handleEditorChange}
-                      options={{
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        folding: false,
-                        lineNumbers: "off",
-                        wordWrap: "on",
-                        wrappingIndent: "deepIndent",
-                        automaticLayout: true,
-                      }}
-                    />
-                  </div>
-                  {jsonError && (
-                    <p className="text-red-500 text-sm mt-1">{jsonError}</p>
-                  )}
-                </div>
+                <BodyTab
+                  body={body || ""}
+                  handleEditorChange={handleEditorChange}
+                  jsonError={jsonError}
+                />
               </TabsContent>
             </Tabs>
           </div>
