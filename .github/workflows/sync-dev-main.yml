@@ -38,12 +38,12 @@ jobs:
       - name: Sync development to main
         run: |
           git checkout main
-          git merge origin/development --no-ff -m "Merge development into main"
-          git push origin main
+          git merge origin/development --ff-only -m "Fast-forward main to latest development"
+          git push git@github.com:${GITHUB_REPOSITORY}.git main
 
-      - name: Handle merge conflicts
+      - name: Handle merge conflicts or non-fast-forward situations
         if: failure()
         run: |
-          echo "⚠️  There was a conflict during the merge. Please resolve it manually."
-          git merge --abort
+          echo "⚠️  Unable to fast-forward. There might be commits on main that are not in development."
+          echo "Please review the branches and merge manually if necessary."
           exit 1
