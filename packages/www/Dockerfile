@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:23-alpine AS builder
 WORKDIR /app
 
 # Install pnpm
@@ -22,7 +22,7 @@ WORKDIR /app/packages/www
 RUN pnpm run build
 
 # Production stage
-FROM node:20-alpine
+FROM node:23-alpine
 WORKDIR /app
 
 # Install pnpm
