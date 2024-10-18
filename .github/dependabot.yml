@@ -10,12 +10,14 @@ updates:
     versioning-strategy: increase
     commit-message:
       prefix: "npm: "
+    target-branch: "development"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    target-branch: "development"
 
   # Docker
   - package-ecosystem: "docker"
@@ -27,3 +29,4 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "[docker] "
+    target-branch: "development"
