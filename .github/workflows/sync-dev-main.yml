@@ -31,24 +31,20 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Fetch all branches
-        run: git fetch origin
-
-      - name: Checkout main branch
-        run: git checkout main
-
-      - name: Rebase development onto main
         run: |
-          git checkout development
-          git rebase main
+          git fetch --all
+          git fetch --tags
 
-      - name: Push changes to main
+      - name: Update main branch
         run: |
           git checkout main
-          git merge development --ff-only
-          git push git@github.com:${GITHUB_REPOSITORY}.git main
+          git reset --hard origin/main
+          git merge --ff-only origin/development
+          git push origin main
 
-      - name: Handle rebase conflicts
+      - name: Handle merge conflicts
         if: failure()
         run: |
-          echo "⚠️  There was a conflict during the rebase. Please resolve it manually."
+          echo "⚠️  There was a conflict during the merge. Please resolve it manually."
+          git merge --abort
           exit 1
