@@ -35,11 +35,10 @@ jobs:
           git fetch --all
           git fetch --tags
 
-      - name: Update main branch
+      - name: Sync development to main
         run: |
           git checkout main
-          git reset --hard origin/main
-          git merge --ff-only origin/development
+          git merge origin/development --no-ff -m "Merge development into main"
           git push origin main
 
       - name: Handle merge conflicts
