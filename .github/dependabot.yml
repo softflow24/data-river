@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # npm packages
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/packages/*"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm: "
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directories:
+      - "/packages/client"
+      - "/packages/www"
+      - "/" # For docker-compose.yml in the root
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[docker] "
