@@ -1,6 +1,6 @@
 import { Button } from "@data-river/shared/ui/components/ui/button";
 import RunWorkflowButton from "./RunWorkflowButton";
-import { Separator } from "@data-river/shared/ui/components/ui/separator";
+import { Separator } from "@data-river/shared/ui/";
 import { TableProperties, Terminal } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { toggleRightPanelVisible, toggleBottomPanelVisible } from "@/store";
@@ -9,10 +9,10 @@ const TopRightControls = () => {
   const dispatch = useDispatch();
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center gap-1 h-full">
       <Button
         size={"icon"}
-        className="mr-2"
+        className="w-8 h-8"
         onClick={() => {
           dispatch(toggleRightPanelVisible());
         }}
@@ -22,7 +22,7 @@ const TopRightControls = () => {
       <Separator orientation="vertical" />
       <Button
         size={"icon"}
-        className="mr-2"
+        className="w-8 h-8"
         onClick={() => {
           dispatch(toggleBottomPanelVisible());
         }}
