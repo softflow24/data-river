@@ -76,9 +76,11 @@ const FlowChart: React.FC = () => {
           style={{ opacity: 0.6 }}
         />
         <Controls />
-        <Panel position="bottom-right">
-          <CustomNodeInfo />
-        </Panel>
+        {isCustomNodeInfoVisible && (
+          <Panel position="bottom-right">
+            <CustomNodeInfo />
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );
