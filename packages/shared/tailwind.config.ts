@@ -52,8 +52,10 @@ export default {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
-        focus: "hsl(var(--focus))",
-        focusForeground: "hsl(var(--focus-foreground))",
+        focus: {
+          DEFAULT: "hsl(var(--focus))",
+          foreground: "hsl(var(--focus-foreground))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
