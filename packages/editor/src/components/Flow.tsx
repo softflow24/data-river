@@ -16,6 +16,8 @@ import CustomNode from "./CustomNode";
 import CustomNodeInfo from "./CustomNodeInfo";
 import CustomEdge from "./CustomEdge";
 import Controls from "./controls";
+import useTheme from "@data-river/shared/ui/hooks/useTheme";
+import useLayoutState from "@/hooks/useLayoutState";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -26,17 +28,17 @@ const edgeTypes: EdgeTypes = {
 };
 
 const FlowChart: React.FC = () => {
-  const { lightTheme, nodes, edges } = useReactFlowState();
+  const theme = useTheme();
+  const { nodes, edges } = useReactFlowState();
   const eventHandlers = useReactFlowEventHandlers();
+  const { isCustomNodeInfoVisible } = useLayoutState();
   useReactFlowHooks();
 
   return (
     <div
       className="w-full h-full min-h-full cursor-default"
       style={{
-        backgroundColor: lightTheme
-          ? "#f0f0f0"
-          : "rgb(3 7 18 / var(--tw-bg-opacity))",
+        backgroundColor: theme.colors.background,
       }}
     >
       <ReactFlow
@@ -74,9 +76,11 @@ const FlowChart: React.FC = () => {
           style={{ opacity: 0.6 }}
         />
         <Controls />
-        <Panel position="bottom-right">
-          <CustomNodeInfo />
-        </Panel>
+        {isCustomNodeInfoVisible && (
+          <Panel position="bottom-right">
+            <CustomNodeInfo />
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );

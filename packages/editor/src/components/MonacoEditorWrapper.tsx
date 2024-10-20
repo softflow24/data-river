@@ -44,7 +44,7 @@ const MonacoEditorWrapper = (props: EditorProps) => {
       };
 
       monaco.editor.defineTheme("customTheme", customTheme);
-      theme === "dark"
+      theme.theme === "dark"
         ? monaco.editor.setTheme("customTheme")
         : monaco.editor.setTheme("vs-light");
       setEditor(_editor);
@@ -54,7 +54,7 @@ const MonacoEditorWrapper = (props: EditorProps) => {
 
   useEffect(() => {
     editor?.updateOptions({
-      theme: theme === "dark" ? "customTheme" : "vs-light",
+      theme: theme.theme === "dark" ? "customTheme" : "vs-light",
     });
   }, [theme, editor]);
 

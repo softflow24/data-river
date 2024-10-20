@@ -20,13 +20,11 @@ import {
 import { BlockMapperService } from "../../../services/BlockMapperService";
 import BlockValidationError from "../../../../../blocks/src/errors/blockValidationError";
 import { CustomLogger } from "@/utils/customLogger";
-import { useToast } from "@data-river/shared/ui/hooks/use-toast";
-import { ToastAction } from "@data-river/shared/ui/components/ui/toast";
+import { toast } from "sonner";
 import { Button } from "@data-river/shared/ui/components/ui/button";
 
 const RunWorkflowButton: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { toast } = useToast();
   const { executionBlocks } = useExecutionState();
   const { edges, nodes } = useReactFlowState();
 
@@ -93,26 +91,20 @@ const RunWorkflowButton: React.FC = () => {
       );
 
       if (result.errors.length > 0) {
-        toast({
-          variant: "destructive",
-          title: "Error executing workflow",
+        toast.error("Error executing workflow", {
           description: "There was a problem with your workflow.",
-          action: (
-            <ToastAction
-              altText="Check logs"
-              onClick={() => {
-                dispatch(setIsBottomPanelVisible(true));
-              }}
-            >
-              Check logs
-            </ToastAction>
-          ),
+          richColors: true,
+          action: {
+            label: "Check logs",
+            onClick: () => {
+              dispatch(setIsBottomPanelVisible(true));
+            },
+          },
         });
       } else {
-        toast({
-          variant: "default",
-          title: "Workflow executed",
+        toast.success("Workflow executed", {
           description: "Your workflow has been executed.",
+          richColors: true,
         });
       }
 
@@ -136,20 +128,15 @@ const RunWorkflowButton: React.FC = () => {
           }),
         );
 
-        toast({
-          variant: "destructive",
-          title: "Error executing workflow",
+        toast.error("Error executing workflow", {
           description: "There was a problem with your workflow.",
-          action: (
-            <ToastAction
-              altText="Check logs"
-              onClick={() => {
-                dispatch(setIsBottomPanelVisible(true));
-              }}
-            >
-              Check logs
-            </ToastAction>
-          ),
+          richColors: true,
+          action: {
+            label: "Check logs",
+            onClick: () => {
+              dispatch(setIsBottomPanelVisible(true));
+            },
+          },
         });
       } else {
         dispatch(
@@ -172,7 +159,14 @@ const RunWorkflowButton: React.FC = () => {
     }
   };
 
-  return <Button onClick={runWorkflow}>Run Workflow</Button>;
+  return (
+    <Button
+      className="h-8 bg-focus text-focus-foreground hover:bg-focus/80"
+      onClick={runWorkflow}
+    >
+      Run Workflow
+    </Button>
+  );
 };
 
 export default RunWorkflowButton;

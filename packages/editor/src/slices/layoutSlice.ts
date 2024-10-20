@@ -7,6 +7,7 @@ export interface LayoutState {
   isBottomPanelVisible: boolean;
   isRightPanelVisible: boolean;
   isLeftPanelVisible: boolean;
+  isCustomNodeInfoVisible: boolean;
 }
 
 const initialState: LayoutState = {
@@ -16,6 +17,7 @@ const initialState: LayoutState = {
   isBottomPanelVisible: false,
   isRightPanelVisible: false,
   isLeftPanelVisible: false,
+  isCustomNodeInfoVisible: false,
 };
 
 const layoutSlice = createSlice({
@@ -49,6 +51,9 @@ const layoutSlice = createSlice({
     toggleLeftPanelVisible: (state) => {
       state.isLeftPanelVisible = !state.isLeftPanelVisible;
     },
+    toggleIsCustomNodeInfoVisible: (state) => {
+      state.isCustomNodeInfoVisible = !state.isCustomNodeInfoVisible;
+    },
   },
 });
 
@@ -62,6 +67,7 @@ export const {
   toggleRightPanelVisible,
   setLeftPanelVisible,
   toggleLeftPanelVisible,
+  toggleIsCustomNodeInfoVisible,
 } = layoutSlice.actions;
 
 export default layoutSlice.reducer;
