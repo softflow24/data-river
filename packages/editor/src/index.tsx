@@ -27,6 +27,7 @@ import TopRightControls from "./components/controls/top-right-controls";
 import RightPanel from "./components/RightPanel";
 import LeftPanel from "./components/LeftPanel";
 import { Toaster } from "@data-river/shared/ui/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@data-river/shared/ui/components/ui/sonner";
 import useHotKeysHook from "./hooks/useHotKeysHook";
 const Editor = () => {
   const dispatch = useDispatch();
@@ -143,6 +144,7 @@ const EditorWithRedux = () => {
         <Editor />
       </div>
       <Toaster />
+      <SonnerToaster />
     </Provider>
   );
 };
