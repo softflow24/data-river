@@ -47,7 +47,7 @@ const RightPanel = () => {
               }
             }
             onConfigChange={handleConfigChange}
-            inputs={selectedNode.data.inputs || {}}
+            inputs={selectedNode.data.config.inputs || {}}
           />
         );
 

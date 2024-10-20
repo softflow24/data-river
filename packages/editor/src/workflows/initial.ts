@@ -90,6 +90,9 @@ const initialNodes: Node<NodeData>[] = [
       config: {
         logicOperator: "AND",
         conditions: [],
+        inputs: {
+          data: undefined,
+        },
       },
       controls: [
         {
