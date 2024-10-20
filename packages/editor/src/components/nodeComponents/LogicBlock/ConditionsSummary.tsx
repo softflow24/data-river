@@ -17,7 +17,7 @@ const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({
   const renderCondition = (condition: ICondition) => {
     if (!condition.left || !condition.operator || !condition.right) {
       return (
-        <div className="flex items-center text-yellow-500 bg-secondary border border-yellow-200 rounded p-2">
+        <div className="flex items-center text-yellow-500 bg-card border border-yellow-200 rounded p-2">
           <AlertCircle className="w-4 h-4 mr-1" />
           <span className="text-sm">Condition missing</span>
         </div>
