@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["es6", "dom"],
     "allowJs": true,
     "esModuleInterop": true,
@@ -10,7 +10,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "./dist",
-    "target": "es6",
+    "target": "ES2022",
     "moduleResolution": "node"
   },
   "exclude": ["node_modules", "dist"]
