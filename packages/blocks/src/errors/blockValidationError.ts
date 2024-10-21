@@ -23,6 +23,25 @@ export class BlockValidationError extends Error {
   }
 }
 
+export class BlockConfigurationError extends Error {
+  constructor(
+    message: string,
+    public errors: Record<string, string[]>,
+  ) {
+    super(message);
+    this.name = "BlockConfigurationError";
+    this.errors = errors;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      errors: this.errors,
+    };
+  }
+}
+
 export const createBlockValidationErrorFromObject = (json: {
   message: string;
   missingFields: string[];
@@ -35,6 +54,13 @@ export const createBlockValidationErrorFromObject = (json: {
     json.invalidFields,
     json.validationType,
   );
+};
+
+export const createBlockConfigurationErrorFromObject = (json: {
+  message: string;
+  errors: Record<string, string[]>;
+}): BlockConfigurationError => {
+  return new BlockConfigurationError(json.message, json.errors);
 };
 
 export default BlockValidationError;

@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declarationDir": "./dist",
-    "module": "commonjs",
-    "target": "es6",
+    "module": "ESNext",
+    "target": "ES2022",
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "strict": true,
