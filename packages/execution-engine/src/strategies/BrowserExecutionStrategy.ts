@@ -8,12 +8,15 @@ import { ILogger } from "@data-river/shared/interfaces/ILogger";
 @injectable()
 export class BrowserExecutionStrategy implements IExecutionStrategy {
   async execute(blockConfig: IBlockConfig, logger: ILogger): Promise<IBlock> {
-    const block = this.createBlockInstance(blockConfig, logger);
+    const block = await this.createBlockInstance(blockConfig, logger);
     await block.safeExecute(blockConfig.inputs ?? {}, blockConfig.config ?? {});
     return block;
   }
 
-  createBlockInstance(blockConfig: IBlockConfig, logger: ILogger): IBlock {
+  createBlockInstance(
+    blockConfig: IBlockConfig,
+    logger: ILogger,
+  ): Promise<IBlock> {
     return createBlock(blockConfig, logger);
   }
 }
