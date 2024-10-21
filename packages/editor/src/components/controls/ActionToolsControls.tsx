@@ -1,6 +1,5 @@
 import { FC } from "react";
-import { PlusCircle, MousePointer, Hand } from "lucide-react";
-import { Separator } from "@data-river/shared/ui/components/ui/separator";
+import { PlusCircle } from "lucide-react";
 
 import { Button } from "@data-river/shared/ui/components/ui/button";
 import { AddBlockDropdownMenu } from "./AddBlockDropdown";
@@ -18,27 +17,6 @@ const ActionToolsControls: FC<ActionToolsControlsProps> = ({ addNewNode }) => {
           <PlusCircle className="h-1/2 w-1/2" />
         </Button>
       </AddBlockDropdownMenu>
-
-      <Separator orientation="vertical" />
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => alert("Not implemented")}
-      >
-        <MousePointer className="h-1/2 w-1/2" />
-      </Button>
-
-      <Separator orientation="vertical" />
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => alert("Not implemented")}
-        className="text-focus-foreground bg-focus/60 hover:bg-focus/100"
-      >
-        <Hand className="h-1/2 w-1/2" />
-      </Button>
     </div>
   );
 };

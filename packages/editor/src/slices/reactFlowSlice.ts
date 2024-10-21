@@ -18,7 +18,6 @@ type CustomNode = Node<NodeData>;
 
 export interface ReactFlowState {
   minimalistic: boolean;
-  lightTheme: boolean;
   selectedNodeId: string | null;
   hoveredNodeId: string | null;
   selectedEdgeId: string | null;
@@ -31,7 +30,6 @@ export interface ReactFlowState {
 
 const initialState: ReactFlowState = {
   minimalistic: false,
-  lightTheme: false,
   selectedNodeId: null,
   hoveredNodeId: null,
   selectedEdgeId: null,
@@ -48,9 +46,6 @@ const reactFlowSlice = createSlice({
   reducers: {
     toggleMinimalistic: (state) => {
       state.minimalistic = !state.minimalistic;
-    },
-    toggleLightTheme: (state) => {
-      state.lightTheme = !state.lightTheme;
     },
     setSelectedNodeId: (state, action: PayloadAction<string | null>) => {
       state.selectedEdgeId = null;
@@ -159,7 +154,6 @@ const reactFlowSlice = createSlice({
 
 export const {
   toggleMinimalistic,
-  toggleLightTheme,
   setSelectedNodeId,
   setHoveredNodeId,
   setNodes,

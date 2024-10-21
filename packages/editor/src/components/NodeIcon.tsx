@@ -1,5 +1,6 @@
 import React from "react";
 import * as Icons from "lucide-react";
+import useTheme from "@data-river/shared/ui/hooks/useTheme";
 
 interface NodeIconProps {
   icon?: string;
@@ -20,6 +21,8 @@ const NodeIcon: React.FC<NodeIconProps> = ({
       ] as React.ComponentType<Icons.LucideProps>)
     : Icons.HelpCircle;
 
+  const theme = useTheme();
+
   return (
     <div
       style={{
@@ -27,7 +30,7 @@ const NodeIcon: React.FC<NodeIconProps> = ({
         height: "30px",
         padding: "4px",
         backgroundColor: useBackgroundColor ? color : "transparent",
-        color: useIconColor ? color : "white",
+        color: useIconColor ? color : theme.colors.foreground,
         borderRadius: "10%",
         margin: "0",
       }}
