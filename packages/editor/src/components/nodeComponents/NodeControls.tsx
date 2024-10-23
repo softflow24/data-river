@@ -34,7 +34,9 @@ const NodeControls: React.FC<NodeControlsProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const { nodes } = useReactFlowState();
+  const { nodes } = useReactFlowState((state) => ({
+    nodes: state.nodes,
+  }));
   const executionBlocks = useExecutionState((state) => state.executionBlocks);
   const executionResult = useExecutionState((state) => state.executionResult);
 

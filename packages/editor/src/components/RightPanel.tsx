@@ -10,9 +10,13 @@ import { Button } from "@data-river/shared/ui/components/ui/button";
 import { toggleRightPanelVisible } from "@/store";
 import RequestSetup from "./panelViews/RequestSetup";
 import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
+import OpenAISetup from "./panelViews/Plugins/OpenAI";
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
-  const { nodes, selectedNodeId } = useReactFlowState();
+  const { nodes, selectedNodeId } = useReactFlowState((state) => ({
+    nodes: state.nodes,
+    selectedNodeId: state.selectedNodeId,
+  }));
   const dispatch = useDispatch();
 
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
@@ -61,6 +65,15 @@ const RightPanel = () => {
           <RequestSetup
             nodeId={selectedNode.id}
             config={selectedNode.data.config as unknown as RequestFormData}
+            onConfigChange={handleConfigChange}
+          />
+        );
+
+      case "openai@0.1":
+        return (
+          <OpenAISetup
+            nodeId={selectedNode.id}
+            config={selectedNode.data.config as any}
             onConfigChange={handleConfigChange}
           />
         );

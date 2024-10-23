@@ -16,7 +16,13 @@ const CustomEdge: React.FC<EdgeProps> = ({
   target,
 }) => {
   const dispatch = useDispatch();
-  const { hoveredNodeId, hoveredEdgeId, selectedEdgeId } = useReactFlowState();
+  const { hoveredNodeId, hoveredEdgeId, selectedEdgeId } = useReactFlowState(
+    (state) => ({
+      hoveredNodeId: state.hoveredNodeId,
+      hoveredEdgeId: state.hoveredEdgeId,
+      selectedEdgeId: state.selectedEdgeId,
+    }),
+  );
 
   const isHovered = id === hoveredEdgeId;
 

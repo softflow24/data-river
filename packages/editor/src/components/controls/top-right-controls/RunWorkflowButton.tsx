@@ -26,7 +26,10 @@ import { Button } from "@data-river/shared/ui/components/ui/button";
 const RunWorkflowButton: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { executionBlocks } = useExecutionState();
-  const { edges, nodes } = useReactFlowState();
+  const { edges, nodes } = useReactFlowState((state) => ({
+    edges: state.edges,
+    nodes: state.nodes,
+  }));
 
   useEffect(() => {
     dispatch(syncBlocksWithNodes(nodes));
