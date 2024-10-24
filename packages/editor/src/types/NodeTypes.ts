@@ -17,6 +17,7 @@ interface Control {
 
 export interface NodeData {
   addable?: boolean; // Whether the block can be added to the flow manually.
+  stable?: boolean; // Whether the block is stable.
   block: string;
   label: string;
   description?: string;

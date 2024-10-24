@@ -1,4 +1,3 @@
-import React from "react";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
 import { useLayoutState } from "@/hooks/useLayoutState";
 import { updateNodesData } from "@/slices/reactFlowSlice";
@@ -11,6 +10,8 @@ import { toggleRightPanelVisible } from "@/store";
 import RequestSetup from "./panelViews/RequestSetup";
 import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
 import OpenAISetup from "./panelViews/Plugins/OpenAI";
+import { Badge } from "@data-river/shared/ui";
+
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
   const { nodes, selectedNodeId } = useReactFlowState((state) => ({
@@ -79,7 +80,9 @@ const RightPanel = () => {
         );
       // Add cases for other node types here
       default:
-        return <div>No settings available for this node type.</div>;
+        return (
+          <div className="mt-12">No settings available for this node type.</div>
+        );
     }
   };
 
@@ -97,6 +100,16 @@ const RightPanel = () => {
           <X />
         </Button>
       </div>
+      {!selectedNode.data.stable && (
+        <div className="relative">
+          <Badge
+            variant="outline"
+            className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
+          >
+            Experimental
+          </Badge>
+        </div>
+      )}
       {renderPanelView()}
     </div>
   );
