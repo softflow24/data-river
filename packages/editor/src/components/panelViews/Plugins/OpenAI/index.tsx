@@ -66,7 +66,9 @@ const OpenAIPluginSidebar: React.FC<OpenAIPluginSidebarProps> = ({
     const newMessages = [...messages];
     newMessages[index] = { ...newMessages[index], [key]: value };
     setMessages(newMessages);
-    handleLocalConfigChange("inputs", { messages: newMessages });
+    handleLocalConfigChange("inputs", {
+      messages: { messages: newMessages },
+    });
   };
 
   const addMessage = () => {

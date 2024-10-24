@@ -93,6 +93,6 @@ export class OpenAIBlock extends Block {
       `OpenAI response finished streaming result: ${fullResponse}`,
     );
 
-    return { response: fullResponse };
+    return { response: fullResponse, data: fullResponse };
   }
 }
