@@ -2,7 +2,13 @@ import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
 import Icons from "lucide-react";
 
 interface Control {
-  type: "text" | "text-area" | "select" | "conditions-summary" | "request-info";
+  type:
+    | "text"
+    | "text-area"
+    | "select"
+    | "conditions-summary"
+    | "request-info"
+    | "text-readonly";
   label: string;
   name: string;
   placeholder?: string;

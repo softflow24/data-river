@@ -124,6 +124,16 @@ const NodeControls: React.FC<NodeControlsProps> = ({
                   onChange={(value) => handleValueChange(control.name, value)}
                 />
               );
+            case "text-readonly":
+              return (
+                <InputWithLabel
+                  key={`${index}-${control.name}`}
+                  label={control.label}
+                  name={control.name}
+                  value={value as string}
+                  inputClassName={`max-w-96 nodrag nowheel ${invalidValue ? "border-red-500" : ""}`}
+                />
+              );
             case "text-area":
               return (
                 <TextAreaWithLabel

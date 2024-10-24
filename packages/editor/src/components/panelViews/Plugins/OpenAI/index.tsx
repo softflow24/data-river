@@ -21,6 +21,7 @@ import { InfoCircledIcon, PlusIcon } from "@radix-ui/react-icons";
 import SettingsDialog from "./SettingsDialog";
 import MessageItem from "./MessageItem";
 import { Settings } from "lucide-react";
+import openAIModels from "@data-river/blocks/plugins/OpenAI/schemas/models";
 
 type Message = {
   role: "system" | "user" | "assistant";
@@ -46,7 +47,6 @@ const OpenAIPluginSidebar: React.FC<OpenAIPluginSidebarProps> = ({
     const inputMessages = (config as OpenAIConfig).inputs?.messages;
     return Array.isArray(inputMessages) ? inputMessages : [];
   });
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setLocalConfig(config);
@@ -124,8 +124,11 @@ const OpenAIPluginSidebar: React.FC<OpenAIPluginSidebarProps> = ({
                 <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                <SelectItem value="gpt-4">GPT-4</SelectItem>
+                {openAIModels.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button

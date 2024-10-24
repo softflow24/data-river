@@ -10,11 +10,6 @@ export const openAINode: Omit<Node<NodeData>, "id" | "position"> = {
     sourceHandle: true,
     targetHandle: true,
     icon: "Brain",
-    inputs: {
-      systemPrompt: "",
-      prompt: "",
-      messages: [],
-    },
     outputs: {
       response: "",
     },
@@ -30,13 +25,9 @@ export const openAINode: Omit<Node<NodeData>, "id" | "position"> = {
     },
     controls: [
       {
-        type: "select",
+        type: "text-readonly",
         label: "Model",
         name: "model",
-        options: [
-          { label: "GPT-4o-mini", value: "gpt-4o-mini" },
-          { label: "GPT-4o", value: "gpt-4o" },
-        ],
       },
     ],
   },

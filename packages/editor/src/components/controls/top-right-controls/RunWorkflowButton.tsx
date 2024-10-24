@@ -22,6 +22,7 @@ import BlockValidationError from "../../../../../blocks/src/errors/blockValidati
 import { CustomLogger } from "@/utils/customLogger";
 import { toast } from "sonner";
 import { Button } from "@data-river/shared/ui/components/ui/button";
+import { initializePlugins } from "@data-river/blocks/plugins/PluginRegistration";
 
 const RunWorkflowButton: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -48,12 +49,6 @@ const RunWorkflowButton: React.FC = () => {
       errors: {},
     };
 
-    const logic = blockConfigs.find((x) => x.type.match("logic"));
-
-    if (!logic) {
-      throw new Error("No logic block found");
-    }
-
     const connections: IConnection[] = edges.map((edge) => ({
       from: edge.source,
       to: edge.target,
@@ -62,6 +57,8 @@ const RunWorkflowButton: React.FC = () => {
       sourceHandle: edge.sourceHandle ?? undefined,
       targetHandle: edge.targetHandle ?? undefined,
     }));
+
+    initializePlugins();
 
     const config = createExecutionEngineConfig({
       workflowConfig: {

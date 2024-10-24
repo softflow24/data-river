@@ -2,31 +2,11 @@ import { IBlockConfig } from "@data-river/shared/interfaces";
 import { Block } from "../../block";
 import { ILogger } from "@data-river/shared/interfaces/ILogger";
 import OpenAI from "openai";
-import { z } from "zod";
 import { BlockConfigurationError } from "../../errors/blockValidationError";
 import { formatZodError } from "../../errors/errorUtils";
-import {
-  BaseOpenAIConfigSchema,
-  MessageSchema,
-  BaseInputSchema,
-  createOpenAIClient,
-} from "./shared";
-
-// Extend the base config schema for OpenAIBlock specific needs
-export const OpenAIConfigSchema = BaseOpenAIConfigSchema.extend({
-  topP: z.number().min(0).max(1).optional(),
-  frequencyPenalty: z.number().min(-2).max(2).optional(),
-  presencePenalty: z.number().min(-2).max(2).optional(),
-  stop: z.union([z.string(), z.array(z.string())]).optional(),
-});
-
-export type OpenAIConfig = z.infer<typeof OpenAIConfigSchema>;
-
-// Extend the base input schema for OpenAIBlock specific needs
-const InputSchema = BaseInputSchema.extend({
-  messages: z.array(MessageSchema).optional(),
-  prompt: z.string().optional(),
-});
+import { createOpenAIClient } from "./shared";
+import { OpenAIConfig, OpenAIConfigSchema } from "./schemas/config";
+import { OpenAIInputSchema } from "./schemas/input";
 
 export class OpenAIBlock extends Block {
   private openai: OpenAI;
@@ -62,12 +42,14 @@ export class OpenAIBlock extends Block {
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    const validatedInputs = InputSchema.parse(inputs);
+    const validatedInputs = OpenAIInputSchema.parse(inputs);
+    const configInputs = this.openAIConfig.inputs?.messages;
 
-    let messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+    let messages: OpenAI.Chat.ChatCompletionMessageParam[] =
+      configInputs?.messages ?? [];
 
     if (validatedInputs.messages) {
-      messages = validatedInputs.messages;
+      messages = [...messages, ...validatedInputs.messages];
     } else {
       if (validatedInputs.systemPrompt) {
         messages.push({
@@ -98,12 +80,18 @@ export class OpenAIBlock extends Block {
       stop: this.openAIConfig.stop,
     });
 
+    this.logger.debug("OpenAI response started streaming");
+
     let fullResponse = "";
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content || "";
       fullResponse += content;
       // In the future, we can implement streaming here
     }
+
+    this.logger.debug(
+      `OpenAI response finished streaming result: ${fullResponse}`,
+    );
 
     return { response: fullResponse };
   }
