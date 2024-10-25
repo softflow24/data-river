@@ -2,7 +2,7 @@ import { ICondition } from "@data-river/shared/interfaces/ICondition";
 import { ILogger } from "@data-river/shared/interfaces/ILogger";
 import _ from "lodash";
 import { ValueResolver } from "@/utils/valueResolver";
-import { DateHandler } from "./dateHandler";
+//import { DateHandler } from "./dateHandler";
 import { Comparator } from "@/utils/comparator";
 
 export class ConditionEvaluator {
@@ -15,12 +15,13 @@ export class ConditionEvaluator {
     const leftValue = ValueResolver.resolveValue(condition.left, inputs);
     const rightValue = ValueResolver.resolveValue(condition.right, inputs);
 
-    const leftDate = DateHandler.parseDateIfValid(leftValue);
-    const rightDate = DateHandler.parseDateIfValid(rightValue);
+    //const leftDate = DateHandler.parseDateIfValid(leftValue);
+    //const rightDate = DateHandler.parseDateIfValid(rightValue);
 
-    if (leftDate && rightDate) {
-      return DateHandler.compareDates(leftDate, rightDate, condition.operator);
-    }
+    // TODO: fix this later
+    // if (leftDate && rightDate) {
+    //   return DateHandler.compareDates(leftDate, rightDate, condition.operator);
+    // }
 
     switch (condition.operator) {
       case "==":
