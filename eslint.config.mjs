@@ -21,18 +21,19 @@ export default [
       import: importPlugin,
     },
     rules: {
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
       "no-unused-vars": "warn",
       semi: ["error", "always"],
       quotes: ["error", "double"],
       "import/order": ["off", { "newlines-between": "always" }],
       "react/react-in-jsx-scope": "off",
+      "linebreak-style": "off", // Turn off linebreak-style rule
     },
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
-      "**/packages/client/**", // Ignore the entire client package
-      "**/.*", // Ignore dotfiles explicitly
+      "**/packages/client/**",
+      "**/.*",
       "**/client/**",
     ],
   },
