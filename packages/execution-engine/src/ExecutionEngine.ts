@@ -35,7 +35,7 @@ export class ExecutionEngine {
     this.logger.group("Executing Workflow");
     this.logger.time("Workflow Execution");
 
-    let output: IExecutionResult = {
+    const output: IExecutionResult = {
       result: [],
       errors: [],
     };
