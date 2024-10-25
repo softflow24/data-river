@@ -22,5 +22,5 @@ export const BaseInputSchema = z.object({
 
 // Function for creating OpenAI client
 export const createOpenAIClient = (apiKey: string) => {
-  return new OpenAI({ apiKey });
+  return new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
 };

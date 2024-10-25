@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "test": "jest"
+    "test": "jest",
+    "fetch-openai-models": "node src/plugins/OpenAI/scripts/fetchOpenAIModels.js"
   },
   "dependencies": {
     "@data-river/shared": "workspace:*",

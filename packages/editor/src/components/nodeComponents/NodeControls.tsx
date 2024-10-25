@@ -34,7 +34,9 @@ const NodeControls: React.FC<NodeControlsProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const { nodes } = useReactFlowState();
+  const { nodes } = useReactFlowState((state) => ({
+    nodes: state.nodes,
+  }));
   const executionBlocks = useExecutionState((state) => state.executionBlocks);
   const executionResult = useExecutionState((state) => state.executionResult);
 
@@ -120,6 +122,16 @@ const NodeControls: React.FC<NodeControlsProps> = ({
                   inputClassName={`nodrag nowheel ${invalidValue ? "border-red-500" : ""}`}
                   value={value as string}
                   onChange={(value) => handleValueChange(control.name, value)}
+                />
+              );
+            case "text-readonly":
+              return (
+                <InputWithLabel
+                  key={`${index}-${control.name}`}
+                  label={control.label}
+                  name={control.name}
+                  value={value as string}
+                  inputClassName={`max-w-96 nodrag nowheel ${invalidValue ? "border-red-500" : ""}`}
                 />
               );
             case "text-area":

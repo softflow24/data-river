@@ -147,13 +147,7 @@ export default function RequestSetup({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto min-w-[26rem] relative">
-      <Badge
-        variant="outline"
-        className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
-      >
-        Experimental
-      </Badge>
+    <div className="w-full max-w-4xl mx-auto min-w-[26rem]">
       <div className="bg-background shadow-sm rounded-lg px-4 mb-4">
         <div className="bg-background shadow-sm rounded-lg py-4">
           <div className="space-y-4">

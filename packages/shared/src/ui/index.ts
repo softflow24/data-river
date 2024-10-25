@@ -19,9 +19,24 @@ export * from "./components/ui/accordion";
 export * from "./components/ui/form";
 export * from "./components/ui/radio-group";
 export * from "./components/ui/skeleton";
+export * from "./components/ui/alert-dialog";
+export * from "./components/ui/slider";
+export * from "./components/ui/switch";
 
 // Re-export utilities
 export * from "./utils";
 
 // Re-export hooks
 export * from "./hooks/use-toast";
+
+export {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "./components/ui/card";
+export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "./components/ui/tooltip";

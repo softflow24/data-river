@@ -12,7 +12,9 @@ import ActionToolsControls from "./ActionToolsControls";
 
 const Controls: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { viewport } = useReactFlowState();
+  const { viewport } = useReactFlowState((state) => ({
+    viewport: state.viewport,
+  }));
   const { setViewport: setReactFlowViewport } = useReactFlow();
 
   //! Don't set viewport in redux store, it's handled by listening to reactFlow's viewport changes.

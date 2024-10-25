@@ -1,4 +1,3 @@
-import React from "react";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
 import { useLayoutState } from "@/hooks/useLayoutState";
 import { updateNodesData } from "@/slices/reactFlowSlice";
@@ -10,9 +9,15 @@ import { Button } from "@data-river/shared/ui/components/ui/button";
 import { toggleRightPanelVisible } from "@/store";
 import RequestSetup from "./panelViews/RequestSetup";
 import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
+import OpenAISetup from "./panelViews/Plugins/OpenAI";
+import { Badge } from "@data-river/shared/ui";
+
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
-  const { nodes, selectedNodeId } = useReactFlowState();
+  const { nodes, selectedNodeId } = useReactFlowState((state) => ({
+    nodes: state.nodes,
+    selectedNodeId: state.selectedNodeId,
+  }));
   const dispatch = useDispatch();
 
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);
@@ -64,9 +69,20 @@ const RightPanel = () => {
             onConfigChange={handleConfigChange}
           />
         );
+
+      case "openai@0.1":
+        return (
+          <OpenAISetup
+            nodeId={selectedNode.id}
+            config={selectedNode.data.config as any}
+            onConfigChange={handleConfigChange}
+          />
+        );
       // Add cases for other node types here
       default:
-        return <div>No settings available for this node type.</div>;
+        return (
+          <div className="mt-12">No settings available for this node type.</div>
+        );
     }
   };
 
@@ -84,6 +100,16 @@ const RightPanel = () => {
           <X />
         </Button>
       </div>
+      {!selectedNode.data.stable && (
+        <div className="relative">
+          <Badge
+            variant="outline"
+            className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
+          >
+            Experimental
+          </Badge>
+        </div>
+      )}
       {renderPanelView()}
     </div>
   );

@@ -29,7 +29,10 @@ const edgeTypes: EdgeTypes = {
 
 const FlowChart: React.FC = () => {
   const theme = useTheme();
-  const { nodes, edges } = useReactFlowState();
+  const { nodes, edges } = useReactFlowState((state) => ({
+    nodes: state.nodes,
+    edges: state.edges,
+  }));
   const eventHandlers = useReactFlowEventHandlers();
   const { isCustomNodeInfoVisible } = useLayoutState();
   useReactFlowHooks();

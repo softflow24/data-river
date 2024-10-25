@@ -26,7 +26,7 @@ export default defineConfig({
         "../execution-engine/src",
       ),
     },
-    extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json"],
+    extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".css"],
   },
   optimizeDeps: {
     include: ["@data-river/editor", "@data-river/shared", "@data-river/blocks"],
@@ -35,5 +35,8 @@ export default defineConfig({
     commonjsOptions: {
       include: [/shared/, /editor/, /node_modules/],
     },
+  },
+  css: {
+    postcss: "./postcss.config.js",
   },
 });

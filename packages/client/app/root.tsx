@@ -9,6 +9,7 @@ import type { LinksFunction } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
 import "reflect-metadata";
 
+import "@data-river/shared/global.css";
 import "@data-river/shared/tailwind.css";
 
 export const links: LinksFunction = () => [

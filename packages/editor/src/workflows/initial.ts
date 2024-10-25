@@ -50,6 +50,11 @@ const initialNodes: Node<NodeData>[] = [
     position: { x: 400, y: 300 },
   },
   {
+    ...blockConfigs.openai,
+    id: "98",
+    position: { x: 800, y: 300 },
+  },
+  {
     id: "3",
     type: "custom",
     position: { x: 1300, y: 0 },
