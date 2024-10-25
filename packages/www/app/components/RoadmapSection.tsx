@@ -71,7 +71,7 @@ export default function RoadmapSection() {
           </AnimatedList>
         </div>
         <div className="text-center mt-12">
-          <a href="https://discord.gg/CmEqvZQUQn" target="_blank">
+          <a href="https://discord.gg/CmEqvZQUQn" target="_blank" rel="noreferrer">
             <RainbowButton size="lg">
               {" "}
               <svg
