@@ -10,7 +10,10 @@ export const useReactFlowHooks = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setCenter } = useReactFlow();
   const [centeredToNode, setCenteredToNode] = useState<Node | null>(null);
-  const { selectedNodeId, nodes } = useReactFlowState();
+  const { selectedNodeId, nodes } = useReactFlowState((state) => ({
+    selectedNodeId: state.selectedNodeId,
+    nodes: state.nodes,
+  }));
 
   // ! Debounce setViewport to prevent excessive state updates
   // ! If you don't do this, the viewport will jitter when you start dragging

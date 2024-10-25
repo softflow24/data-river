@@ -3,7 +3,13 @@ import { useReactFlowState } from "@/hooks/useReactFlowState";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const CustomNodeInfo: React.FC = () => {
-  const { selectedNodeId, hoveredNodeId, nodes } = useReactFlowState();
+  const { selectedNodeId, hoveredNodeId, nodes } = useReactFlowState(
+    (state) => ({
+      selectedNodeId: state.selectedNodeId,
+      hoveredNodeId: state.hoveredNodeId,
+      nodes: state.nodes,
+    }),
+  );
   const [isInputsExpanded, setIsInputsExpanded] = useState(false);
   const [isOutputsExpanded, setIsOutputsExpanded] = useState(false);
 

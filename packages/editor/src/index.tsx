@@ -58,7 +58,7 @@ const Editor = () => {
 
   useEffect(() => {
     if (isRightPanelVisible) {
-      rightSidebarRef.current?.resize(20);
+      rightSidebarRef.current?.resize(30);
     } else {
       rightSidebarRef.current?.collapse();
     }

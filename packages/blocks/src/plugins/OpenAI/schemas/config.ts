@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OpenAIInputSchema } from "./input";
 
 // Common base configuration schema
 export const BaseOpenAIConfigSchema = z.object({
@@ -14,6 +15,11 @@ export const OpenAIConfigSchema = BaseOpenAIConfigSchema.extend({
   frequencyPenalty: z.number().min(-2).max(2).optional(),
   presencePenalty: z.number().min(-2).max(2).optional(),
   stop: z.union([z.string(), z.array(z.string())]).optional(),
+  inputs: z
+    .object({
+      messages: OpenAIInputSchema,
+    })
+    .optional(),
 });
 
 // OpenAIStructuredBlock specific config
