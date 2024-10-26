@@ -2,11 +2,11 @@ import _ from "lodash";
 
 export class Comparator {
   static looseEquals(a: unknown, b: unknown): boolean {
-    return _.eq(a, b);
+    return a == b;
   }
 
   static strictEquals(a: unknown, b: unknown): boolean {
-    return _.isEqual(a, b);
+    return a === b;
   }
 
   static compare(a: unknown, b: unknown): number {

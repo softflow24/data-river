@@ -11,6 +11,7 @@ import { ComparisonOperator } from "@data-river/shared/types/ComparisonOperator"
 interface OperatorSelectProps {
   value: string;
   onChange: (value: string) => void;
+  type: "number" | "string" | "boolean" | "date";
 }
 
 const operatorOptions: { value: ComparisonOperator; label: string }[] = [
@@ -30,14 +31,38 @@ const operatorOptions: { value: ComparisonOperator; label: string }[] = [
   { value: "is_not_empty", label: "Is not empty" },
 ];
 
-const OperatorSelect: React.FC<OperatorSelectProps> = ({ value, onChange }) => {
+const OperatorSelect: React.FC<OperatorSelectProps> = ({
+  value,
+  onChange,
+  type,
+}) => {
+  const filteredOptions = operatorOptions.filter((option) => {
+    if (type === "string") {
+      return true;
+    }
+    if (type === "number" || type === "date") {
+      return ![
+        "contains",
+        "not_contains",
+        "starts_with",
+        "ends_with",
+        "is_empty",
+        "is_not_empty",
+      ].includes(option.value);
+    }
+    if (type === "boolean") {
+      return ["==", "===", "!=", "!=="].includes(option.value);
+    }
+    return false;
+  });
+
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="w-[200px]">
         <SelectValue placeholder="Select operator" />
       </SelectTrigger>
       <SelectContent>
-        {operatorOptions.map((option) => (
+        {filteredOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>
