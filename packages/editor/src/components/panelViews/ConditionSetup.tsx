@@ -7,7 +7,13 @@ import VariableSelect from "./condition-setup/VariableSelect";
 import OperatorSelect from "./condition-setup/OperatorSelect";
 import ExpectedValueInput from "./condition-setup/ExpectedValueInput";
 import { Badge } from "@data-river/shared/ui/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@data-river/shared/ui/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@data-river/shared/ui/components/ui/select";
 
 interface ConditionSetupProps {
   conditions: ICondition[];
@@ -70,7 +76,9 @@ const ConditionSetup: React.FC<ConditionSetupProps> = ({
                   />
                   <Select
                     value={condition.type}
-                    onValueChange={(value) => updateCondition(index, "type", value)}
+                    onValueChange={(value) =>
+                      updateCondition(index, "type", value)
+                    }
                   >
                     <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder="Select type" />

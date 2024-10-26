@@ -31,13 +31,24 @@ const operatorOptions: { value: ComparisonOperator; label: string }[] = [
   { value: "is_not_empty", label: "Is not empty" },
 ];
 
-const OperatorSelect: React.FC<OperatorSelectProps> = ({ value, onChange, type }) => {
+const OperatorSelect: React.FC<OperatorSelectProps> = ({
+  value,
+  onChange,
+  type,
+}) => {
   const filteredOptions = operatorOptions.filter((option) => {
     if (type === "string") {
       return true;
     }
     if (type === "number" || type === "date") {
-      return !["contains", "not_contains", "starts_with", "ends_with", "is_empty", "is_not_empty"].includes(option.value);
+      return ![
+        "contains",
+        "not_contains",
+        "starts_with",
+        "ends_with",
+        "is_empty",
+        "is_not_empty",
+      ].includes(option.value);
     }
     if (type === "boolean") {
       return ["==", "===", "!=", "!=="].includes(option.value);
