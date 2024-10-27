@@ -1,9 +1,10 @@
 import { CustomEvaluatorFunction } from "@data-river/shared/types";
 import { ICondition } from "@data-river/shared/interfaces/ICondition";
+
 export class CustomEvaluatorStrategy {
   private static createSandbox(inputs: Record<string, unknown>) {
     const sandbox: Record<string, unknown> = {
-      ...inputs,
+      inputs,
       console: {
         log: (...args: any[]) => console.log("Custom Evaluator:", ...args),
         warn: (...args: any[]) => console.warn("Custom Evaluator:", ...args),
@@ -64,15 +65,10 @@ export class CustomEvaluatorStrategy {
       const sandbox = this.createSandbox(inputs);
 
       const safeEval = new Function(
-        "condition",
-        "sandbox",
+        ...Object.keys(sandbox),
         `
         "use strict";
-        return (function() {
-          with (sandbox) {
-            return ${code};
-          }
-        })();
+        return (${code});
       `,
       );
 
@@ -84,7 +80,7 @@ export class CustomEvaluatorStrategy {
           throw new Error("Evaluation timed out");
         }, timeout);
 
-        result = safeEval(condition, sandbox) as boolean;
+        result = safeEval(...Object.values(sandbox)) as boolean;
 
         clearTimeout(timeoutId);
 
@@ -96,6 +92,49 @@ export class CustomEvaluatorStrategy {
       } catch (error) {
         console.error("Error in custom evaluator:", error);
         return false;
+      }
+    };
+  }
+
+  static createCodeBlockEvaluator(
+    code: string,
+    timeout: number = 5000,
+  ): (inputs: Record<string, unknown>) => unknown {
+    if (!this.validateCode(code)) {
+      throw new Error("Invalid code in code block evaluator");
+    }
+
+    return (inputs: Record<string, unknown>) => {
+      const sandbox = this.createSandbox(inputs);
+
+      const safeEval = new Function(
+        ...Object.keys(sandbox),
+        `
+        "use strict";
+        ${code}
+      `,
+      );
+
+      try {
+        let result: unknown;
+        let isTimedOut = false;
+        const timeoutId = setTimeout(() => {
+          isTimedOut = true;
+          throw new Error("Execution timed out");
+        }, timeout);
+
+        result = safeEval(...Object.values(sandbox));
+
+        clearTimeout(timeoutId);
+
+        if (isTimedOut) {
+          throw new Error("Execution timed out");
+        }
+
+        return result;
+      } catch (error) {
+        console.error("Error in code block evaluator:", error);
+        throw error;
       }
     };
   }

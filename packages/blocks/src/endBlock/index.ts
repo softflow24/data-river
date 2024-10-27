@@ -9,12 +9,17 @@ export class EndBlock extends Block {
       {
         ...config,
         inputConfigs: {
-          data: {
+          value: {
             type: ["string", "number", "boolean", "object", "array"],
             required: false,
           },
         },
-        outputConfigs: {},
+        outputConfigs: {
+          value: {
+            type: ["string", "number", "boolean", "object", "array"],
+            required: false,
+          },
+        },
       },
       logger,
     );
@@ -23,7 +28,7 @@ export class EndBlock extends Block {
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    this.logger.debug("Workflow ended with input:", inputs.data);
-    return {};
+    this.logger.debug("Workflow ended with input:", inputs.value);
+    return { value: inputs.value };
   }
 }

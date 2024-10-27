@@ -23,6 +23,13 @@ export const openAINode: Omit<Node<NodeData>, "id" | "position"> = {
       presencePenalty: 0,
       stop: [],
     },
+    inputsConfiguration: {},
+    outputsConfiguration: {
+      response: {
+        type: "string",
+        required: true,
+      },
+    },
     controls: [
       {
         type: "text-readonly",

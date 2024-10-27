@@ -1,7 +1,7 @@
 import { Node } from "reactflow";
 import { NodeData } from "@/types/NodeTypes";
 
-export const outputNode: Partial<Node<NodeData>> = {
+export const outputNode: Omit<Node<NodeData>, "id" | "position"> = {
   type: "custom",
   data: {
     block: "output@0.1",
@@ -10,6 +10,18 @@ export const outputNode: Partial<Node<NodeData>> = {
     sourceHandle: true,
     targetHandle: true,
     icon: "Square",
+    inputsConfiguration: {
+      value: {
+        type: ["string", "number", "boolean", "object"],
+        required: true,
+      },
+    },
+    outputsConfiguration: {
+      value: {
+        type: ["string", "number", "boolean", "object"],
+        required: true,
+      },
+    },
     controls: [
       {
         label: "",

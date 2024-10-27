@@ -63,6 +63,8 @@ export const useReactFlowEventHandlers = () => {
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
+      console.log(connection);
+
       const newEdges = addEdge(connection, edges);
 
       if (!isValidConnection(connection, newEdges)) return;

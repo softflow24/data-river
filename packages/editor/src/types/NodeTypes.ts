@@ -29,6 +29,14 @@ export interface NodeData {
   inputs?: Record<string, unknown>;
   outputs?: Record<string, unknown>;
   config?: Record<string, unknown>;
+  inputsConfiguration?: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
+  outputsConfiguration?: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
 }
 
 export type RequestNodeData = Omit<NodeData, "config"> & {

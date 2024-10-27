@@ -12,11 +12,7 @@ import {
   createExecutionEngine,
   createExecutionEngineConfig,
 } from "@data-river/execution-engine";
-import {
-  IEnvironment,
-  IConnection,
-  IBlockConfig,
-} from "@data-river/shared/interfaces";
+import { IEnvironment, IBlockConfig } from "@data-river/shared/interfaces";
 import { BlockMapperService } from "../../../services/BlockMapperService";
 import BlockValidationError from "../../../../../blocks/src/errors/blockValidationError";
 import { CustomLogger } from "@/utils/customLogger";
@@ -49,14 +45,21 @@ const RunWorkflowButton: React.FC = () => {
       errors: {},
     };
 
-    const connections: IConnection[] = edges.map((edge) => ({
-      from: edge.source,
-      to: edge.target,
-      inputKey: "data",
-      outputKey: "data",
-      sourceHandle: edge.sourceHandle ?? undefined,
-      targetHandle: edge.targetHandle ?? undefined,
-    }));
+    const connections = edges.map((edge) => {
+      const outputKey = edge.data!.sourceProperty;
+      const inputKey = edge.data!.targetProperty;
+
+      return {
+        from: edge.source,
+        to: edge.target,
+        inputKey,
+        outputKey,
+        sourceHandle: edge.sourceHandle ?? undefined,
+        targetHandle: edge.targetHandle ?? undefined,
+      };
+    });
+
+    debugger;
 
     initializePlugins();
 

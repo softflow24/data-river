@@ -2,10 +2,11 @@ import { injectable } from "tsyringe";
 import { Node } from "reactflow";
 import { ISharedBlock } from "@data-river/shared/interfaces/ISharedBlock";
 import { IBlockConfig } from "@data-river/shared/interfaces";
+import { NodeData } from "@/types/NodeTypes";
 
 @injectable()
 export class BlockMapperService {
-  mapReactFlowNodeToBlock(node: Node): ISharedBlock {
+  mapReactFlowNodeToBlock(node: Node<NodeData>): ISharedBlock {
     return {
       id: node.id,
       type: this.mapNodeTypeToBlockType(node.data.block),
@@ -15,8 +16,8 @@ export class BlockMapperService {
         label: node.data.label,
         color: node.data.color,
         icon: node.data.icon,
-        inputConfigs: node.data.inputConfigs,
-        outputConfigs: node.data.outputConfigs,
+        inputConfigs: node.data.inputsConfiguration,
+        outputConfigs: node.data.outputsConfiguration,
         inputs: node.data.inputs,
         outputs: node.data.outputs,
         config: node.data.config,

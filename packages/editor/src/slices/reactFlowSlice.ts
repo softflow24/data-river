@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   Node,
   Edge,
@@ -9,12 +9,15 @@ import {
   Viewport,
 } from "reactflow";
 import _ from "lodash";
-import { NodeData } from "@/types/NodeTypes";
-import { applyDataChanges, NodeDataChange } from "@/utils/nodesUpdates";
-import { blockConfigs, BlockType } from "@/blocks";
+
+import { applyDataChanges, type NodeDataChange } from "@/utils/nodesUpdates";
+import { blockConfigs, type BlockType } from "@/blocks";
 import { initialEdges, initialNodes } from "@/workflows/initial";
+import { type EdgeData } from "@/types/EdgeTypes";
+import { type NodeData } from "@/types/NodeTypes";
 
 type CustomNode = Node<NodeData>;
+type CustomEdge = Edge<EdgeData>;
 
 export interface ReactFlowState {
   minimalistic: boolean;
@@ -23,7 +26,7 @@ export interface ReactFlowState {
   selectedEdgeId: string | null;
   hoveredEdgeId: string | null;
   nodes: CustomNode[];
-  edges: Edge[];
+  edges: CustomEdge[];
   viewport: Viewport;
   draggingNodeId: string | null;
 }

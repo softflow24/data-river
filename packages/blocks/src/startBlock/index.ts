@@ -12,7 +12,7 @@ export class StartBlock extends Block {
           trigger: { type: "boolean", required: false },
         },
         outputConfigs: {
-          started: { type: "boolean" },
+          started: { type: "boolean", required: false },
         },
       },
       logger,

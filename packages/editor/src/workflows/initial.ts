@@ -1,234 +1,169 @@
 import { Edge, Node } from "reactflow";
-import { NodeData } from "@/types/NodeTypes";
+import { type NodeData } from "@/types/NodeTypes";
 import { blockConfigs } from "@/blocks";
+import { type EdgeData } from "@/types/EdgeTypes";
 
 const initialNodes: Node<NodeData>[] = [
   {
-    id: "1",
-    type: "custom",
+    ...blockConfigs.start,
+    id: "1-start",
     position: { x: 100, y: 100 },
-    data: {
-      block: "start@0.1",
-      label: "Start",
-      color: "rgb(34 197 94)",
-      sourceHandle: true,
-      targetHandle: false,
-      icon: "Play",
-    },
   },
   {
-    id: "2",
-    type: "custom",
+    ...blockConfigs.input,
+    id: "2-input",
     position: { x: 400, y: 100 },
     data: {
-      block: "input@0.1",
-      label: "Input node",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "TextCursorInput",
-      inputs: {},
-      config: {
-        input: "100",
-      },
-      outputs: {
-        output: "",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
+      ...blockConfigs.input.data,
+      config: { input: "100" },
     },
   },
   {
     ...blockConfigs.request,
-    id: "99",
+    id: "99-request",
     position: { x: 400, y: 300 },
   },
   {
     ...blockConfigs.openai,
-    id: "98",
+    id: "98-openai",
     position: { x: 800, y: 300 },
   },
   {
-    id: "3",
-    type: "custom",
+    ...blockConfigs.input,
+    id: "3-input",
     position: { x: 1300, y: 0 },
     data: {
-      block: "input@0.1",
-      label: "Input",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      config: {
-        input: "logic was resolved to TRUE",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
+      ...blockConfigs.input.data,
+      config: { input: "logic was resolved to TRUE" },
     },
   },
   {
-    id: "5",
-    type: "custom",
+    ...blockConfigs.logic,
+    id: "5-logic",
     position: { x: 800, y: 100 },
-    data: {
-      block: "logic@0.1",
-      label: "Logic",
-      color: "rgb(59 130 246)",
-      sourceHandle: false,
-      targetHandle: true,
-      icon: "GitBranch",
-      outputs: {
-        result: "",
-      },
-      config: {
-        logicOperator: "AND",
-        conditions: [],
-        inputs: {
-          data: undefined,
-        },
-      },
-      controls: [
-        {
-          type: "conditions-summary",
-          label: "Conditions summary",
-          name: "conditions",
-        },
-      ],
-    },
   },
 
   {
-    id: "6",
-    type: "custom",
+    ...blockConfigs.input,
+    id: "6-input",
     position: { x: 1300, y: 300 },
     data: {
-      block: "input@0.1",
-      label: "Input",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      config: {
-        input: "logic was resolved to FALSE",
-      },
-      controls: [
-        {
-          type: "text",
-          label: "Value",
-          name: "input",
-          placeholder: "Pass to output",
-        },
-      ],
+      ...blockConfigs.input.data,
+      config: { input: "logic was resolved to FALSE" },
     },
   },
 
   {
-    id: "9",
-    type: "custom",
+    ...blockConfigs.output,
+    id: "9-output",
     position: { x: 1800, y: 150 },
-    data: {
-      block: "output@0.1",
-      label: "Output",
-      color: "rgb(234 179 8)",
-      sourceHandle: true,
-      targetHandle: true,
-      icon: "Square",
-      controls: [
-        {
-          label: "",
-          type: "text-area",
-          name: "output",
-          placeholder:
-            "Value from input will be displayed here after execution",
-        },
-      ],
-    },
   },
 
   {
-    id: "4",
-    type: "custom",
+    ...blockConfigs.end,
+    id: "4-end",
     position: { x: 2300, y: 200 },
-    data: {
-      block: "end@0.1",
-      label: "End",
-      color: "rgb(239 68 68)",
-      sourceHandle: false,
-      targetHandle: true,
-      icon: "Flag",
-    },
   },
 ];
 
-const initialEdges: Edge[] = [
+const initialEdges: Edge<EdgeData>[] = [
   {
     id: "e1-2",
-    source: "1",
-    target: "2",
+    source: "1-start",
+    target: "2-input",
     type: "custom",
-    sourceHandle: "1-source",
-    targetHandle: "2-target",
+    sourceHandle: "1-start-source",
+    targetHandle: "2-input-target",
+    data: {
+      sourceProperty: "started",
+      sourceType: "boolean",
+      targetProperty: "trigger",
+      targetType: "boolean",
+    },
   },
-
   {
     id: "e2-5",
-    source: "2",
-    target: "5",
+    source: "2-input",
+    target: "5-logic",
     type: "custom",
-    sourceHandle: "2-source",
-    targetHandle: "5-target",
+    sourceHandle: "2-input-source",
+    targetHandle: "5-logic-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "value",
+      targetType: "string",
+    },
   },
   {
     id: "e5-3",
-    source: "5",
-    target: "3",
+    source: "5-logic",
+    target: "3-input",
     type: "custom",
-    sourceHandle: "5-if-handle",
-    targetHandle: "3-target",
+    sourceHandle: "5-logic-if-handle",
+    targetHandle: "3-input-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "trigger",
+      targetType: "boolean",
+    },
   },
   {
     id: "e6-3",
-    source: "5",
-    target: "6",
+    source: "5-logic",
+    target: "6-input",
     type: "custom",
-    sourceHandle: "5-else-handle",
-    targetHandle: "6-target",
+    sourceHandle: "5-logic-else-handle",
+    targetHandle: "6-input-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "trigger",
+      targetType: "boolean",
+    },
   },
   {
     id: "e6-9",
-    source: "6",
-    target: "9",
+    source: "6-input",
+    target: "9-output",
     type: "custom",
-    sourceHandle: "6-source",
-    targetHandle: "9-target",
+    sourceHandle: "6-input-source",
+    targetHandle: "9-output-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "value",
+      targetType: "string",
+    },
   },
   {
     id: "e3-4",
-    source: "3",
-    target: "9",
+    source: "3-input",
+    target: "9-output",
     type: "custom",
-    sourceHandle: "9-source",
-    targetHandle: "9-target",
+    sourceHandle: "3-input-source",
+    targetHandle: "9-output-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "value",
+      targetType: "string",
+    },
   },
   {
     id: "e9-4",
-    source: "9",
-    target: "4",
+    source: "9-output",
+    target: "4-end",
     type: "custom",
-    sourceHandle: "9-source",
-    targetHandle: "4-target",
+    sourceHandle: "9-output-source",
+    targetHandle: "4-end-target",
+    data: {
+      sourceProperty: "value",
+      sourceType: "string",
+      targetProperty: "value",
+      targetType: "string",
+    },
   },
 ];
 

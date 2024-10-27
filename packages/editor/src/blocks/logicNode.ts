@@ -1,7 +1,7 @@
 import { Node } from "reactflow";
 import { NodeData } from "@/types/NodeTypes";
 
-export const logicNode: Partial<Node<NodeData>> = {
+export const logicNode: Omit<Node<NodeData>, "id" | "position"> = {
   type: "custom",
   data: {
     block: "logic@0.1",
@@ -10,13 +10,12 @@ export const logicNode: Partial<Node<NodeData>> = {
     sourceHandle: false,
     targetHandle: true,
     icon: "GitBranch",
-    inputs: { value: "" },
-    outputs: {
-      result: "",
-    },
     config: {
       logicOperator: "AND",
       conditions: [],
+    },
+    inputsConfiguration: {
+      value: { type: "string", required: true },
     },
     controls: [
       {

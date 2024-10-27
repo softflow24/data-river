@@ -13,7 +13,7 @@ export class InputBlock extends Block {
           input: { type: "string", required: true },
         },
         outputConfigs: {
-          data: { type: "string" },
+          value: { type: "string", required: true },
         },
       },
       logger,
@@ -23,6 +23,6 @@ export class InputBlock extends Block {
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    return { data: inputs.input };
+    return { value: inputs.input };
   }
 }

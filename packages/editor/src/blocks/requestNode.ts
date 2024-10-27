@@ -22,6 +22,12 @@ export const requestNode: Omit<Node<RequestNodeData>, "position"> = {
       ],
       bodyType: "none",
     },
+    inputsConfiguration: {},
+    outputsConfiguration: {
+      data: { type: "object", required: true },
+      status: { type: "number", required: true },
+      statusText: { type: "string", required: true },
+    },
     controls: [
       {
         type: "request-info",

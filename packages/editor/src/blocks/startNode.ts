@@ -1,7 +1,7 @@
 import { NodeData } from "@/types/NodeTypes";
 import { Node } from "reactflow";
 
-export const startNode: Partial<Node<NodeData>> = {
+export const startNode: Omit<Node<NodeData>, "id" | "position"> = {
   type: "custom",
   data: {
     addable: false,
@@ -11,5 +11,8 @@ export const startNode: Partial<Node<NodeData>> = {
     sourceHandle: true,
     targetHandle: false,
     icon: "Play",
+    outputsConfiguration: {
+      started: { type: "boolean", required: false },
+    },
   },
 };

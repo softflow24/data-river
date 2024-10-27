@@ -7,8 +7,14 @@ export interface ISharedBlock {
     label: string;
     color: string;
     icon: string;
-    inputConfigs?: Record<string, { type: string; required: boolean }>;
-    outputConfigs?: Record<string, { type: string }>;
+    inputConfigs?: Record<
+      string,
+      { type: string | string[]; required: boolean }
+    >;
+    outputConfigs?: Record<
+      string,
+      { type: string | string[]; required: boolean }
+    >;
     inputs?: Record<string, any>;
     outputs?: Record<string, any>;
     config?: Record<string, any>;
