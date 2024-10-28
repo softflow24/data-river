@@ -42,9 +42,6 @@ const SourceHandle = React.forwardRef<HTMLDivElement, SourceHandleProps>(
       >
         <Plus size={16} />
         <Handle
-          onMouseDown={(x) => {
-            console.log(x.currentTarget);
-          }}
           type="source"
           id={handleId}
           className="nodrag nowheel"
