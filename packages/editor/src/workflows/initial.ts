@@ -2,6 +2,9 @@ import { Edge, Node } from "reactflow";
 import { type NodeData } from "@/types/NodeTypes";
 import { blockConfigs } from "@/blocks";
 import { type EdgeData } from "@/types/EdgeTypes";
+import { createHandles } from "@/utils/nodeCreated";
+import { type Handle } from "@/types/HandleTypes";
+import { createEdge, SimpleEdgeConfig } from "@/utils/createEdge";
 
 const initialNodes: Node<NodeData>[] = [
   {
@@ -21,12 +24,12 @@ const initialNodes: Node<NodeData>[] = [
   {
     ...blockConfigs.request,
     id: "99-request",
-    position: { x: 400, y: 300 },
+    position: { x: 400, y: 400 },
   },
   {
     ...blockConfigs.openai,
     id: "98-openai",
-    position: { x: 800, y: 300 },
+    position: { x: 800, y: 400 },
   },
   {
     ...blockConfigs.input,
@@ -66,105 +69,61 @@ const initialNodes: Node<NodeData>[] = [
   },
 ];
 
-const initialEdges: Edge<EdgeData>[] = [
+const edgeConfigs: SimpleEdgeConfig[] = [
   {
-    id: "e1-2",
     source: "1-start",
     target: "2-input",
-    type: "custom",
-    sourceHandle: "1-start-source",
-    targetHandle: "2-input-target",
-    data: {
-      sourceProperty: "started",
-      sourceType: "boolean",
-      targetProperty: "trigger",
-      targetType: "boolean",
-    },
+    sourceProperty: "started",
+    targetProperty: "trigger",
   },
   {
-    id: "e2-5",
     source: "2-input",
     target: "5-logic",
-    type: "custom",
-    sourceHandle: "2-input-source",
-    targetHandle: "5-logic-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "value",
-      targetType: "string",
-    },
+    sourceProperty: "value",
+    targetProperty: "value",
   },
   {
-    id: "e5-3",
     source: "5-logic",
     target: "3-input",
-    type: "custom",
-    sourceHandle: "5-logic-if-handle",
-    targetHandle: "3-input-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "trigger",
-      targetType: "boolean",
-    },
+    sourceProperty: "result",
+    targetProperty: "trigger",
+    condition: "if",
   },
   {
-    id: "e6-3",
     source: "5-logic",
     target: "6-input",
-    type: "custom",
-    sourceHandle: "5-logic-else-handle",
-    targetHandle: "6-input-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "trigger",
-      targetType: "boolean",
-    },
+    sourceProperty: "result",
+    targetProperty: "trigger",
+    condition: "else",
   },
   {
-    id: "e6-9",
     source: "6-input",
     target: "9-output",
-    type: "custom",
-    sourceHandle: "6-input-source",
-    targetHandle: "9-output-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "value",
-      targetType: "string",
-    },
+    sourceProperty: "value",
+    targetProperty: "value",
   },
   {
-    id: "e3-4",
     source: "3-input",
     target: "9-output",
-    type: "custom",
-    sourceHandle: "3-input-source",
-    targetHandle: "9-output-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "value",
-      targetType: "string",
-    },
+    sourceProperty: "value",
+    targetProperty: "value",
   },
   {
-    id: "e9-4",
     source: "9-output",
     target: "4-end",
-    type: "custom",
-    sourceHandle: "9-output-source",
-    targetHandle: "4-end-target",
-    data: {
-      sourceProperty: "value",
-      sourceType: "string",
-      targetProperty: "value",
-      targetType: "string",
-    },
+    sourceProperty: "value",
+    targetProperty: "value",
   },
 ];
 
-export { initialNodes, initialEdges };
+const initialHandles: Handle[] = initialNodes.flatMap(createHandles);
+
+const initialEdges: Edge<EdgeData>[] = edgeConfigs.map((config) =>
+  createEdge(
+    config,
+    initialNodes.map((node) => node.data),
+    initialHandles,
+  ),
+);
+
+export { initialNodes, initialEdges, initialHandles };

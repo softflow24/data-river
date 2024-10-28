@@ -13,7 +13,12 @@ export const codeNode: Omit<Node<NodeData>, "id" | "position"> = {
     config: {
       code: "",
     },
-    inputsConfiguration: {},
+    inputsConfiguration: {
+      input: {
+        type: ["string", "number", "boolean", "object"],
+        required: true,
+      },
+    },
     outputsConfiguration: {
       result: {
         type: ["string", "number", "boolean", "object"],

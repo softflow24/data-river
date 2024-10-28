@@ -23,7 +23,9 @@ export const openAINode: Omit<Node<NodeData>, "id" | "position"> = {
       presencePenalty: 0,
       stop: [],
     },
-    inputsConfiguration: {},
+    inputsConfiguration: {
+      trigger: { type: "boolean", required: false },
+    },
     outputsConfiguration: {
       response: {
         type: "string",

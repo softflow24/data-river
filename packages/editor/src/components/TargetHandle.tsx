@@ -4,9 +4,14 @@ import { Handle, Position } from "reactflow";
 interface TargetHandleProps {
   isVisible: boolean;
   handleId: string;
+  style?: React.CSSProperties;
 }
 
-const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible, handleId }) => {
+const TargetHandle: React.FC<TargetHandleProps> = ({
+  isVisible,
+  handleId,
+  style = {},
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -31,6 +36,7 @@ const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible, handleId }) => {
           ? "translateY(-46%) scale(1.1)"
           : "translateY(-50%)",
         scale: isHovered ? "1.1" : "1",
+        ...style,
       }}
     >
       <Handle

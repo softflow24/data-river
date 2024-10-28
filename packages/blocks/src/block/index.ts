@@ -118,10 +118,6 @@ export abstract class Block implements IBlock {
       }
     }
 
-    if (missingFields.length > 0 || invalidFields.length > 0) {
-      debugger;
-    }
-
     return {
       valid: missingFields.length === 0 && invalidFields.length === 0,
       missingFields,

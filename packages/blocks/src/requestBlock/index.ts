@@ -64,7 +64,7 @@ export class RequestBlock extends Block {
       return {
         data: response.data,
         status: response.status,
-        statusText: response.statusText,
+        statusText: response.statusText || "OK",
       };
     } catch (error) {
       // TODO: Add option in config to accept error and handle it manually if needed.

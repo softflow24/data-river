@@ -199,11 +199,9 @@ export class ExecutionEngine {
       (conn) => conn.to === blockConfig.id,
     );
 
-    debugger;
     for (const conn of connectionsBlocks) {
       if (conn.from && conn.outputKey && conn.inputKey) {
         inputs[conn.inputKey] = this.workflowState[conn.from]?.[conn.outputKey];
-
         if (inputs[conn.inputKey]) break;
       }
     }

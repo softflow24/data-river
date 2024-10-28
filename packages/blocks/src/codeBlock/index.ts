@@ -4,7 +4,7 @@ import { Block } from "@/block";
 import { CustomEvaluatorStrategy } from "@/utils/customEvaluatorStrategy";
 
 export interface CodeBlockConfig {
-  code: string; // return inputs.data.abilities[0].ability.name
+  code: string; // return inputs.input.abilities[0].ability.name
   timeout?: number;
 }
 

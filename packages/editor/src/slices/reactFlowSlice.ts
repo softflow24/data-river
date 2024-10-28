@@ -12,10 +12,15 @@ import _ from "lodash";
 
 import { applyDataChanges, type NodeDataChange } from "@/utils/nodesUpdates";
 import { blockConfigs, type BlockType } from "@/blocks";
-import { initialEdges, initialNodes } from "@/workflows/initial";
+import {
+  initialEdges,
+  initialNodes,
+  initialHandles,
+} from "@/workflows/initial";
 import { type EdgeData } from "@/types/EdgeTypes";
 import { type NodeData } from "@/types/NodeTypes";
-
+import { type Handle } from "@/types/HandleTypes";
+import { createHandles } from "@/utils/nodeCreated";
 type CustomNode = Node<NodeData>;
 type CustomEdge = Edge<EdgeData>;
 
@@ -27,6 +32,7 @@ export interface ReactFlowState {
   hoveredEdgeId: string | null;
   nodes: CustomNode[];
   edges: CustomEdge[];
+  handles: Handle[];
   viewport: Viewport;
   draggingNodeId: string | null;
 }
@@ -39,6 +45,7 @@ const initialState: ReactFlowState = {
   hoveredEdgeId: null,
   nodes: initialNodes,
   edges: initialEdges,
+  handles: initialHandles,
   viewport: { x: 0, y: 0, zoom: 1 },
   draggingNodeId: null,
 };
@@ -77,6 +84,14 @@ const reactFlowSlice = createSlice({
     },
     setEdges: (state, action: PayloadAction<Edge[]>) => {
       state.edges = action.payload;
+    },
+    addHandles: (state, action: PayloadAction<Handle[]>) => {
+      state.handles.push(...action.payload);
+    },
+    removeHandles: (state, action: PayloadAction<string[]>) => {
+      state.handles = state.handles.filter(
+        (handle) => !action.payload.includes(handle.id),
+      );
     },
     setZoom: (state, action: PayloadAction<number>) => {
       state.viewport = { ...state.viewport, zoom: action.payload };
@@ -120,7 +135,10 @@ const reactFlowSlice = createSlice({
         data: { ...blockConfig.data! },
       };
 
+      const handles = createHandles(newNode);
+
       state.nodes.push(newNode);
+      state.handles.push(...handles);
       state.draggingNodeId = newNode.id;
       state.selectedNodeId = newNode.id;
       state.hoveredNodeId = newNode.id;
@@ -163,6 +181,8 @@ export const {
   updateNodes,
   updateEdges,
   setEdges,
+  addHandles,
+  removeHandles,
   setSelectedEdgeId,
   setHoveredEdgeId,
   setViewport,

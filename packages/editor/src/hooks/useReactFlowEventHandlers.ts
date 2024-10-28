@@ -13,6 +13,7 @@ import {
   Node,
   useReactFlow,
   NodePositionChange,
+  Edge,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -25,20 +26,23 @@ import {
   setSelectedNodeId,
   finishDraggingNode,
   cancelDraggingNode,
+  removeHandles,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
 import { useHotkeys } from "react-hotkeys-hook";
 import { isValidConnection } from "@/utils/validation";
+import { EdgeData } from "@/types/EdgeTypes";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { screenToFlowPosition } = useReactFlow();
   const rafRef = useRef<number | null>(null);
 
-  const { draggingNodeId, edges } = useReactFlowState((x) => ({
+  const { draggingNodeId, edges, handles } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
     edges: x.edges,
+    handles: x.handles,
   }));
 
   const debouncedUpdateNodes = useMemo(
@@ -63,15 +67,37 @@ export const useReactFlowEventHandlers = () => {
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
-      console.log(connection);
-
       const newEdges = addEdge(connection, edges);
 
       if (!isValidConnection(connection, newEdges)) return;
 
+      const handleMap = new Map(handles.map((handle) => [handle.id, handle]));
+
+      const sourceHandle = handleMap.get(connection.sourceHandle!);
+      const targetHandle = handleMap.get(connection.targetHandle!);
+
+      if (!sourceHandle || !targetHandle) {
+        throw Error("Handle not found");
+      }
+
+      const data: EdgeData = {
+        sourceProperty: sourceHandle.property,
+        sourceType: sourceHandle.propertyType,
+        targetProperty: targetHandle.property,
+        targetType: targetHandle.propertyType,
+      };
+
+      const edge: Edge<EdgeData> = newEdges.find(
+        (e) =>
+          e.sourceHandle === connection.sourceHandle &&
+          e.targetHandle === connection.targetHandle,
+      )!;
+
+      edge.data = data;
+
       dispatch(setEdges(newEdges));
     },
-    [edges, dispatch],
+    [edges, dispatch, handles],
   );
 
   const onEdgeClick: EdgeMouseHandler = useCallback(

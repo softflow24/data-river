@@ -1,5 +1,6 @@
 import { Node } from "reactflow";
 import { RequestNodeData } from "@/types/NodeTypes";
+import { url } from "inspector";
 
 export const requestNode: Omit<Node<RequestNodeData>, "position"> = {
   id: "0",
@@ -22,7 +23,12 @@ export const requestNode: Omit<Node<RequestNodeData>, "position"> = {
       ],
       bodyType: "none",
     },
-    inputsConfiguration: {},
+    inputsConfiguration: {
+      trigger: { type: "boolean", required: false },
+      url: { type: "string", required: false },
+      headers: { type: "object", required: false },
+      body: { type: "object", required: false },
+    },
     outputsConfiguration: {
       data: { type: "object", required: true },
       status: { type: "number", required: true },

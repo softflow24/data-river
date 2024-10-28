@@ -59,8 +59,6 @@ const RunWorkflowButton: React.FC = () => {
       };
     });
 
-    debugger;
-
     initializePlugins();
 
     const config = createExecutionEngineConfig({
