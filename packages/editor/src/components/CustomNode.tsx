@@ -1,9 +1,6 @@
 import React, { useMemo } from "react";
 import { NodeProps } from "reactflow";
 import { NodeData } from "../types/NodeTypes";
-
-import SourceHandle from "./SourceHandle";
-import TargetHandle from "./TargetHandle";
 import NodeIcon from "./NodeIcon";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
 import {
@@ -84,7 +81,10 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
   }
 
   const renderHandles = (
-    configuration: Record<string, any>,
+    configuration: Record<
+      string,
+      { type: string | string[]; required: boolean }
+    >,
     type: "input" | "output",
   ) => {
     const handles = useMemo(
@@ -100,13 +100,14 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
         renderLabel={handles.length > 1}
         type={type}
         isSelected={showHandles}
+        config={config}
         handleId={`${id}-${type}-${key}`}
       />
     ));
   };
 
   let inputsConfiguration = data.inputsConfiguration ?? {};
-  if (inputsConfiguration && hasTriggerInput && !hasSingleInput) {
+  if (hasTriggerInput && !hasSingleInput) {
     inputsConfiguration = Object.fromEntries(
       Object.entries(inputsConfiguration).filter(([key]) => key !== "trigger"),
     );

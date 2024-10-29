@@ -7,8 +7,6 @@ export const outputNode: Omit<Node<NodeData>, "id" | "position"> = {
     block: "output@0.1",
     label: "Output",
     color: "rgb(234 179 8)",
-    sourceHandle: true,
-    targetHandle: true,
     icon: "Square",
     inputsConfiguration: {
       value: {

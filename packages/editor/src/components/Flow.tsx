@@ -50,6 +50,8 @@ const FlowChart: React.FC = () => {
         onNodesChange={eventHandlers.onNodesChangeHandler}
         onEdgesChange={eventHandlers.onEdgesChangeHandler}
         onConnect={eventHandlers.onConnect}
+        onConnectStart={eventHandlers.onConnectStart}
+        onConnectEnd={eventHandlers.onConnectEnd}
         onEdgeClick={eventHandlers.onEdgeClick}
         onEdgeMouseEnter={eventHandlers.onEdgeMouseEnter}
         onEdgeMouseLeave={eventHandlers.onEdgeMouseLeave}

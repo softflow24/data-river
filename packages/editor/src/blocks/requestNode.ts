@@ -9,8 +9,6 @@ export const requestNode: Omit<Node<RequestNodeData>, "position"> = {
     block: "request@0.1",
     label: "Request",
     color: "rgb(234 179 8)",
-    sourceHandle: true,
-    targetHandle: true,
     icon: "Network",
     config: {
       httpMethod: "GET",

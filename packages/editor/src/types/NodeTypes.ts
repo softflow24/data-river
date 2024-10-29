@@ -22,8 +22,6 @@ export interface NodeData {
   label: string;
   description?: string;
   color: string;
-  sourceHandle: boolean;
-  targetHandle: boolean;
   icon: keyof typeof Icons;
   controls?: Control[];
   inputs?: Record<string, unknown>;

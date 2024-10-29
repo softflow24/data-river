@@ -7,8 +7,6 @@ export const openAINode: Omit<Node<NodeData>, "id" | "position"> = {
     block: "openai@0.1",
     label: "OpenAI",
     color: "rgb(16 185 129)", // A teal color
-    sourceHandle: true,
-    targetHandle: true,
     icon: "Brain",
     outputs: {
       response: "",

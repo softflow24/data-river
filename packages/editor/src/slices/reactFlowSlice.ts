@@ -33,6 +33,7 @@ export interface ReactFlowState {
   nodes: CustomNode[];
   edges: CustomEdge[];
   handles: Handle[];
+  connectingHandle: Handle | null;
   viewport: Viewport;
   draggingNodeId: string | null;
 }
@@ -48,6 +49,7 @@ const initialState: ReactFlowState = {
   handles: initialHandles,
   viewport: { x: 0, y: 0, zoom: 1 },
   draggingNodeId: null,
+  connectingHandle: null,
 };
 
 const reactFlowSlice = createSlice({
@@ -170,6 +172,15 @@ const reactFlowSlice = createSlice({
         }
       }
     },
+    setConnectingHandle: (state, action: PayloadAction<string | null>) => {
+      if (!action.payload) {
+        state.connectingHandle = null;
+        return;
+      }
+
+      state.connectingHandle =
+        state.handles.find((handle) => handle.id === action.payload) ?? null;
+    },
   },
 });
 
@@ -191,6 +202,7 @@ export const {
   finishDraggingNode,
   cancelDraggingNode,
   updateDraggingNodePosition,
+  setConnectingHandle,
 } = reactFlowSlice.actions;
 
 export default reactFlowSlice.reducer;

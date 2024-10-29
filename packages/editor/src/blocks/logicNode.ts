@@ -7,8 +7,6 @@ export const logicNode: Omit<Node<NodeData>, "id" | "position"> = {
     block: "logic@0.1",
     label: "Logic",
     color: "rgb(59 130 246)",
-    sourceHandle: false,
-    targetHandle: true,
     icon: "GitBranch",
     config: {
       logicOperator: "AND",

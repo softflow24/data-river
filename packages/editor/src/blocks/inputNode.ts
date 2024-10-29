@@ -7,8 +7,6 @@ export const inputNode: Omit<Node<NodeData>, "id" | "position"> = {
     block: "input@0.1",
     label: "Input",
     color: "rgb(234 179 8)",
-    sourceHandle: true,
-    targetHandle: true,
     icon: "TextCursorInput",
     config: {
       input: "",

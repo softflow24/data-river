@@ -7,8 +7,6 @@ export const codeNode: Omit<Node<NodeData>, "id" | "position"> = {
     block: "code@0.1",
     label: "Code",
     color: "rgb(0 122 255)",
-    sourceHandle: true,
-    targetHandle: true,
     icon: "Code",
     config: {
       code: "",

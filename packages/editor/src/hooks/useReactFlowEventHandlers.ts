@@ -14,6 +14,8 @@ import {
   useReactFlow,
   NodePositionChange,
   Edge,
+  OnConnectStart,
+  OnConnectEnd,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -27,6 +29,7 @@ import {
   finishDraggingNode,
   cancelDraggingNode,
   removeHandles,
+  setConnectingHandle,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
@@ -99,6 +102,19 @@ export const useReactFlowEventHandlers = () => {
     },
     [edges, dispatch, handles],
   );
+
+  const onConnectStart: OnConnectStart = useCallback(
+    (_, connection) => {
+      dispatch(setConnectingHandle(connection.handleId));
+      dispatch(setIsRightPanelVisible(false));
+    },
+    [dispatch],
+  );
+
+  const onConnectEnd: OnConnectEnd = useCallback(() => {
+    dispatch(setConnectingHandle(null));
+    dispatch(setIsRightPanelVisible(true));
+  }, [dispatch]);
 
   const onEdgeClick: EdgeMouseHandler = useCallback(
     (_, edge) => {
@@ -206,6 +222,8 @@ export const useReactFlowEventHandlers = () => {
     onNodesChangeHandler,
     onEdgesChangeHandler,
     onConnect,
+    onConnectStart,
+    onConnectEnd,
     onEdgeClick,
     onEdgeMouseEnter,
     onEdgeMouseLeave,
