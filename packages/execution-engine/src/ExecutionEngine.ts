@@ -16,6 +16,12 @@ import { ILogger } from "@data-river/shared/interfaces/ILogger";
 export class ExecutionEngine {
   private workflowState: IWorkflowState = {};
   private connections: IConnection[];
+  private blocksMap: Map<string, IBlockConfig> = new Map();
+  private executedBlocks: Set<string> = new Set();
+  private output: IExecutionResult = {
+    result: [],
+    errors: [],
+  };
 
   constructor(
     @inject("WorkflowConfig") private config: IWorkflowConfig,
@@ -35,12 +41,8 @@ export class ExecutionEngine {
     this.logger.group("Executing Workflow");
     this.logger.time("Workflow Execution");
 
-    const output: IExecutionResult = {
-      result: [],
-      errors: [],
-    };
+    this.blocksMap = new Map(blockConfigs.map((block) => [block.id, block]));
 
-    const executedBlocks = new Set<string>();
     const startBlock = blockConfigs.find((block) =>
       block.type.startsWith("blocks/start@"),
     );
@@ -49,30 +51,24 @@ export class ExecutionEngine {
       throw new Error("No start block found in the workflow");
     }
 
-    await this.executeBlock(
-      startBlock.id,
-      blockConfigs,
-      executedBlocks,
-      output,
-    );
+    await this.executeBlock(startBlock.id);
 
     this.logger.timeEnd("Workflow Execution");
     this.logger.groupEnd();
-    return output;
+    return this.output;
   }
 
   private async executeBlock(
     blockId: string,
-    blockConfigs: IBlockConfig[],
-    executedBlocks: Set<string>,
-    output: IExecutionResult,
+    shouldRunConnectedBlocks = true,
   ): Promise<void> {
-    if (executedBlocks.has(blockId)) return;
+    if (this.executedBlocks.has(blockId)) return;
 
-    const blockConfig = blockConfigs.find((block) => block.id === blockId);
+    const blockConfig = this.blocksMap.get(blockId);
     if (!blockConfig) return;
 
     try {
+      await this.runNodesConnectedToBlockThatDidNotRunYet(blockId);
       const inputs = this.getInputsForBlock(blockConfig);
       const resolvedInputs = this.resolveVariables(inputs);
 
@@ -88,42 +84,39 @@ export class ExecutionEngine {
         outputs,
       });
       this.handleBlockOutputs(blockConfig, outputs);
-      output.result.push({
+      this.output.result.push({
         nodeType: blockConfig.type,
         nodeId: blockConfig.id,
         outputs,
         inputs: resolvedInputs,
       });
 
-      executedBlocks.add(blockId);
+      this.executedBlocks.add(blockId);
+
+      if (!shouldRunConnectedBlocks) {
+        return;
+      }
 
       // Handle logic blocks
       if (blockConfig.type.startsWith("blocks/logic@")) {
         const nextBlockId = await this.evaluateLogicBlock(blockConfig, outputs);
         if (nextBlockId) {
-          await this.executeBlock(
-            nextBlockId,
-            blockConfigs,
-            executedBlocks,
-            output,
-          );
+          await this.executeBlock(nextBlockId);
         }
       } else {
         // For non-logic blocks, execute all connected blocks
         const connectedBlocks = this.getConnectedBlocks(blockConfig.id);
         for (const connectedBlock of connectedBlocks) {
-          await this.executeBlock(
-            connectedBlock,
-            blockConfigs,
-            executedBlocks,
-            output,
-          );
+          await this.executeBlock(connectedBlock);
         }
       }
     } catch (error) {
       const blockError = this.handleBlockError(error as Error, blockConfig);
       this.environment.errors[blockConfig.id] = blockError.errors;
-      output.errors.push({ blockId: blockConfig.id, error: error as Error });
+      this.output.errors.push({
+        blockId: blockConfig.id,
+        error: error as Error,
+      });
     }
   }
 
@@ -191,6 +184,17 @@ export class ExecutionEngine {
     );
   }
 
+  private async runNodesConnectedToBlockThatDidNotRunYet(blockId: string) {
+    const connectionsBlocks = this.connections.filter(
+      (conn) => conn.to === blockId,
+    );
+
+    for (const conn of connectionsBlocks) {
+      if (this.workflowState[conn.from]) continue;
+      await this.executeBlock(conn.from, false);
+    }
+  }
+
   private getInputsForBlock(
     blockConfig: IBlockConfig,
   ): Record<string, unknown> {
@@ -202,7 +206,7 @@ export class ExecutionEngine {
     for (const conn of connectionsBlocks) {
       if (conn.from && conn.outputKey && conn.inputKey) {
         inputs[conn.inputKey] = this.workflowState[conn.from]?.[conn.outputKey];
-        if (inputs[conn.inputKey]) break;
+        if (inputs[conn.inputKey]) continue;
       }
     }
 

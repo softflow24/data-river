@@ -12,7 +12,10 @@ export class RequestBlock extends Block {
 
   constructor(config: IBlockConfig, logger: ILogger) {
     super(config, logger);
-    const result = RequestFormSchema.safeParse(config.config);
+    const result = RequestFormSchema.safeParse({
+      ...config.config,
+      ...config.inputs,
+    });
     if (!result.success) {
       throw new Error(`Invalid request configuration: ${result.error}`);
     }
