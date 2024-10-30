@@ -59,6 +59,7 @@ const FlowChart: React.FC = () => {
         onNodeMouseEnter={eventHandlers.onNodeMouseEnter}
         onNodeMouseLeave={eventHandlers.onNodeMouseLeave}
         onNodeClick={eventHandlers.onNodeClick}
+        onNodeDragStart={eventHandlers.onNodeDragStart}
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={{

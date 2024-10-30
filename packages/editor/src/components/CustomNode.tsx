@@ -16,11 +16,12 @@ import { createBlockValidationErrorFromObject } from "@data-river/blocks/errors/
 import { HandleContainer } from "./handles/HandleContainer";
 import { Separator } from "@data-river/shared/ui/components/ui/separator";
 
-const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
+const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
   const { selectedNodeId, hoveredNodeId } = useReactFlowState((state) => ({
     selectedNodeId: state.selectedNodeId,
     hoveredNodeId: state.hoveredNodeId,
   }));
+
   const executionResult = useExecutionState((x) => x.executionResult);
 
   const { hasMultipleOutputs, hasSingleOutput } = useMemo(() => {
@@ -48,7 +49,7 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
     };
   }, [data.inputsConfiguration]);
 
-  const isSelected = id === selectedNodeId || selected;
+  const isSelected = id === selectedNodeId;
   const isHovered = hoveredNodeId === id;
   const showHandles =
     isSelected || selectedNodeId === id || hoveredNodeId === id;
@@ -58,7 +59,7 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
   );
 
   const hasError = errorForNode !== undefined;
-  const highlight = isSelected || selectedNodeId === id;
+  const highlight = isSelected || isHovered;
 
   const validationError =
     errorForNode?.error.name === "BlockValidationError"

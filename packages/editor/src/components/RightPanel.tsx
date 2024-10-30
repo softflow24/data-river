@@ -114,7 +114,7 @@ const RightPanel = () => {
         <div className="relative">
           <Badge
             variant="outline"
-            className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
+            className="mb-4 text-warning border-warning absolute top-0 right-0"
           >
             Experimental
           </Badge>

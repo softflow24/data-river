@@ -154,17 +154,22 @@ export const useReactFlowEventHandlers = () => {
 
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
+      if (!node || !node.id) return;
+
       dispatch(setSelectedNodeId(node.id));
       dispatch(setIsRightPanelVisible(true));
     },
-    [dispatch],
+    [dispatch, setSelectedNodeId, setIsRightPanelVisible],
   );
 
   const onNodeDragStart = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      console.log("onNodeDragStart", node);
+      if (!node || !node.id) return;
+
       dispatch(setSelectedNodeId(node.id));
     },
-    [dispatch],
+    [dispatch, setSelectedNodeId],
   );
 
   const handleMouseMove = useCallback(

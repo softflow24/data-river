@@ -1,10 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SourceHandle from "../SourceHandle";
 import TargetHandle from "../TargetHandle";
-import { cn } from "@data-river/shared/ui";
+import {
+  cn,
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@data-river/shared/ui";
 import useReactFlowState from "@/hooks/useReactFlowState";
 import { useUpdateNodeInternals } from "@reactflow/core";
 import debounce from "lodash.debounce";
+import { HandleTooltipContent } from "./HandleTooltipContent";
+import { checkTypeMatch } from "@/utils/handleTypeMatching";
 
 interface HandleContainerProps {
   nodeId: string;
@@ -35,37 +42,10 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
 
   const handleTypes = config.type;
 
-  const typeMatch = useMemo(() => {
-    const incomingPropertyType = connectingHandle?.propertyType;
-
-    if (
-      typeof incomingPropertyType === "string" &&
-      typeof handleTypes === "string"
-    ) {
-      return incomingPropertyType === handleTypes;
-    }
-
-    if (
-      typeof incomingPropertyType === "string" &&
-      Array.isArray(handleTypes)
-    ) {
-      return handleTypes.includes(incomingPropertyType);
-    }
-
-    if (
-      Array.isArray(incomingPropertyType) &&
-      typeof handleTypes === "string"
-    ) {
-      return incomingPropertyType.includes(handleTypes);
-    }
-
-    if (Array.isArray(incomingPropertyType) && Array.isArray(handleTypes)) {
-      const incomingPropertyTypeSet = new Set(incomingPropertyType);
-      return handleTypes.some((type) => incomingPropertyTypeSet.has(type));
-    }
-
-    return false;
-  }, [connectingHandle, handleTypes]);
+  const typeMatch = useMemo(
+    () => checkTypeMatch(connectingHandle?.propertyType, handleTypes),
+    [connectingHandle?.propertyType, handleTypes],
+  );
 
   const showSourceHandle = useMemo(() => {
     return (
@@ -92,36 +72,53 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
   }, [debouncedShowSourceHandle, isSelected]);
 
   return (
-    <div className="relative flex items-center h-6 w-full">
-      {renderLabel && (
-        <div className="flex items-center justify-between w-full">
-          <span
-            className={cn(
-              "text-bold w-full capitalize",
-              type === "input" ? "text-left" : "text-right",
-              !isSelected && "text-muted-foreground",
-              "transition-colors duration-200 ease-in-out",
+    <TooltipProvider>
+      <Tooltip open={showSourceHandle || type == "input" ? undefined : false}>
+        <TooltipTrigger asChild>
+          <div className="relative flex items-center h-6 w-full">
+            {renderLabel && (
+              <div className="flex items-center justify-between w-full">
+                <span
+                  className={cn(
+                    "text-bold w-full capitalize text-muted-foreground",
+                    type === "input" ? "text-left" : "text-right",
+                    "transition-colors duration-200 ease-in-out",
+                    isSelected &&
+                      ((type === "output" && !connectingHandle) ||
+                        type === "input") &&
+                      "text-foreground",
+                  )}
+                >
+                  {label}
+                </span>
+              </div>
             )}
-          >
-            {label}
-          </span>
-        </div>
-      )}
-      {type === "input" ? (
-        <TargetHandle
-          connectable={connectingHandle?.nodeId !== nodeId && typeMatch}
-          connectionInProgress={!!connectingHandle}
-          handleId={handleId}
-          isVisible={connectingHandle?.nodeId !== nodeId}
-          style={{ left: "-30px" }}
-        />
-      ) : (
-        <SourceHandle
-          handleId={handleId}
-          isVisible={debouncedShowSourceHandle}
-          style={{ right: "-34px" }}
-        />
-      )}
-    </div>
+
+            {type === "input" ? (
+              <TargetHandle
+                connectable={connectingHandle?.nodeId !== nodeId && typeMatch}
+                connectionInProgress={!!connectingHandle}
+                handleId={handleId}
+                style={{ left: "-30px" }}
+              />
+            ) : (
+              <SourceHandle
+                handleId={handleId}
+                connectionInProgress={!!connectingHandle}
+                isVisible={debouncedShowSourceHandle}
+                style={{ right: "-34px" }}
+              />
+            )}
+
+            <HandleTooltipContent
+              type={type}
+              typeMatch={typeMatch}
+              handleTypes={handleTypes}
+              connectingHandlePropertyType={connectingHandle?.propertyType}
+            />
+          </div>
+        </TooltipTrigger>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

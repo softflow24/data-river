@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Handle, Position, useReactFlow, useStore } from "reactflow";
+import { Handle, Position } from "reactflow";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -11,10 +11,11 @@ interface SourceHandleProps {
   style?: React.CSSProperties;
   handleId?: string;
   handleRef?: React.RefObject<HTMLDivElement>;
+  connectionInProgress: boolean;
 }
 
 const SourceHandle = React.forwardRef<HTMLDivElement, SourceHandleProps>(
-  ({ isVisible, style = {}, handleId }, ref) => {
+  ({ isVisible, style = {}, handleId, connectionInProgress }, ref) => {
     const [isHovered, setIsHovered] = useState(false);
     const { zoom } = useReactFlowState((state) => ({
       zoom: state.viewport.zoom,
@@ -78,6 +79,7 @@ const SourceHandle = React.forwardRef<HTMLDivElement, SourceHandleProps>(
           <Handle
             type="source"
             id={handleId}
+            isConnectable={!connectionInProgress}
             className={cn(
               "nodrag nowheel !w-full !h-full !border-none !right-0 opacity-0",
               !isVisible && "!w-1 !h-1 !right-1/2",
