@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SourceHandle from "../SourceHandle";
 import TargetHandle from "../TargetHandle";
 import { cn } from "@data-river/shared/ui";
 import useReactFlowState from "@/hooks/useReactFlowState";
 import { useUpdateNodeInternals } from "@reactflow/core";
+import debounce from "lodash.debounce";
 
 interface HandleContainerProps {
   nodeId: string;
@@ -28,6 +29,9 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
   const { connectingHandle } = useReactFlowState((x) => ({
     connectingHandle: x.connectingHandle,
   }));
+
+  const [debouncedShowSourceHandle, setDebouncedShowSourceHandle] =
+    useState(false);
 
   const handleTypes = config.type;
 
@@ -72,8 +76,20 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
   }, [type, connectingHandle?.id, handleId, isSelected]);
 
   useEffect(() => {
+    const handleVisibilityChange = debounce((value: boolean) => {
+      setDebouncedShowSourceHandle(value);
+    }, 100);
+
+    handleVisibilityChange(showSourceHandle);
+
+    return () => {
+      handleVisibilityChange.cancel();
+    };
+  }, [showSourceHandle]);
+
+  useEffect(() => {
     updateNodeInternals(nodeId);
-  }, [showSourceHandle, isSelected]);
+  }, [debouncedShowSourceHandle, isSelected]);
 
   return (
     <div className="relative flex items-center h-6 w-full">
@@ -81,8 +97,10 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
         <div className="flex items-center justify-between w-full">
           <span
             className={cn(
-              "text-bold w-full",
+              "text-bold w-full capitalize",
               type === "input" ? "text-left" : "text-right",
+              !isSelected && "text-muted-foreground",
+              "transition-colors duration-200 ease-in-out",
             )}
           >
             {label}
@@ -100,7 +118,7 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
       ) : (
         <SourceHandle
           handleId={handleId}
-          isVisible={showSourceHandle}
+          isVisible={debouncedShowSourceHandle}
           style={{ right: "-34px" }}
         />
       )}
