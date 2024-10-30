@@ -73,14 +73,13 @@ export class CustomEvaluatorStrategy {
       );
 
       try {
-        let result: boolean;
         let isTimedOut = false;
         const timeoutId = setTimeout(() => {
           isTimedOut = true;
           throw new Error("Evaluation timed out");
         }, timeout);
 
-        result = safeEval(...Object.values(sandbox)) as boolean;
+        const result = safeEval(...Object.values(sandbox)) as boolean;
 
         clearTimeout(timeoutId);
 
@@ -116,14 +115,13 @@ export class CustomEvaluatorStrategy {
       );
 
       try {
-        let result: unknown;
         let isTimedOut = false;
         const timeoutId = setTimeout(() => {
           isTimedOut = true;
           throw new Error("Execution timed out");
         }, timeout);
 
-        result = safeEval(...Object.values(sandbox));
+        const result = safeEval(...Object.values(sandbox));
 
         clearTimeout(timeoutId);
 

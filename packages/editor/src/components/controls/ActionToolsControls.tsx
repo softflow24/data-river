@@ -8,7 +8,7 @@ interface ActionToolsControlsProps {
   toggleMinimalist: () => void;
 }
 
-const ActionToolsControls: FC<ActionToolsControlsProps> = ({}) => {
+const ActionToolsControls: FC<ActionToolsControlsProps> = () => {
   return (
     <div className="flex items-center bg-background border p-2 rounded-lg shadow-md space-x-1.5">
       <AddBlockDropdownMenu>

@@ -8,11 +8,7 @@ interface CodeSetupProps {
   onConfigChange: (config: { code: string }) => void;
 }
 
-const CodeSetup: React.FC<CodeSetupProps> = ({
-  nodeId,
-  config,
-  onConfigChange,
-}) => {
+const CodeSetup: React.FC<CodeSetupProps> = ({ config, onConfigChange }) => {
   const [code, setCode] = useState(config.code || "");
   const { toast } = useToast();
 
