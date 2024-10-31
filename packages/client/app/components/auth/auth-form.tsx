@@ -58,7 +58,7 @@ export const AuthForm = ({ error }: AuthFormProps) => {
             id="password"
             name="password"
             type="password"
-            placeholder="••••••••"
+            placeholder="••••••••••"
             required
             className="h-11 text-base"
           />
