@@ -1,9 +1,11 @@
+import { SectionHeader } from "./section-header";
+
 export function AuthSection() {
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-semibold">
+    <section className="space-y-4" id="authentication-services">
+      <SectionHeader id="authentication-services">
         Authentication & Third-Party Services
-      </h2>
+      </SectionHeader>
       <p>
         We use the following third-party services to provide authentication and
         data storage:
