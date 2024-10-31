@@ -17,7 +17,7 @@ interface HandleContainerProps {
   nodeId: string;
   label: string;
   type: "input" | "output";
-  isSelected: boolean;
+  showHandles: boolean;
   handleId: string;
   renderLabel: boolean;
   config: { type: string | string[]; required: boolean };
@@ -27,7 +27,7 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
   nodeId,
   label,
   type,
-  isSelected,
+  showHandles,
   handleId,
   renderLabel,
   config,
@@ -49,11 +49,11 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
 
   const showSourceHandle = useMemo(() => {
     return (
-      isSelected &&
+      showHandles &&
       type === "output" &&
       (!connectingHandle || connectingHandle.id === handleId)
     );
-  }, [type, connectingHandle?.id, handleId, isSelected]);
+  }, [type, connectingHandle?.id, handleId, showHandles]);
 
   useEffect(() => {
     const handleVisibilityChange = debounce((value: boolean) => {
@@ -69,7 +69,7 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
 
   useEffect(() => {
     updateNodeInternals(nodeId);
-  }, [debouncedShowSourceHandle, isSelected]);
+  }, [debouncedShowSourceHandle, showHandles]);
 
   return (
     <TooltipProvider>
@@ -83,7 +83,7 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
                     "text-bold w-full capitalize text-muted-foreground",
                     type === "input" ? "text-left" : "text-right",
                     "transition-colors duration-200 ease-in-out",
-                    isSelected &&
+                    showHandles &&
                       ((type === "output" && !connectingHandle) ||
                         type === "input") &&
                       "text-foreground",

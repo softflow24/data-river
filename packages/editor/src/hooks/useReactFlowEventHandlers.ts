@@ -16,6 +16,7 @@ import {
   Edge,
   OnConnectStart,
   OnConnectEnd,
+  OnSelectionChangeFunc,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -28,8 +29,9 @@ import {
   setSelectedNodeId,
   finishDraggingNode,
   cancelDraggingNode,
-  removeHandles,
   setConnectingHandle,
+  setSelectedNodes,
+  setSelectedEdges,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
@@ -50,13 +52,20 @@ export const useReactFlowEventHandlers = () => {
 
   const debouncedUpdateNodes = useMemo(
     () =>
-      _.debounce((changes: NodeChange[]) => dispatch(updateNodes(changes)), 1),
+      _.debounce(
+        (changes: NodeChange[]) => dispatch(updateNodes(changes)),
+        200,
+      ),
     [dispatch],
   );
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      debouncedUpdateNodes(changes);
+      if (!changes.some((change) => change.type === "dimensions")) {
+        dispatch(updateNodes(changes));
+      } else {
+        debouncedUpdateNodes(changes);
+      }
     },
     [debouncedUpdateNodes],
   );
@@ -141,6 +150,14 @@ export const useReactFlowEventHandlers = () => {
     }
   }, [dispatch, draggingNodeId]);
 
+  const onSelectionChange: OnSelectionChangeFunc = useCallback(
+    (selection) => {
+      dispatch(setSelectedNodes(selection.nodes.map((node) => node.id)));
+      dispatch(setSelectedEdges(selection.edges.map((edge) => edge.id)));
+    },
+    [dispatch],
+  );
+
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setHoveredNodeId(node.id));
@@ -164,7 +181,6 @@ export const useReactFlowEventHandlers = () => {
 
   const onNodeDragStart = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      console.log("onNodeDragStart", node);
       if (!node || !node.id) return;
 
       dispatch(setSelectedNodeId(node.id));
@@ -237,6 +253,7 @@ export const useReactFlowEventHandlers = () => {
     onNodeMouseLeave,
     onNodeClick,
     onNodeDragStart,
+    onSelectionChange,
     handleMouseMove,
   };
 };

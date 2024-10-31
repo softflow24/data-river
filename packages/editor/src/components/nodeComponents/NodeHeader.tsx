@@ -34,7 +34,7 @@ export const NodeHeader: React.FC<NodeHeaderProps> = ({
               label={Object.keys(data.inputsConfiguration!)[0]}
               renderLabel={false}
               type="input"
-              isSelected={showHandles}
+              showHandles={showHandles}
               config={Object.values(data.inputsConfiguration!)[0]}
               handleId={`${id}-input-${Object.keys(data.inputsConfiguration!)[0]}`}
             />
@@ -47,7 +47,7 @@ export const NodeHeader: React.FC<NodeHeaderProps> = ({
               label="trigger"
               renderLabel={false}
               type="input"
-              isSelected={showHandles}
+              showHandles={showHandles}
               config={{ type: "boolean", required: false }}
               handleId={`${id}-input-trigger`}
             />
@@ -69,7 +69,7 @@ export const NodeHeader: React.FC<NodeHeaderProps> = ({
               label={Object.keys(data.outputsConfiguration!)[0]}
               renderLabel={false}
               type="output"
-              isSelected={showHandles}
+              showHandles={showHandles}
               config={Object.values(data.outputsConfiguration!)[0]}
               handleId={`${id}-output-${Object.keys(data.outputsConfiguration!)[0]}`}
             />

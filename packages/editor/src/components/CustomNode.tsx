@@ -8,12 +8,16 @@ import clsx from "clsx";
 import { createBlockValidationErrorFromObject } from "@data-river/blocks/errors/blockValidationError";
 import { NodeHeader } from "./nodeComponents/NodeHeader";
 import { NodeContent } from "./nodeComponents/NodeContent";
+import { NodeHandles } from "./nodeComponents/NodeHandles";
 
 const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
-  const { selectedNodeId, hoveredNodeId } = useReactFlowState((state) => ({
-    selectedNodeId: state.selectedNodeId,
-    hoveredNodeId: state.hoveredNodeId,
-  }));
+  const { selectedNodeId, selectedNodes, hoveredNodeId, nodeSelectionMode } =
+    useReactFlowState((state) => ({
+      selectedNodeId: state.selectedNodeId,
+      selectedNodes: state.selectedNodes,
+      hoveredNodeId: state.hoveredNodeId,
+      nodeSelectionMode: state.nodeSelectionMode,
+    }));
 
   const executionResult = useExecutionState((x) => x.executionResult);
 
@@ -49,9 +53,14 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
     [data.inputsConfiguration],
   );
 
-  const isSelected = id === selectedNodeId;
+  const isSelected = useMemo(() => {
+    if (nodeSelectionMode === "multiple") {
+      return selectedNodes.includes(id);
+    }
+    return id === selectedNodeId;
+  }, [nodeSelectionMode, selectedNodes, selectedNodeId, id]);
   const isHovered = hoveredNodeId === id;
-  const showHandles = isSelected || hoveredNodeId === id;
+  const showHandles = isSelected || isHovered;
 
   const errorForNode = executionResult.errors.find(
     (error) => error.blockId.toString() === id,
@@ -105,11 +114,16 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
         missingFields={missingFields}
         invalidFields={invalidFields}
         isSelected={isSelected}
-        hasMultipleInputs={hasMultipleInputs}
-        hasMultipleOutputs={hasMultipleOutputs}
-        inputsConfiguration={inputsConfiguration}
-        outputsConfiguration={data.outputsConfiguration}
-      />
+      >
+        <NodeHandles
+          nodeId={id}
+          showHandles={showHandles}
+          hasMultipleInputs={hasMultipleInputs}
+          hasMultipleOutputs={hasMultipleOutputs}
+          inputsConfiguration={inputsConfiguration}
+          outputsConfiguration={data.outputsConfiguration}
+        />
+      </NodeContent>
     </Card>
   );
 };

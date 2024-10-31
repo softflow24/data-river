@@ -24,11 +24,17 @@ import { createHandles } from "@/utils/nodeCreated";
 type CustomNode = Node<NodeData>;
 type CustomEdge = Edge<EdgeData>;
 
+type SelectionMode = "single" | "multiple";
+
 export interface ReactFlowState {
   minimalistic: boolean;
   selectedNodeId: string | null;
+  selectedNodes: string[];
+  nodeSelectionMode: SelectionMode;
   hoveredNodeId: string | null;
   selectedEdgeId: string | null;
+  selectedEdges: string[];
+  edgeSelectionMode: SelectionMode;
   hoveredEdgeId: string | null;
   nodes: CustomNode[];
   edges: CustomEdge[];
@@ -41,8 +47,12 @@ export interface ReactFlowState {
 const initialState: ReactFlowState = {
   minimalistic: false,
   selectedNodeId: null,
+  selectedNodes: [],
+  nodeSelectionMode: "single",
   hoveredNodeId: null,
   selectedEdgeId: null,
+  selectedEdges: [],
+  edgeSelectionMode: "single",
   hoveredEdgeId: null,
   nodes: initialNodes,
   edges: initialEdges,
@@ -62,12 +72,35 @@ const reactFlowSlice = createSlice({
     setSelectedNodeId: (state, action: PayloadAction<string | null>) => {
       state.selectedEdgeId = null;
       state.selectedNodeId = action.payload;
+
+      state.nodeSelectionMode = "single";
+      state.selectedNodes = action.payload ? [action.payload] : [];
+      state.edgeSelectionMode = "single";
+      state.selectedEdges = [];
+    },
+    setSelectedNodes: (state, action: PayloadAction<string[]>) => {
+      if (action.payload.length === 0) {
+        return;
+      }
+
+      state.selectedNodes = action.payload;
+      state.nodeSelectionMode =
+        action.payload.length > 1 ? "multiple" : "single";
     },
     setHoveredNodeId: (state, action: PayloadAction<string | null>) => {
       state.hoveredNodeId = action.payload;
     },
     setSelectedEdgeId: (state, action: PayloadAction<string | null>) => {
       state.selectedEdgeId = action.payload;
+    },
+    setSelectedEdges: (state, action: PayloadAction<string[]>) => {
+      if (action.payload.length === 0) {
+        return;
+      }
+
+      state.selectedEdges = action.payload;
+      state.edgeSelectionMode =
+        action.payload.length > 1 ? "multiple" : "single";
     },
     setHoveredEdgeId: (state, action: PayloadAction<string | null>) => {
       state.hoveredEdgeId = action.payload;
@@ -180,6 +213,10 @@ const reactFlowSlice = createSlice({
 
       state.connectingHandle =
         state.handles.find((handle) => handle.id === action.payload) ?? null;
+
+      if (state.connectingHandle) {
+        state.selectedNodeId = state.connectingHandle.nodeId;
+      }
     },
   },
 });
@@ -187,6 +224,7 @@ const reactFlowSlice = createSlice({
 export const {
   toggleMinimalistic,
   setSelectedNodeId,
+  setSelectedNodes,
   setHoveredNodeId,
   setNodes,
   updateNodes,
@@ -195,6 +233,7 @@ export const {
   addHandles,
   removeHandles,
   setSelectedEdgeId,
+  setSelectedEdges,
   setHoveredEdgeId,
   setViewport,
   updateNodesData,

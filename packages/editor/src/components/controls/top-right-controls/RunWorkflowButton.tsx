@@ -77,7 +77,6 @@ const RunWorkflowButton: React.FC = () => {
     try {
       const engine = createExecutionEngine(config, logger);
       const result = await engine.executeWorkflow(blockConfigs);
-      console.log(result);
       dispatch(
         setExecutionResult({
           result: result.result,

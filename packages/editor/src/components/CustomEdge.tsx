@@ -22,17 +22,21 @@ const CustomEdge: React.FC<EdgeProps> = ({
     selectedEdgeId,
     selectedNodeId,
     connectingHandle,
+    edgeSelectionMode,
+    selectedEdges,
   } = useReactFlowState((state) => ({
     hoveredNodeId: state.hoveredNodeId,
     hoveredEdgeId: state.hoveredEdgeId,
     selectedEdgeId: state.selectedEdgeId,
     selectedNodeId: state.selectedNodeId,
     connectingHandle: state.connectingHandle,
+    edgeSelectionMode: state.edgeSelectionMode,
+    selectedEdges: state.selectedEdges,
   }));
 
   const isHovered = id === hoveredEdgeId;
 
-  const isSelected = id === selectedEdgeId;
+  const isSelected = selectedEdges.includes(id);
   const connectedToSelectedNode =
     source === selectedNodeId || target === selectedNodeId;
   const connectedToHoveredNode =
