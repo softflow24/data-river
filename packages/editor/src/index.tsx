@@ -137,7 +137,7 @@ const Editor = () => {
 const EditorWithRedux = () => {
   return (
     <Provider store={store}>
-      <div className="h-screen w-full flex flex-col">
+      <div className="h-full w-full flex flex-col">
         <div className="min-h-12 flex items-center justify-end p-2 border bg-background">
           <TopRightControls />
         </div>

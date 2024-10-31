@@ -134,3 +134,8 @@ dist
 
 # MacOS
 .DS_Store
+
+# Supabase
+**/supabase/.temp
+**/supabase/.branches
+**/supabase/config.toml

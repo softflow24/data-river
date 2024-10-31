@@ -59,16 +59,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     url.pathname.startsWith(route),
   );
 
-  // If not a public route and no access token, redirect to sign in
-  if (!isPublicRoute && !session.has("access_token")) {
-    return redirect("/sign-in");
-  }
-
-  // If has token and trying to access auth pages, redirect to editor
-  if (session.has("access_token") && isPublicRoute) {
-    return redirect("/editor");
-  }
-
   return json({
     isAuthenticated: session.has("access_token"),
     userId: session.get("user_id") as string,
