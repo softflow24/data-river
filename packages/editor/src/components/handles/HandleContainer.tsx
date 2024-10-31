@@ -69,7 +69,7 @@ export const HandleContainer: React.FC<HandleContainerProps> = ({
 
   useEffect(() => {
     updateNodeInternals(nodeId);
-  }, [debouncedShowSourceHandle, showHandles]);
+  }, [showHandles]);
 
   return (
     <TooltipProvider>

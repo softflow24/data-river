@@ -12,7 +12,6 @@ import {
   addEdge,
   Node,
   useReactFlow,
-  NodePositionChange,
   Edge,
   OnConnectStart,
   OnConnectEnd,
@@ -32,22 +31,25 @@ import {
   setConnectingHandle,
   setSelectedNodes,
   setSelectedEdges,
+  setNodes,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
 import { useHotkeys } from "react-hotkeys-hook";
 import { isValidConnection } from "@/utils/validation";
 import { EdgeData } from "@/types/EdgeTypes";
+import useMousePosition from "./useMousePosition";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { screenToFlowPosition } = useReactFlow();
-  const rafRef = useRef<number | null>(null);
   const batchedChangesRef = useRef<NodeChange[]>([]);
+  const mousePosition = useMousePosition();
 
-  const { draggingNodeId, edges, handles } = useReactFlowState((x) => ({
+  const { draggingNodeId, edges, nodes, handles } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
     edges: x.edges,
+    nodes: x.nodes,
     handles: x.handles,
   }));
 
@@ -56,13 +58,16 @@ export const useReactFlowEventHandlers = () => {
       _.throttle(
         () => {
           if (batchedChangesRef.current.length > 0) {
-            // Merge dimension changes, preserve order of other changes
+            // Merge dimension and position changes, preserve order of other changes
             const dimensionChanges = new Map<string, NodeChange>();
+            const positionChanges = new Map<string, NodeChange>();
             const otherChanges: NodeChange[] = [];
 
             batchedChangesRef.current.forEach((change) => {
               if (change.type === "dimensions") {
                 dimensionChanges.set(change.id, change);
+              } else if (change.type === "position") {
+                positionChanges.set(change.id, change);
               } else {
                 otherChanges.push(change);
               }
@@ -71,13 +76,14 @@ export const useReactFlowEventHandlers = () => {
             const mergedChanges = [
               ...otherChanges,
               ...Array.from(dimensionChanges.values()),
+              ...Array.from(positionChanges.values()),
             ];
 
             dispatch(updateNodes(mergedChanges));
             batchedChangesRef.current = [];
           }
         },
-        500,
+        40,
         { leading: true },
       ),
     [dispatch],
@@ -85,20 +91,20 @@ export const useReactFlowEventHandlers = () => {
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      const hasDimensions = changes.some(
-        (change) => change.type === "dimensions",
+      const hasDimensionsOrPosition = changes.some(
+        (change) => change.type === "dimensions" || change.type === "position",
       );
 
-      if (!hasDimensions || draggingNodeId !== null) {
-        // For non-dimension changes, dispatch immediately
+      if (!hasDimensionsOrPosition || draggingNodeId !== null) {
+        // For non-dimension/position changes, dispatch immediately
         dispatch(updateNodes(changes));
       } else {
-        // For changes including dimensions, batch them
+        // For changes including dimensions or position, batch them
         batchedChangesRef.current.push(...changes);
         debouncedUpdateNodes();
       }
     },
-    [debouncedUpdateNodes, dispatch],
+    [debouncedUpdateNodes, dispatch, draggingNodeId],
   );
 
   const onEdgesChangeHandler: OnEdgesChange = useCallback(
@@ -219,30 +225,27 @@ export const useReactFlowEventHandlers = () => {
     [dispatch, setSelectedNodeId],
   );
 
-  const handleMouseMove = useCallback(
-    (event: MouseEvent) => {
-      if (draggingNodeId) {
-        if (rafRef.current !== null) {
-          cancelAnimationFrame(rafRef.current);
-        }
+  const handleMouseMove = useEffect(() => {
+    if (draggingNodeId) {
+      const flowPosition = screenToFlowPosition({
+        x: mousePosition.x,
+        y: mousePosition.y + 5,
+      });
 
-        rafRef.current = requestAnimationFrame(() => {
-          const flowPosition = screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY + 5,
-          });
-          const nodeChange: NodePositionChange = {
-            id: draggingNodeId,
-            type: "position",
+      const newNodes = nodes.map((node: Node) => {
+        if (node.id === draggingNodeId) {
+          return {
+            ...node,
             position: flowPosition,
             dragging: true,
           };
-          dispatch(updateNodes([nodeChange]));
-        });
-      }
-    },
-    [draggingNodeId, screenToFlowPosition, dispatch],
-  );
+        }
+        return node;
+      });
+
+      dispatch(setNodes(newNodes));
+    }
+  }, [draggingNodeId, screenToFlowPosition, dispatch, mousePosition]);
 
   useHotkeys(
     "esc",
@@ -255,20 +258,6 @@ export const useReactFlowEventHandlers = () => {
     },
     [draggingNodeId, dispatch],
   );
-
-  useEffect(() => {
-    if (draggingNodeId) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [draggingNodeId, handleMouseMove]);
 
   return {
     onNodesChangeHandler,
