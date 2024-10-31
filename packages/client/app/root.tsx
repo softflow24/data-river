@@ -4,13 +4,25 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
+import { json, redirect } from "@remix-run/node";
+import { getSession } from "~/utils/session.server";
 import "reflect-metadata";
 
 import "@data-river/shared/global.css";
 import "@data-river/shared/tailwind.css";
+
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+  "/auth/callback",
+  "/auth/github",
+];
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -40,7 +52,30 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: ReactNode }) {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  const url = new URL(request.url);
+  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
+    url.pathname.startsWith(route),
+  );
+
+  // If not a public route and no access token, redirect to sign in
+  if (!isPublicRoute && !session.has("access_token")) {
+    return redirect("/sign-in");
+  }
+
+  // If has token and trying to access auth pages, redirect to editor
+  if (session.has("access_token") && isPublicRoute) {
+    return redirect("/editor");
+  }
+
+  return json({
+    isAuthenticated: session.has("access_token"),
+    userId: session.get("user_id") as string,
+  });
+}
+
+function Document({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -85,5 +120,21 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <Document>
+      <Outlet />
+    </Document>
+  );
+}
+
+// Handle errors
+export function ErrorBoundary() {
+  return (
+    <Document>
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold">Something went wrong!</h1>
+        <p className="text-muted-foreground">Please try again later.</p>
+      </div>
+    </Document>
+  );
 }

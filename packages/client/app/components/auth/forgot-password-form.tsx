@@ -1,16 +1,32 @@
-import { Link } from "@remix-run/react";
+import { Link, Form } from "@remix-run/react";
 import { Button, Input, Label } from "@data-river/shared/ui";
 
-export const ForgotPasswordForm = () => {
+interface ForgotPasswordFormProps {
+  error?: string;
+  success?: string;
+}
+
+export const ForgotPasswordForm = ({
+  error,
+  success,
+}: ForgotPasswordFormProps) => {
   return (
     <div className="space-y-6 mx-auto">
-      <form className="space-y-5">
+      <Form method="post" className="space-y-5">
+        {error && (
+          <div className="text-sm text-red-500 text-center">{error}</div>
+        )}
+        {success && (
+          <div className="text-sm text-green-500 text-center">{success}</div>
+        )}
+
         <div className="space-y-3">
           <Label htmlFor="email" className="text-sm">
             Email
           </Label>
           <Input
             id="email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             required
@@ -24,7 +40,7 @@ export const ForgotPasswordForm = () => {
         >
           Send reset email
         </Button>
-      </form>
+      </Form>
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

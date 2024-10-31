@@ -1,8 +1,12 @@
-import { Link } from "@remix-run/react";
+import { Link, Form } from "@remix-run/react";
 import { Button, Input, Label, Separator } from "@data-river/shared/ui";
 import { GithubButton } from "./github-button";
 
-export const AuthForm = () => {
+interface AuthFormProps {
+  error?: string;
+}
+
+export const AuthForm = ({ error }: AuthFormProps) => {
   return (
     <div className="space-y-6 mx-auto">
       <GithubButton />
@@ -18,13 +22,18 @@ export const AuthForm = () => {
         </div>
       </div>
 
-      <form className="space-y-5">
+      <Form method="post" className="space-y-5">
+        {error && (
+          <div className="text-sm text-red-500 text-center">{error}</div>
+        )}
+
         <div className="space-y-3">
           <Label htmlFor="email" className="text-sm">
             Email
           </Label>
           <Input
             id="email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             required
@@ -47,6 +56,7 @@ export const AuthForm = () => {
           </div>
           <Input
             id="password"
+            name="password"
             type="password"
             placeholder="••••••••"
             required
@@ -60,7 +70,7 @@ export const AuthForm = () => {
         >
           Sign In
         </Button>
-      </form>
+      </Form>
 
       <p className="text-center text-sm text-muted-foreground">
         Don't have an account?{" "}
