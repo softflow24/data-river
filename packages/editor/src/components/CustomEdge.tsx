@@ -16,18 +16,30 @@ const CustomEdge: React.FC<EdgeProps> = ({
   target,
 }) => {
   const dispatch = useDispatch();
-  const { hoveredNodeId, hoveredEdgeId, selectedEdgeId } = useReactFlowState(
-    (state) => ({
-      hoveredNodeId: state.hoveredNodeId,
-      hoveredEdgeId: state.hoveredEdgeId,
-      selectedEdgeId: state.selectedEdgeId,
-    }),
-  );
+  const {
+    hoveredNodeId,
+    hoveredEdgeId,
+    selectedEdgeId,
+    selectedNodeId,
+    connectingHandle,
+    edgeSelectionMode,
+    selectedEdges,
+  } = useReactFlowState((state) => ({
+    hoveredNodeId: state.hoveredNodeId,
+    hoveredEdgeId: state.hoveredEdgeId,
+    selectedEdgeId: state.selectedEdgeId,
+    selectedNodeId: state.selectedNodeId,
+    connectingHandle: state.connectingHandle,
+    edgeSelectionMode: state.edgeSelectionMode,
+    selectedEdges: state.selectedEdges,
+  }));
 
   const isHovered = id === hoveredEdgeId;
 
-  const isSelected = id === selectedEdgeId;
-  const connectToHoveredNode =
+  const isSelected = selectedEdges.includes(id);
+  const connectedToSelectedNode =
+    source === selectedNodeId || target === selectedNodeId;
+  const connectedToHoveredNode =
     source === hoveredNodeId || target === hoveredNodeId;
 
   const [edgePath] = getBezierPath({
@@ -40,7 +52,9 @@ const CustomEdge: React.FC<EdgeProps> = ({
   });
 
   const activeStroke =
-    isSelected || isHovered || connectToHoveredNode
+    isSelected ||
+    connectedToSelectedNode ||
+    ((isHovered || connectedToHoveredNode) && !connectingHandle)
       ? "hsl(var(--focus))"
       : "hsl(var(--muted-foreground))";
 

@@ -46,18 +46,6 @@ const CustomNodeInfo: React.FC = () => {
         <span className="font-bold">{selectedNode.data.icon}</span>
       </p>
       <p>
-        <span className="font-medium mr-1">Source Handle:</span>
-        <span className="font-bold">
-          {selectedNode.data.sourceHandle ? "Yes" : "No"}
-        </span>
-      </p>
-      <p>
-        <span className="font-medium mr-1">Target Handle:</span>
-        <span className="font-bold">
-          {selectedNode.data.targetHandle ? "Yes" : "No"}
-        </span>
-      </p>
-      <p>
         <span className="font-medium mr-1">Is Hovered:</span>
         <span className="font-bold">
           {selectedNode.id === hoveredNodeId ? "Yes" : "No"}

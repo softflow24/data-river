@@ -11,6 +11,7 @@ import RequestSetup from "./panelViews/RequestSetup";
 import { RequestFormData } from "@data-river/shared/contracts/blocks/request";
 import OpenAISetup from "./panelViews/Plugins/OpenAI";
 import { Badge } from "@data-river/shared/ui";
+import CodeSetup from "./panelViews/CodeSetup";
 
 const RightPanel = () => {
   const { isRightPanelVisible } = useLayoutState();
@@ -52,8 +53,8 @@ const RightPanel = () => {
               }
             }
             onConfigChange={handleConfigChange}
-            inputs={
-              (selectedNode.data.config?.inputs || {}) as Record<
+            inputsConfiguration={
+              (selectedNode.data.inputsConfiguration || {}) as Record<
                 string,
                 unknown
               >
@@ -66,6 +67,15 @@ const RightPanel = () => {
           <RequestSetup
             nodeId={selectedNode.id}
             config={selectedNode.data.config as unknown as RequestFormData}
+            onConfigChange={handleConfigChange}
+          />
+        );
+
+      case "code@0.1":
+        return (
+          <CodeSetup
+            nodeId={selectedNode.id}
+            config={selectedNode.data.config as any}
             onConfigChange={handleConfigChange}
           />
         );
@@ -104,7 +114,7 @@ const RightPanel = () => {
         <div className="relative">
           <Badge
             variant="outline"
-            className="mb-4 text-yellow-500 border-yellow-500 absolute top-0 right-0"
+            className="mb-4 text-warning border-warning absolute top-0 right-0"
           >
             Experimental
           </Badge>

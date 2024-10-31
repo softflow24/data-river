@@ -1,62 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Handle, Position } from "reactflow";
 import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import debounce from "lodash.debounce";
+import { useReactFlowState } from "@/hooks/useReactFlowState";
 
 interface SourceHandleProps {
   isVisible: boolean;
   style?: React.CSSProperties;
   handleId?: string;
   handleRef?: React.RefObject<HTMLDivElement>;
+  connectionInProgress: boolean;
 }
 
 const SourceHandle = React.forwardRef<HTMLDivElement, SourceHandleProps>(
-  ({ isVisible, style = {}, handleId }, ref) => {
+  ({ isVisible, style = {}, handleId, connectionInProgress }, ref) => {
     const [isHovered, setIsHovered] = useState(false);
+    const { zoom } = useReactFlowState((state) => ({
+      zoom: state.viewport.zoom,
+    }));
+
+    const handleHoverStart = useCallback(
+      debounce(() => setIsHovered(true), 50),
+      [],
+    );
+
+    const handleHoverEnd = useCallback(
+      debounce(() => setIsHovered(false), 50),
+      [],
+    );
 
     return (
       <div
-        ref={ref}
-        className="source-handle-wrapper nodrag nowheel"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         style={{
-          position: "absolute",
-          top: "50%",
-          right: isVisible ? "-12px" : "0",
-          width: "24px",
-          height: "24px",
-          borderRadius: "50%",
-          background: "#3b82f6",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "white",
-          cursor: "pointer",
-          opacity: isVisible ? 1 : 0,
-          transition: "translateY 0.1s ease, scale 0.1s ease",
-          transform: isHovered
-            ? "translateY(-46%) scale(1.1)"
-            : "translateY(-50%)",
           ...style,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "20px",
+          height: "20px",
         }}
       >
-        <Plus size={16} />
-        <Handle
-          onMouseDown={(x) => {
-            console.log(x.currentTarget);
+        <motion.div
+          ref={ref}
+          key={zoom}
+          initial={{
+            width: isVisible ? "20px" : 0,
+            height: isVisible ? "20px" : 0,
           }}
-          type="source"
-          id={handleId}
-          className="nodrag nowheel"
-          position={Position.Right}
-          style={{
-            background: "transparent",
-            border: "none",
-            width: "100%",
-            height: "100%",
-            right: "0",
+          animate={{
+            width: isVisible ? "20px" : 0,
+            height: isVisible ? "20px" : 0,
+            scale: isHovered ? 1.1 : 1,
           }}
-        />
+          transition={{
+            duration: 0.2,
+            ease: "easeOut",
+          }}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
+          className={cn(
+            "source-handle-wrapper absolute nodrag nowheel rounded-full",
+            "flex justify-center items-center bg-focus cursor-pointer",
+          )}
+        >
+          <Plus
+            size={16}
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: `scale(${isVisible ? 1 : 0})`,
+              transition: "all 0.15s ease-out",
+              transitionDelay: "0.1s",
+              shapeRendering: "geometricPrecision",
+            }}
+          />
+          <Handle
+            type="source"
+            id={handleId}
+            isConnectable={!connectionInProgress}
+            className={cn(
+              "nodrag nowheel !w-full !h-full !border-none !right-0 opacity-0",
+              !isVisible && "!w-1 !h-1 !right-1/2",
+            )}
+            position={Position.Right}
+          />
+        </motion.div>
       </div>
     );
   },

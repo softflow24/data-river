@@ -50,6 +50,8 @@ const FlowChart: React.FC = () => {
         onNodesChange={eventHandlers.onNodesChangeHandler}
         onEdgesChange={eventHandlers.onEdgesChangeHandler}
         onConnect={eventHandlers.onConnect}
+        onConnectStart={eventHandlers.onConnectStart}
+        onConnectEnd={eventHandlers.onConnectEnd}
         onEdgeClick={eventHandlers.onEdgeClick}
         onEdgeMouseEnter={eventHandlers.onEdgeMouseEnter}
         onEdgeMouseLeave={eventHandlers.onEdgeMouseLeave}
@@ -57,6 +59,9 @@ const FlowChart: React.FC = () => {
         onNodeMouseEnter={eventHandlers.onNodeMouseEnter}
         onNodeMouseLeave={eventHandlers.onNodeMouseLeave}
         onNodeClick={eventHandlers.onNodeClick}
+        onNodeDragStart={eventHandlers.onNodeDragStart}
+        onSelectionChange={eventHandlers.onSelectionChange}
+        selectionKeyCode="Meta"
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={{
@@ -70,6 +75,7 @@ const FlowChart: React.FC = () => {
         selectNodesOnDrag={true}
         selectionOnDrag={true}
         selectionMode={SelectionMode.Partial}
+        multiSelectionKeyCode="Shift"
         panOnDrag={[1, 2]}
         panOnScroll
       >

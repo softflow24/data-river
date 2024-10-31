@@ -1,40 +1,70 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { NodeProps } from "reactflow";
 import { NodeData } from "../types/NodeTypes";
-
-import SourceHandle from "./SourceHandle";
-import TargetHandle from "./TargetHandle";
-import NodeIcon from "./NodeIcon";
 import { useReactFlowState } from "@/hooks/useReactFlowState";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@data-river/shared/ui/components/ui/card";
-import NodeControls from "./nodeComponents/NodeControls";
+import { Card } from "@data-river/shared/ui/components/ui/card";
 import { useExecutionState } from "@/hooks/useExecutionState";
 import clsx from "clsx";
 import { createBlockValidationErrorFromObject } from "@data-river/blocks/errors/blockValidationError";
+import { NodeHeader } from "./nodeComponents/NodeHeader";
+import { NodeContent } from "./nodeComponents/NodeContent";
+import { NodeHandles } from "./nodeComponents/NodeHandles";
 
-const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
-  const { selectedNodeId, hoveredNodeId } = useReactFlowState((state) => ({
-    selectedNodeId: state.selectedNodeId,
-    hoveredNodeId: state.hoveredNodeId,
-  }));
+const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data }) => {
+  const { selectedNodeId, selectedNodes, hoveredNodeId, nodeSelectionMode } =
+    useReactFlowState((state) => ({
+      selectedNodeId: state.selectedNodeId,
+      selectedNodes: state.selectedNodes,
+      hoveredNodeId: state.hoveredNodeId,
+      nodeSelectionMode: state.nodeSelectionMode,
+    }));
+
   const executionResult = useExecutionState((x) => x.executionResult);
 
-  const isSelected = id === selectedNodeId || selected;
+  const { hasMultipleOutputs, hasSingleOutput } = useMemo(
+    () => ({
+      hasMultipleOutputs: Boolean(
+        data.outputsConfiguration &&
+          Object.keys(data.outputsConfiguration).length > 1,
+      ),
+      hasSingleOutput: Boolean(
+        data.outputsConfiguration &&
+          Object.keys(data.outputsConfiguration).length === 1,
+      ),
+    }),
+    [data.outputsConfiguration],
+  );
+
+  const { hasMultipleInputs, hasSingleInput, hasTriggerInput } = useMemo(
+    () => ({
+      hasMultipleInputs: Boolean(
+        data.inputsConfiguration &&
+          Object.keys(data.inputsConfiguration).length > 1,
+      ),
+      hasSingleInput: Boolean(
+        data.inputsConfiguration &&
+          Object.keys(data.inputsConfiguration).length === 1,
+      ),
+      hasTriggerInput: Boolean(
+        data.inputsConfiguration &&
+          Object.keys(data.inputsConfiguration).includes("trigger"),
+      ),
+    }),
+    [data.inputsConfiguration],
+  );
+
+  const isSelected = useMemo(() => {
+    if (nodeSelectionMode === "multiple") {
+      return selectedNodes.includes(id);
+    }
+    return id === selectedNodeId;
+  }, [nodeSelectionMode, selectedNodes, selectedNodeId, id]);
   const isHovered = hoveredNodeId === id;
-  const showHandles =
-    isSelected || selectedNodeId === id || hoveredNodeId === id;
+  const showHandles = isSelected || isHovered;
 
   const errorForNode = executionResult.errors.find(
     (error) => error.blockId.toString() === id,
   );
-
-  const hasError = errorForNode !== undefined;
-  const highlight = isSelected || selectedNodeId === id;
 
   const validationError =
     errorForNode?.error.name === "BlockValidationError"
@@ -48,12 +78,14 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
         )
       : undefined;
 
-  let missingFields: string[] = [];
-  let invalidFields: string[] = [];
+  const missingFields = validationError?.missingFields ?? [];
+  const invalidFields = validationError?.invalidFields ?? [];
 
-  if (validationError) {
-    missingFields = validationError.missingFields ?? [];
-    invalidFields = validationError.invalidFields ?? [];
+  let inputsConfiguration = data.inputsConfiguration ?? {};
+  if (hasTriggerInput && !hasSingleInput) {
+    inputsConfiguration = Object.fromEntries(
+      Object.entries(inputsConfiguration).filter(([key]) => key !== "trigger"),
+    );
   }
 
   return (
@@ -61,36 +93,37 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({ id, data, selected }) => {
       className={clsx(`
         border
         ${isHovered ? "shadow-lg" : ""}
-        ${highlight && "border-focus"}
-        ${hasError && "border-destructive"}
-        `)}
+        ${(isSelected || isHovered) && "border-focus"}
+        ${errorForNode && "border-destructive"}
+      `)}
       data-custom-node-id={id}
     >
-      {data.targetHandle && (
-        <TargetHandle handleId={`${id}-target`} isVisible={showHandles} />
-      )}
-      <CardHeader className="flex flex-row justify-between items-center min-w-[9rem]">
-        <CardTitle>{data.label}</CardTitle>
-        <NodeIcon
-          icon={data.icon}
-          color={data.color}
-          useBackgroundColor={false}
-          useIconColor={false}
-        />
-      </CardHeader>
-      <CardContent className={data.controls ? "" : "hidden"}>
-        <NodeControls
+      <NodeHeader
+        id={id}
+        data={data}
+        showHandles={showHandles}
+        hasSingleInput={hasSingleInput}
+        hasTriggerInput={hasTriggerInput}
+        hasSingleOutput={hasSingleOutput}
+      />
+
+      <NodeContent
+        nodeId={id}
+        controls={data.controls}
+        config={data.config}
+        missingFields={missingFields}
+        invalidFields={invalidFields}
+        isSelected={isSelected}
+      >
+        <NodeHandles
           nodeId={id}
-          controls={data.controls}
-          configuration={data.config}
-          fieldsMissing={missingFields}
-          invalidFields={invalidFields}
-          isSelected={isSelected}
+          showHandles={showHandles}
+          hasMultipleInputs={hasMultipleInputs}
+          hasMultipleOutputs={hasMultipleOutputs}
+          inputsConfiguration={inputsConfiguration}
+          outputsConfiguration={data.outputsConfiguration}
         />
-      </CardContent>
-      {data.sourceHandle && (
-        <SourceHandle handleId={`${id}-source`} isVisible={showHandles} />
-      )}
+      </NodeContent>
     </Card>
   );
 };

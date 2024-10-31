@@ -12,7 +12,10 @@ import {
   addEdge,
   Node,
   useReactFlow,
-  NodePositionChange,
+  Edge,
+  OnConnectStart,
+  OnConnectEnd,
+  OnSelectionChangeFunc,
 } from "reactflow";
 import _ from "lodash";
 import {
@@ -25,33 +28,83 @@ import {
   setSelectedNodeId,
   finishDraggingNode,
   cancelDraggingNode,
+  setConnectingHandle,
+  setSelectedNodes,
+  setSelectedEdges,
+  setNodes,
 } from "@slices/reactFlowSlice";
 import { useReactFlowState } from "@hooks/useReactFlowState";
 import { setIsRightPanelVisible } from "@slices/layoutSlice";
 import { useHotkeys } from "react-hotkeys-hook";
 import { isValidConnection } from "@/utils/validation";
+import { EdgeData } from "@/types/EdgeTypes";
+import useMousePosition from "./useMousePosition";
 
 export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { screenToFlowPosition } = useReactFlow();
-  const rafRef = useRef<number | null>(null);
+  const batchedChangesRef = useRef<NodeChange[]>([]);
+  const mousePosition = useMousePosition();
 
-  const { draggingNodeId, edges } = useReactFlowState((x) => ({
+  const { draggingNodeId, edges, nodes, handles } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
     edges: x.edges,
+    nodes: x.nodes,
+    handles: x.handles,
   }));
 
   const debouncedUpdateNodes = useMemo(
     () =>
-      _.debounce((changes: NodeChange[]) => dispatch(updateNodes(changes)), 1),
+      _.throttle(
+        () => {
+          if (batchedChangesRef.current.length > 0) {
+            // Merge dimension and position changes, preserve order of other changes
+            const dimensionChanges = new Map<string, NodeChange>();
+            const positionChanges = new Map<string, NodeChange>();
+            const otherChanges: NodeChange[] = [];
+
+            batchedChangesRef.current.forEach((change) => {
+              if (change.type === "dimensions") {
+                dimensionChanges.set(change.id, change);
+              } else if (change.type === "position") {
+                positionChanges.set(change.id, change);
+              } else {
+                otherChanges.push(change);
+              }
+            });
+
+            const mergedChanges = [
+              ...otherChanges,
+              ...Array.from(dimensionChanges.values()),
+              ...Array.from(positionChanges.values()),
+            ];
+
+            dispatch(updateNodes(mergedChanges));
+            batchedChangesRef.current = [];
+          }
+        },
+        40,
+        { leading: true },
+      ),
     [dispatch],
   );
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      debouncedUpdateNodes(changes);
+      const hasDimensionsOrPosition = changes.some(
+        (change) => change.type === "dimensions" || change.type === "position",
+      );
+
+      if (!hasDimensionsOrPosition || draggingNodeId !== null) {
+        // For non-dimension/position changes, dispatch immediately
+        dispatch(updateNodes(changes));
+      } else {
+        // For changes including dimensions or position, batch them
+        batchedChangesRef.current.push(...changes);
+        debouncedUpdateNodes();
+      }
     },
-    [debouncedUpdateNodes],
+    [debouncedUpdateNodes, dispatch, draggingNodeId],
   );
 
   const onEdgesChangeHandler: OnEdgesChange = useCallback(
@@ -67,10 +120,47 @@ export const useReactFlowEventHandlers = () => {
 
       if (!isValidConnection(connection, newEdges)) return;
 
+      const handleMap = new Map(handles.map((handle) => [handle.id, handle]));
+
+      const sourceHandle = handleMap.get(connection.sourceHandle!);
+      const targetHandle = handleMap.get(connection.targetHandle!);
+
+      if (!sourceHandle || !targetHandle) {
+        throw Error("Handle not found");
+      }
+
+      const data: EdgeData = {
+        sourceProperty: sourceHandle.property,
+        sourceType: sourceHandle.propertyType,
+        targetProperty: targetHandle.property,
+        targetType: targetHandle.propertyType,
+      };
+
+      const edge: Edge<EdgeData> = newEdges.find(
+        (e) =>
+          e.sourceHandle === connection.sourceHandle &&
+          e.targetHandle === connection.targetHandle,
+      )!;
+
+      edge.data = data;
+
       dispatch(setEdges(newEdges));
     },
-    [edges, dispatch],
+    [edges, dispatch, handles],
   );
+
+  const onConnectStart: OnConnectStart = useCallback(
+    (_, connection) => {
+      dispatch(setConnectingHandle(connection.handleId));
+      dispatch(setIsRightPanelVisible(false));
+    },
+    [dispatch],
+  );
+
+  const onConnectEnd: OnConnectEnd = useCallback(() => {
+    dispatch(setConnectingHandle(null));
+    dispatch(setIsRightPanelVisible(true));
+  }, [dispatch]);
 
   const onEdgeClick: EdgeMouseHandler = useCallback(
     (_, edge) => {
@@ -97,6 +187,14 @@ export const useReactFlowEventHandlers = () => {
     }
   }, [dispatch, draggingNodeId]);
 
+  const onSelectionChange: OnSelectionChangeFunc = useCallback(
+    (selection) => {
+      dispatch(setSelectedNodes(selection.nodes.map((node) => node.id)));
+      dispatch(setSelectedEdges(selection.edges.map((edge) => edge.id)));
+    },
+    [dispatch],
+  );
+
   const onNodeMouseEnter: NodeMouseHandler = useCallback(
     (_, node) => {
       dispatch(setHoveredNodeId(node.id));
@@ -110,43 +208,44 @@ export const useReactFlowEventHandlers = () => {
 
   const onNodeClick: NodeMouseHandler = useCallback(
     (_, node) => {
+      if (!node || !node.id) return;
+
       dispatch(setSelectedNodeId(node.id));
       dispatch(setIsRightPanelVisible(true));
     },
-    [dispatch],
+    [dispatch, setSelectedNodeId, setIsRightPanelVisible],
   );
 
   const onNodeDragStart = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      if (!node || !node.id) return;
+
       dispatch(setSelectedNodeId(node.id));
     },
-    [dispatch],
+    [dispatch, setSelectedNodeId],
   );
 
-  const handleMouseMove = useCallback(
-    (event: MouseEvent) => {
-      if (draggingNodeId) {
-        if (rafRef.current !== null) {
-          cancelAnimationFrame(rafRef.current);
-        }
+  const handleMouseMove = useEffect(() => {
+    if (draggingNodeId) {
+      const flowPosition = screenToFlowPosition({
+        x: mousePosition.x,
+        y: mousePosition.y + 5,
+      });
 
-        rafRef.current = requestAnimationFrame(() => {
-          const flowPosition = screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY + 5,
-          });
-          const nodeChange: NodePositionChange = {
-            id: draggingNodeId,
-            type: "position",
+      const newNodes = nodes.map((node: Node) => {
+        if (node.id === draggingNodeId) {
+          return {
+            ...node,
             position: flowPosition,
             dragging: true,
           };
-          dispatch(updateNodes([nodeChange]));
-        });
-      }
-    },
-    [draggingNodeId, screenToFlowPosition, dispatch],
-  );
+        }
+        return node;
+      });
+
+      dispatch(setNodes(newNodes));
+    }
+  }, [draggingNodeId, screenToFlowPosition, dispatch, mousePosition]);
 
   useHotkeys(
     "esc",
@@ -160,24 +259,12 @@ export const useReactFlowEventHandlers = () => {
     [draggingNodeId, dispatch],
   );
 
-  useEffect(() => {
-    if (draggingNodeId) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [draggingNodeId, handleMouseMove]);
-
   return {
     onNodesChangeHandler,
     onEdgesChangeHandler,
     onConnect,
+    onConnectStart,
+    onConnectEnd,
     onEdgeClick,
     onEdgeMouseEnter,
     onEdgeMouseLeave,
@@ -186,6 +273,7 @@ export const useReactFlowEventHandlers = () => {
     onNodeMouseLeave,
     onNodeClick,
     onNodeDragStart,
+    onSelectionChange,
     handleMouseMove,
   };
 };

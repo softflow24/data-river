@@ -1,52 +1,42 @@
-import React, { useState } from "react";
+import { cn } from "@/lib/utils";
+import React from "react";
 import { Handle, Position } from "reactflow";
 
 interface TargetHandleProps {
-  isVisible: boolean;
+  connectable: boolean;
+  connectionInProgress: boolean;
   handleId: string;
+  style?: React.CSSProperties;
 }
 
-const TargetHandle: React.FC<TargetHandleProps> = ({ isVisible, handleId }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className="target-handle-wrapper"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        position: "absolute",
-        left: "-6px",
-        top: "50%",
-        width: "6px",
-        height: "12px",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        cursor: "pointer",
-        background: "#3b82f6",
-        opacity: 1,
-        transition: "translateY 0.1s ease, scale 0.1s ease",
-        transform: isHovered
-          ? "translateY(-46%) scale(1.1)"
-          : "translateY(-50%)",
-        scale: isHovered ? "1.1" : "1",
-      }}
-    >
-      <Handle
-        id={handleId}
-        type="target"
-        position={Position.Left}
+const TargetHandle = React.forwardRef<HTMLDivElement, TargetHandleProps>(
+  ({ connectable, connectionInProgress, handleId, style = {} }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "target-handle-wrapper absolute bg-focus flex justify-start items-center cursor-pointer h-4 w-1.5",
+          connectionInProgress && !connectable && "bg-muted",
+          "transition-transform duration-100 ease-in-out",
+          "hover:-translate-y-[46%] hover:scale-110 -translate-y-1/2",
+          "left-[-6px] top-1/2",
+        )}
         style={{
-          background: "transparent",
-          border: "none",
-          width: "12px",
-          height: "12px",
-          left: "0px",
+          ...style,
         }}
-      />
-    </div>
-  );
-};
+      >
+        <Handle
+          id={handleId}
+          className="!w-1/2 !h-1/2 !left-1/2 opacity-0"
+          isConnectable={connectable}
+          type="target"
+          position={Position.Left}
+        />
+      </div>
+    );
+  },
+);
+
+TargetHandle.displayName = "TargetHandle";
 
 export default TargetHandle;

@@ -22,13 +22,19 @@ export interface NodeData {
   label: string;
   description?: string;
   color: string;
-  sourceHandle: boolean;
-  targetHandle: boolean;
   icon: keyof typeof Icons;
   controls?: Control[];
   inputs?: Record<string, unknown>;
   outputs?: Record<string, unknown>;
   config?: Record<string, unknown>;
+  inputsConfiguration?: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
+  outputsConfiguration?: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
 }
 
 export type RequestNodeData = Omit<NodeData, "config"> & {

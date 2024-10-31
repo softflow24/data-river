@@ -9,12 +9,17 @@ export class OutputBlock extends Block {
       {
         ...config,
         inputConfigs: {
-          data: {
+          value: {
             type: ["string", "number", "boolean", "object", "array"],
             required: true,
           },
         },
-        outputConfigs: {},
+        outputConfigs: {
+          value: {
+            type: ["string", "number", "boolean", "object", "array"],
+            required: true,
+          },
+        },
       },
       logger,
     );
@@ -23,7 +28,7 @@ export class OutputBlock extends Block {
   async execute(
     inputs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    this.logger.info("Output:", inputs.data);
-    return { data: inputs.data };
+    this.logger.info("Output:", inputs.value);
+    return { value: inputs.value };
   }
 }

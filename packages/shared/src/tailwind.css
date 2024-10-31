@@ -20,6 +20,8 @@
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --warning: 47.9 95.8% 53.1%;
+    --warning-foreground: 26 83.3% 14.1%;
     --focus: 217 91 60%;
     --focus-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
@@ -50,6 +52,8 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --warning: 47.9 95.8% 53.1%;
+    --warning-foreground: 26 83.3% 14.1%;
     --focus: 217 91 60%;
     --focus-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;

@@ -32,12 +32,6 @@ const Controls: FC = () => {
     setReactFlowViewport({ ...viewport, zoom: 1 });
   }, [viewport, setReactFlowViewport]);
 
-  function addNewNode() {
-    // Implement this function in the reactFlowSlice if needed
-    // For now, we'll just log a message
-    console.log("Add new node functionality not implemented yet");
-  }
-
   return (
     <div
       style={{ bottom: "12px", zIndex: 6, position: "absolute" }}
@@ -51,7 +45,6 @@ const Controls: FC = () => {
       />
       <UndoRedoControls />
       <ActionToolsControls
-        addNewNode={addNewNode}
         toggleMinimalist={() => dispatch(toggleMinimalistic())}
       />
     </div>

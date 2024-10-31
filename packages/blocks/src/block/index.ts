@@ -11,7 +11,10 @@ export abstract class Block implements IBlock {
     string,
     { type: string | string[]; required: boolean }
   >;
-  private outputConfigs: Record<string, { type: string }>;
+  private outputConfigs: Record<
+    string,
+    { type: string | string[]; required: boolean }
+  >;
   readonly retry: number;
   readonly timeout: number;
   readonly onError: (error: Error, blockConfig: IBlockConfig) => void;
@@ -25,7 +28,7 @@ export abstract class Block implements IBlock {
     this.inputs = config.inputs ?? {};
     this.outputs = {};
     this.retry = config.retry || 0;
-    this.timeout = config.timeout || 0;
+    this.timeout = config.timeout || 1000;
     this.onError = config.onError || (() => {});
     this.logger = logger;
   }
@@ -102,7 +105,15 @@ export abstract class Block implements IBlock {
     for (const [key, config] of Object.entries(this.outputConfigs)) {
       if (!(key in outputs)) {
         missingFields.push(key);
-      } else if (typeof outputs[key] !== config.type) {
+      } else if (
+        Array.isArray(config.type) &&
+        !config.type.includes(typeof outputs[key])
+      ) {
+        invalidFields.push(key);
+      } else if (
+        !Array.isArray(config.type) &&
+        typeof outputs[key] !== config.type
+      ) {
         invalidFields.push(key);
       }
     }
@@ -143,7 +154,7 @@ export abstract class Block implements IBlock {
     const outputValidation = this.validateOutputs(outputs);
     if (!outputValidation.valid) {
       throw new BlockValidationError(
-        `Invalid outputs for block ${this.id}`,
+        `Invalid outputs for block ${this.id} - ${this.type}`,
         outputValidation.missingFields,
         outputValidation.invalidFields,
         "output",

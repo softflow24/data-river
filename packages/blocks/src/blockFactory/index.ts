@@ -8,6 +8,7 @@ import {
   InputBlock,
   OutputBlock,
   LogicBlock,
+  CodeBlock,
 } from "..";
 
 type BlockConstructor = new (config: IBlockConfig, logger: ILogger) => IBlock;
@@ -21,6 +22,7 @@ const blockRegistry: Record<string, BlockConstructor | AsyncBlockConstructor> =
     "blocks/output@0.1": OutputBlock,
     "blocks/logic@0.1": LogicBlock,
     "blocks/request@0.1": RequestBlock,
+    "blocks/code@0.1": CodeBlock,
   };
 
 export async function createBlock(

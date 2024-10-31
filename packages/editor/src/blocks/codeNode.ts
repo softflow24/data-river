@@ -1,34 +1,33 @@
 import { Node } from "reactflow";
 import { NodeData } from "@/types/NodeTypes";
 
-export const inputNode: Omit<Node<NodeData>, "id" | "position"> = {
+export const codeNode: Omit<Node<NodeData>, "id" | "position"> = {
   type: "custom",
   data: {
-    block: "input@0.1",
-    label: "Input",
-    color: "rgb(234 179 8)",
-    icon: "TextCursorInput",
+    block: "code@0.1",
+    label: "Code",
+    color: "rgb(0 122 255)",
+    icon: "Code",
     config: {
-      input: "",
+      code: "",
     },
     inputsConfiguration: {
-      trigger: {
-        type: "boolean",
+      input: {
+        type: ["string", "number", "boolean", "object"],
         required: true,
       },
     },
     outputsConfiguration: {
-      value: {
+      result: {
         type: ["string", "number", "boolean", "object"],
         required: true,
       },
     },
     controls: [
       {
-        type: "text",
-        label: "Value",
-        name: "input",
-        placeholder: "Pass to output",
+        type: "text-readonly",
+        label: "Code",
+        name: "code",
       },
     ],
   },

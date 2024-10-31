@@ -9,14 +9,14 @@ interface LogicNodePanelViewProps {
     conditions: ICondition[];
   };
   onConfigChange: (config: any) => void;
-  inputs: Record<string, unknown>;
+  inputsConfiguration: Record<string, unknown>;
 }
 
 const LogicNodePanelView: React.FC<LogicNodePanelViewProps> = ({
   nodeId,
   config,
   onConfigChange,
-  inputs,
+  inputsConfiguration,
 }) => {
   const handleConditionsChange = (conditions: ICondition[]) => {
     onConfigChange({ ...config, conditions });
@@ -33,7 +33,7 @@ const LogicNodePanelView: React.FC<LogicNodePanelViewProps> = ({
         logicOperator={config.logicOperator}
         onConditionsChange={handleConditionsChange}
         onLogicOperatorChange={handleLogicOperatorChange}
-        logicNodeInputs={Object.keys(inputs)}
+        logicNodeInputs={Object.keys(inputsConfiguration)}
       />
     </div>
   );

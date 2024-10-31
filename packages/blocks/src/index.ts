@@ -5,5 +5,6 @@ export * from "./inputBlock";
 export * from "./outputBlock";
 export * from "./logicBlock";
 export * from "./requestBlock";
+export * from "./codeBlock";
 export * from "./blockFactory";
 // Note: We're not exporting DatabaseBlock here, as it's a plugin
