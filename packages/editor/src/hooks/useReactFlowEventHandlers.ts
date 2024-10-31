@@ -43,6 +43,7 @@ export const useReactFlowEventHandlers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { screenToFlowPosition } = useReactFlow();
   const rafRef = useRef<number | null>(null);
+  const batchedChangesRef = useRef<NodeChange[]>([]);
 
   const { draggingNodeId, edges, handles } = useReactFlowState((x) => ({
     draggingNodeId: x.draggingNodeId,
@@ -52,22 +53,52 @@ export const useReactFlowEventHandlers = () => {
 
   const debouncedUpdateNodes = useMemo(
     () =>
-      _.debounce(
-        (changes: NodeChange[]) => dispatch(updateNodes(changes)),
-        200,
+      _.throttle(
+        () => {
+          if (batchedChangesRef.current.length > 0) {
+            // Merge dimension changes, preserve order of other changes
+            const dimensionChanges = new Map<string, NodeChange>();
+            const otherChanges: NodeChange[] = [];
+
+            batchedChangesRef.current.forEach((change) => {
+              if (change.type === "dimensions") {
+                dimensionChanges.set(change.id, change);
+              } else {
+                otherChanges.push(change);
+              }
+            });
+
+            const mergedChanges = [
+              ...otherChanges,
+              ...Array.from(dimensionChanges.values()),
+            ];
+
+            dispatch(updateNodes(mergedChanges));
+            batchedChangesRef.current = [];
+          }
+        },
+        500,
+        { leading: true },
       ),
     [dispatch],
   );
 
   const onNodesChangeHandler: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      if (!changes.some((change) => change.type === "dimensions")) {
+      const hasDimensions = changes.some(
+        (change) => change.type === "dimensions",
+      );
+
+      if (!hasDimensions || draggingNodeId !== null) {
+        // For non-dimension changes, dispatch immediately
         dispatch(updateNodes(changes));
       } else {
-        debouncedUpdateNodes(changes);
+        // For changes including dimensions, batch them
+        batchedChangesRef.current.push(...changes);
+        debouncedUpdateNodes();
       }
     },
-    [debouncedUpdateNodes],
+    [debouncedUpdateNodes, dispatch],
   );
 
   const onEdgesChangeHandler: OnEdgesChange = useCallback(
