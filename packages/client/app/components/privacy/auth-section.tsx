@@ -6,11 +6,11 @@ export function AuthSection() {
       <SectionHeader id="authentication-services">
         Authentication & Third-Party Services
       </SectionHeader>
-      <p>
+      <p className="text-muted-foreground">
         We use the following third-party services to provide authentication and
         data storage:
       </p>
-      <ul className="list-disc pl-6 space-y-2">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <strong>Supabase:</strong> We use Supabase for authentication and data
           storage. When you create an account or log in, your information is

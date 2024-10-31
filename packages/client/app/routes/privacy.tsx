@@ -11,6 +11,7 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useOutletContext } from "@remix-run/react";
 import { SectionHeader } from "~/components/privacy/section-header";
 import { TableOfContents } from "~/components/privacy/table-of-contents";
+import { ControlSection } from "~/components/privacy/control-section";
 
 export default function PrivacyPolicy() {
   const lastUpdated = "2024-10-31";
@@ -39,6 +40,10 @@ export default function PrivacyPolicy() {
     { id: "data-storage", title: "Data Storage" },
     { id: "your-rights", title: "Your Rights" },
     { id: "contact", title: "Contact Us" },
+    {
+      id: "control-over-information",
+      title: "Control Over Your Information",
+    },
   ];
 
   return (
@@ -69,16 +74,16 @@ export default function PrivacyPolicy() {
             <AuthSection />
           </section>
 
-          <CookieSection />
+          <ControlSection />
 
           <section id="data-storage" className="space-y-4">
             <SectionHeader id="data-storage">Data Storage</SectionHeader>
-            <p>
-              Your data is stored securely in Supabase's infrastructure. We
+            <p className="text-muted-foreground">
+              Your data is stored securely in data-river's infrastructure. We
               implement appropriate security measures to protect your personal
               information, including:
             </p>
-            <ul className="list-disc pl-6 space-y-2">
+            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
               <li>Encrypted data transmission</li>
               <li>Secure authentication mechanisms</li>
               <li>Regular security updates and monitoring</li>
@@ -90,8 +95,8 @@ export default function PrivacyPolicy() {
 
           <section id="your-rights" className="space-y-4">
             <SectionHeader id="your-rights">Your Rights</SectionHeader>
-            <p>You have the right to:</p>
-            <ul className="list-disc pl-6 space-y-2">
+            <p className="text-muted-foreground">You have the right to:</p>
+            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
               <li>Access your personal data</li>
               <li>Correct your personal data</li>
               <li>Delete your account and associated data</li>
@@ -101,13 +106,15 @@ export default function PrivacyPolicy() {
             </ul>
           </section>
 
+          <CookieSection />
+
           <section id="contact" className="space-y-4">
             <SectionHeader id="contact">Contact Us</SectionHeader>
-            <p>
+            <p className="text-muted-foreground">
               If you have any questions about our Privacy Policy or how we
               handle your data, please contact us:
             </p>
-            <ul className="list-disc pl-6">
+            <ul className="list-disc pl-6 text-muted-foreground">
               <li>Email: privacy@example.com</li>
               <li>Address: 123 Privacy Street, Data City, 12345</li>
             </ul>
