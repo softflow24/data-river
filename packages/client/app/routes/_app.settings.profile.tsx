@@ -18,6 +18,13 @@ import { ProfilePicture } from "~/components/settings/profile-picture";
 import { VisibilitySettings } from "~/components/settings/visibility-settings";
 import { ProfileForm } from "~/components/settings/profile-form";
 
+// Define the action data type
+type ActionData = {
+  errors?: Record<string, string[]>;
+  values?: Record<string, unknown>;
+  success?: boolean;
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const userId = session.get("user_id") as string;
@@ -86,12 +93,12 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  return json({ success: true });
+  return json<ActionData>({ success: true });
 }
 
 export default function ProfileSettings() {
   const { profile } = useLoaderData<typeof loader>();
-  const actionData = useActionData();
+  const actionData = useActionData<ActionData>();
 
   return (
     <div className="grid grid-cols-3 gap-6">

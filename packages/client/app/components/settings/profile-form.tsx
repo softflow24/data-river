@@ -107,11 +107,13 @@ export function ProfileForm({ profile, actionData, action }: ProfileFormProps) {
   useEffect(() => {
     if (actionData) {
       if (actionData.errors) {
-        Object.keys(actionData.errors).forEach((key) => {
-          form.setError(key as keyof ProfileFormData, {
-            type: "server",
-            message: actionData.errors[key]?.join(", "),
-          });
+        Object.entries(actionData.errors).forEach(([key, messages]) => {
+          if (messages) {
+            form.setError(key as keyof ProfileFormData, {
+              type: "server",
+              message: messages.join(", "),
+            });
+          }
         });
         toast.error("Failed to update profile");
       } else {
@@ -206,6 +208,7 @@ export function ProfileForm({ profile, actionData, action }: ProfileFormProps) {
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value || ""}
                   placeholder="https://example.com"
                   type="url"
                 />
@@ -222,7 +225,7 @@ export function ProfileForm({ profile, actionData, action }: ProfileFormProps) {
             <FormItem>
               <FormLabel>Company</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} value={field.value || ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -237,7 +240,7 @@ export function ProfileForm({ profile, actionData, action }: ProfileFormProps) {
               <FormItem>
                 <FormLabel>City</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -251,7 +254,7 @@ export function ProfileForm({ profile, actionData, action }: ProfileFormProps) {
               <FormItem>
                 <FormLabel>Country</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
