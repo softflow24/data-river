@@ -6,7 +6,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: `${new URL(request.url).origin}/sign-in`,
+      redirectTo: `${new URL(request.url).origin}/sign-up`,
     },
   });
 
@@ -16,5 +16,5 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader() {
-  return redirect("/sign-in");
+  return redirect("/sign-up");
 }

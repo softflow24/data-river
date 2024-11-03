@@ -15,7 +15,7 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export const getSession = (request: Request | string) => {
+export const getSession = (request: Request | string | null) => {
   if (typeof request !== "string" && !(request instanceof Request)) {
     return sessionStorage.getSession();
   }

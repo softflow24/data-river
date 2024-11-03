@@ -35,14 +35,25 @@ create policy "Users can update their own profile"
   on profiles for update
   using ( auth.uid() = id );
 
--- This trigger automatically creates a profile entry when a new user signs up
+-- Add a function to check if username is set
+create function public.has_username(user_id uuid)
+returns boolean as $$
+begin
+  return exists (
+    select 1 from profiles
+    where id = user_id and username is not null
+  );
+end;
+$$ language plpgsql security definer;
+
+-- Modify handle_new_user to create initial profile
 create function public.handle_new_user() 
 returns trigger as $$
 begin
   insert into public.profiles (id, display_name, avatar_url)
   values (
-    new.id, 
-    coalesce(new.raw_user_meta_data->>'display_name', 'User_' || substr(new.id::text, 1, 8)), 
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User_' || substr(new.id::text, 1, 8)),
     new.raw_user_meta_data->>'avatar_url'
   );
   return new;
