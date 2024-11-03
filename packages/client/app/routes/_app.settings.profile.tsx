@@ -1,4 +1,4 @@
-import { useLoaderData, useActionData } from "@remix-run/react";
+import { useLoaderData, useActionData, useNavigate } from "@remix-run/react";
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
@@ -15,18 +15,20 @@ import {
 } from "@data-river/shared/ui/components/ui/card";
 import { profileSchema } from "~/schemas/profile";
 import { ProfilePicture } from "~/components/settings/profile-picture";
-import { VisibilitySettings } from "~/components/settings/visibility-settings";
 import { ProfileForm } from "~/components/settings/profile-form";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 // Define the action data type
 type ActionData = {
   errors?: Record<string, string[]>;
   values?: Record<string, unknown>;
   success?: boolean;
+  error?: string;
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
   const userId = session.get("user_id") as string;
 
   const { data: profile, error } = await supabase
@@ -43,7 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
   if (!session.has("access_token")) {
     return redirect("/sign-in");
   }
@@ -99,6 +101,20 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function ProfileSettings() {
   const { profile } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionData>();
+  const navigate = useNavigate();
+
+  // Handle action data changes
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.error) {
+        toast.error(actionData.error);
+      } else if (actionData.success) {
+        toast.success("Profile updated successfully");
+        // Optionally refresh the page to show updated data
+        navigate(".", { replace: true });
+      }
+    }
+  }, [actionData, navigate]);
 
   return (
     <div className="grid grid-cols-3 gap-6">
@@ -117,7 +133,6 @@ export default function ProfileSettings() {
 
       <div className="space-y-6">
         <ProfilePicture profile={profile} />
-        <VisibilitySettings />
       </div>
     </div>
   );

@@ -15,4 +15,15 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export const { getSession, commitSession, destroySession } = sessionStorage;
+export const getSession = (request: Request | string) => {
+  if (typeof request !== "string" && !(request instanceof Request)) {
+    return sessionStorage.getSession();
+  }
+
+  if (typeof request === "string") {
+    return sessionStorage.getSession(request);
+  }
+  return sessionStorage.getSession(request.headers.get("Cookie"));
+};
+
+export const { commitSession, destroySession } = sessionStorage;

@@ -85,7 +85,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
   const url = new URL(request.url);
   const isPublicRoute = PUBLIC_ROUTES.some((route) =>
     url.pathname.startsWith(route),

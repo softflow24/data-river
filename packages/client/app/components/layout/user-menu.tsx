@@ -46,7 +46,7 @@ export function UserMenu({ profile }: UserMenuProps) {
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href="/settings">
+          <a href="/settings/profile">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </a>

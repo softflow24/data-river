@@ -9,3 +9,6 @@ export const supabase = createClient<Database>(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY,
 );
+
+export const createServerClient = (accessToken: string) =>
+  createClient<Database>(process.env.SUPABASE_URL!, accessToken);
