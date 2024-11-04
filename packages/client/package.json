@@ -53,6 +53,7 @@
     "@remix-run/router": "^1.20.0",
     "@remix-run/serve": "^2.13.1",
     "@remix-run/server-runtime": "^2.13.1",
+    "@supabase/supabase-js": "^2.45.4",
     "@types/set-cookie-parser": "^2.4.10",
     "@web3-storage/multipart-parser": "^1.0.0",
     "class-variance-authority": "^0.7.0",
