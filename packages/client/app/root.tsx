@@ -21,17 +21,6 @@ import "@data-river/shared/global.css";
 import "@data-river/shared/tailwind.css";
 import { localeCookie, themeCookie } from "~/cookies.server";
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = [
-  "/sign-in",
-  "/sign-up",
-  "/forgot-password",
-  "/auth/callback",
-  "/auth/github",
-  "/preferences",
-  "/privacy",
-];
-
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -87,14 +76,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request);
   const url = new URL(request.url);
-  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-    url.pathname.startsWith(route),
-  );
-
-  // Check authentication for non-public routes
-  if (!isPublicRoute && !session.has("access_token")) {
-    return redirect("/sign-in");
-  }
 
   // Get stored preferences
   const locale =
