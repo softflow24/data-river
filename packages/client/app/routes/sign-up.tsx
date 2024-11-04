@@ -47,19 +47,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     if (user) {
       // Check if user has username
-      // const { data: hasUsername } = await supabase.rpc("has_username", {
-      //   user_id: user.id,
-      // });
+      const { data: hasUsername } = await supabase.rpc("has_username", {
+        user_id: user.id,
+      });
 
-      // // If no username, redirect to username selection
-      // if (!hasUsername) {
-      //   return json({
-      //     step: "username",
-      //     oauth: true,
-      //     user_id: user.id,
-      //     access_token: accessToken,
-      //   });
-      // }
+      // If no username, redirect to username selection
+      if (!hasUsername) {
+        return json({
+          step: "username",
+          oauth: true,
+          user_id: user.id,
+          access_token: accessToken,
+        });
+      }
 
       // If has username, redirect to editor
       return redirect("/editor");
