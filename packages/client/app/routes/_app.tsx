@@ -17,7 +17,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
 
   if (!session.has("access_token")) {
-    return redirect("/sign-in");
+    // TODO: Remove this after testing
+    return json<LoaderData>({
+      profile: {
+        id: "test",
+        display_name: "test",
+        avatar_url: "test",
+        username: "test",
+      },
+    });
+    // return redirect("/sign-in");
   }
 
   const userId = session.get("user_id") as string;
