@@ -8,5 +8,5 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["lucide", "reactflow"]
+  "cSpell.words": ["lucide", "reactflow", "supabase"]
 }

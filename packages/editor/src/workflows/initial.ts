@@ -1,6 +1,6 @@
+import { blockConfigs } from "@/blocks";
 import { Edge, Node } from "reactflow";
 import { type NodeData } from "@/types/NodeTypes";
-import { blockConfigs } from "@/blocks";
 import { type EdgeData } from "@/types/EdgeTypes";
 import { createHandles } from "@/utils/nodeCreated";
 import { type Handle } from "@/types/HandleTypes";

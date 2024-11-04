@@ -7,18 +7,21 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY!,
 );
 
-interface DatabaseResult {
-  id: number;
-  email: string;
-  created_at: Date;
-}
+async function saveEmailToDatabase(
+  email: string,
+  request: Request,
+): Promise<void> {
+  const ip_address =
+    request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip");
+  const user_agent = request.headers.get("user-agent");
 
-async function saveEmailToDatabase(email: string): Promise<DatabaseResult> {
-  const { data, error } = await supabase
-    .from("email_subscribers")
-    .insert({ email })
-    .select()
-    .single();
+  const { error } = await supabase.from("email_subscribers").insert({
+    email,
+    status: "active",
+    source: "website",
+    ip_address,
+    user_agent,
+  });
 
   if (error) {
     if (error.code === "23505") {
@@ -26,57 +29,35 @@ async function saveEmailToDatabase(email: string): Promise<DatabaseResult> {
     }
     throw error;
   }
-
-  return data;
-}
-
-async function deleteEmailFromDatabase(email: string): Promise<DatabaseResult> {
-  const { data, error } = await supabase
-    .from("email_subscribers")
-    .delete()
-    .eq("email", email)
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data) {
-    throw new Error("Email not found");
-  }
-
-  return data;
 }
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const email = formData.get("email");
-  const action = formData.get("action");
 
   if (!email || typeof email !== "string") {
     return json({ error: "Email is required" }, { status: 400 });
   }
 
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    return json({ error: "Invalid email format" }, { status: 400 });
+  }
+
   try {
-    if (action === "subscribe") {
-      await saveEmailToDatabase(email);
-      return json({ message: "Subscribed successfully" });
-    } else if (action === "unsubscribe") {
-      await deleteEmailFromDatabase(email);
-      return json({ message: "Unsubscribed successfully" });
-    } else {
-      return json({ error: "Invalid action" }, { status: 400 });
-    }
+    await saveEmailToDatabase(email, request);
+    return json({
+      message: "Subscribed successfully",
+      status: "active",
+    });
   } catch (error) {
-    console.error("Database operation failed:", error);
     if (error instanceof Error) {
       if (error.message === "Email already exists") {
         return json({ error: "Email is already subscribed" }, { status: 409 });
-      } else if (error.message === "Email not found") {
-        return json({ error: "Email not found" }, { status: 404 });
       }
     }
+
+    console.error(error);
     return json(
       { error: "An error occurred. Please try again." },
       { status: 500 },
