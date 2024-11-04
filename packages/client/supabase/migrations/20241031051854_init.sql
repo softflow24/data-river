@@ -1,3 +1,5 @@
+begin;  -- Start transaction
+
 -- Create a table for public profiles
 create table public.profiles (
   id uuid references auth.users on delete cascade not null primary key,
@@ -84,3 +86,5 @@ $$ language plpgsql security definer;
 create trigger on_profile_updated
   before update on profiles
   for each row execute procedure public.handle_updated_at();
+
+commit;  -- End transaction

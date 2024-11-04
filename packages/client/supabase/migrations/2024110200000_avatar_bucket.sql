@@ -1,3 +1,5 @@
+begin;  -- Start transaction
+
 -- Create the Avatars Bucket
 -- Create a new bucket named 'avatars' with public access set to true
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -44,3 +46,5 @@ WITH CHECK (
   bucket_id = 'avatars' AND
   owner = auth.uid()
 );
+
+commit;  -- End transaction
