@@ -4,12 +4,13 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/hooks/use-toast";
 
-interface QuickLink {
-  label: string;
-  url: string;
+interface FetcherData {
+  message?: string;
+  error?: string;
+  status?: "active" | "unsubscribed" | "bounced" | "complained";
 }
 
-const quickLinks: QuickLink[] = [
+const quickLinks = [
   {
     label: "Documentation",
     url: "https://docs.data-river.dev/",
@@ -24,27 +25,16 @@ const quickLinks: QuickLink[] = [
   },
 ];
 
-interface FetcherData {
-  message?: string;
-  error?: string;
-}
-
 export default function Footer(): React.ReactElement {
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState("");
   const fetcher = useFetcher<FetcherData>();
   const { toast } = useToast();
 
-  const validateEmail = (email: string): boolean => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(String(email).toLowerCase());
-  };
-
-  const handleSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-    action: "subscribe" | "unsubscribe",
-  ) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validateEmail(email)) {
+
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
       toast({
         variant: "destructive",
         title: "Invalid Email",
@@ -54,32 +44,25 @@ export default function Footer(): React.ReactElement {
     }
 
     fetcher.submit(
-      { email, action },
+      { email },
       { method: "post", action: "/api/email-subscription" },
     );
   };
 
   useEffect(() => {
     if (fetcher.data) {
-      if ("message" in fetcher.data) {
+      if (fetcher.data.message) {
         toast({
           title: "Success",
           description: fetcher.data.message,
         });
         setEmail("");
-      } else if ("error" in fetcher.data) {
-        if (fetcher.data.error === "Email is already subscribed") {
-          toast({
-            title: "Already Subscribed",
-            description: "This email is already subscribed.",
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: fetcher.data.error,
-          });
-        }
+      } else if (fetcher.data.error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: fetcher.data.error,
+        });
       }
     }
   }, [fetcher.data, toast]);
@@ -114,36 +97,22 @@ export default function Footer(): React.ReactElement {
             <p className="text-muted-foreground">
               Subscribe to our newsletter for updates and news.
             </p>
-            <fetcher.Form
-              className="mt-4"
-              onSubmit={(e) => handleSubmit(e, "subscribe")}
-            >
+            <fetcher.Form className="mt-4" onSubmit={handleSubmit}>
               <Input
                 type="email"
                 name="email"
                 placeholder="Enter your email"
                 className="w-full mb-2"
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <Button type="submit" className="w-full mb-2">
-                Subscribe
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={fetcher.state !== "idle"}
+              >
+                {fetcher.state !== "idle" ? "Subscribing..." : "Subscribe"}
               </Button>
-              {/*<Button*/}
-              {/*  type="button"*/}
-              {/*  className="w-full"*/}
-              {/*  onClick={(e) => {*/}
-              {/*    e.preventDefault();*/}
-              {/*    handleSubmit(*/}
-              {/*      e as unknown as React.FormEvent<HTMLFormElement>,*/}
-              {/*      "unsubscribe",*/}
-              {/*    );*/}
-              {/*  }}*/}
-              {/*>*/}
-              {/*  Unsubscribe*/}
-              {/*</Button>*/}
             </fetcher.Form>
           </div>
         </div>
