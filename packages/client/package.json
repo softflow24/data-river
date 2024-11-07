@@ -69,7 +69,7 @@
     "react": "^18.3.1",
     "react-day-picker": "9.2.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.53.0",
+    "react-hook-form": "^7.53.1",
     "react-image-crop": "^11.0.7",
     "react-resizable-panels": "^2.1.4",
     "react-router": "^6.27.0",
