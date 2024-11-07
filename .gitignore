@@ -138,4 +138,3 @@ dist
 # Supabase
 **/supabase/.temp
 **/supabase/.branches
-**/supabase/config.toml
