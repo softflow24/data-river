@@ -4,7 +4,7 @@ import {
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import { uploadHandler } from "~/utils/upload.server";
 import { deleteStorageFile } from "~/utils/storage.server";
 
@@ -13,7 +13,6 @@ const AVATARS_BUCKET = "avatars";
 async function handleAvatarUpload(
   request: Request,
   userId: string,
-  accessToken: string,
   oldAvatarUrl: string | null,
 ) {
   let newAvatarUrl: string | null = null;
@@ -21,12 +20,13 @@ async function handleAvatarUpload(
   try {
     const formData = await unstable_parseMultipartFormData(
       request,
-      uploadHandler(accessToken),
+      uploadHandler(request),
     );
 
     newAvatarUrl = formData.get("avatar") as string;
 
     // Update profile with new avatar URL
+    const { supabase } = await createClient(request);
     const { error: updateError } = await supabase
       .from("profiles")
       .update({
@@ -40,13 +40,13 @@ async function handleAvatarUpload(
     }
 
     // Delete old avatar if it exists
-    await deleteStorageFile(oldAvatarUrl, accessToken, AVATARS_BUCKET);
+    await deleteStorageFile(request, oldAvatarUrl, AVATARS_BUCKET);
 
     return json({ success: true });
   } catch (error) {
     // If we failed after uploading the new avatar, clean it up
     if (newAvatarUrl) {
-      await deleteStorageFile(newAvatarUrl, accessToken, AVATARS_BUCKET);
+      await deleteStorageFile(request, newAvatarUrl, AVATARS_BUCKET);
     }
 
     return json(
@@ -61,11 +61,12 @@ async function handleAvatarUpload(
 }
 
 async function handleAvatarRemoval(
+  request: Request,
   userId: string,
   oldAvatarUrl: string | null,
-  accessToken: string,
 ) {
   try {
+    const { supabase } = await createClient(request);
     const { error } = await supabase
       .from("profiles")
       .update({ avatar_url: null, updated_at: new Date().toISOString() })
@@ -76,7 +77,7 @@ async function handleAvatarRemoval(
     }
 
     // Delete the old avatar file
-    await deleteStorageFile(oldAvatarUrl, accessToken, AVATARS_BUCKET);
+    await deleteStorageFile(request, oldAvatarUrl, AVATARS_BUCKET);
 
     return json({ success: true });
   } catch (error) {
@@ -98,6 +99,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const userId = session.get("user_id") as string;
 
   // Fetch current profile to get the old avatar URL
+  const { supabase } = await createClient(request);
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("avatar_url")
@@ -120,10 +122,10 @@ export async function action({ request }: ActionFunctionArgs) {
   ) {
     const formData = await request.formData();
     if (formData.get("_action") === "remove") {
-      return handleAvatarRemoval(userId, oldAvatarUrl, accessToken);
+      return handleAvatarRemoval(request, userId, oldAvatarUrl);
     }
   }
 
   // Handle avatar upload
-  return handleAvatarUpload(request, userId, accessToken, oldAvatarUrl);
+  return handleAvatarUpload(request, userId, oldAvatarUrl);
 }

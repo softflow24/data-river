@@ -1,8 +1,10 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  const { supabase, headers } = await createClient(request);
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
@@ -12,5 +14,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (error) throw error;
 
-  return redirect(data.url);
+  return redirect(data.url, {
+    headers,
+  });
 }

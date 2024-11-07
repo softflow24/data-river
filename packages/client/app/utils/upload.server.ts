@@ -1,5 +1,5 @@
 import type { UploadHandler } from "@remix-run/node";
-import { createServerClient } from "./supabase.server";
+import { createClient } from "./supabase.server";
 import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
 
@@ -41,18 +41,14 @@ async function compressImage(
 }
 
 export const uploadHandler =
-  (accessToken: string): UploadHandler =>
+  (request: Request): UploadHandler =>
   async ({ name, contentType, data }) => {
     if (name !== "avatar") {
       return undefined;
     }
 
-    if (!accessToken) {
-      throw new Error("Unauthorized");
-    }
-
     // Create an authenticated Supabase client
-    const supabase = createServerClient(accessToken);
+    const { supabase } = await createClient(request);
 
     // Validate content type
     if (!Object.keys(ALLOWED_TYPES).includes(contentType)) {
@@ -103,8 +99,6 @@ export const uploadHandler =
       } catch (cleanupError) {
         console.error("Failed to clean up file after error:", cleanupError);
       }
-
-      console.error("Upload error:", error);
       throw new Error("Failed to upload file");
     }
   };

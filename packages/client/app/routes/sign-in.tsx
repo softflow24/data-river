@@ -7,7 +7,7 @@ import { json, redirect } from "@remix-run/node";
 import { Card, CardHeader, CardContent } from "@data-river/shared/ui";
 import { AuthLayout } from "~/components/layout/auth-layout";
 import { AuthForm } from "~/components/auth/auth-form";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import { getSession, commitSession } from "~/utils/session.server";
 import { useActionData } from "@remix-run/react";
 import { useEffect } from "react";
@@ -21,9 +21,13 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const { supabase } = await createClient(request, true);
 
-  if (session.has("access_token")) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
     return redirect("/editor");
   }
 
@@ -36,6 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const password = formData.get("password") as string;
 
   try {
+    const { supabase } = await createClient(request, true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -46,6 +51,8 @@ export async function action({ request }: ActionFunctionArgs) {
     const session = await getSession(request.headers.get("Cookie"));
     session.set("access_token", data.session.access_token);
     session.set("user_id", data.user.id);
+    session.set("refresh_token", data.session.refresh_token);
+    session.set("expires_at", data.session.expires_at);
 
     return redirect("/editor", {
       headers: {

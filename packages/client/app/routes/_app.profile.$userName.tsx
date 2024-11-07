@@ -1,7 +1,7 @@
 import { useLoaderData } from "@remix-run/react";
 import { type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import type { Database } from "~/types/supabase";
 import { ProfileHeader } from "~/components/profile/profile-header";
 import { AchievementsCard } from "~/components/profile/achievements-card";
@@ -17,6 +17,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!params.userName) {
     return redirect("/profile");
   }
+
+  const { supabase } = await createClient(request);
 
   const { data: profile, error } = await supabase
     .from("profiles")

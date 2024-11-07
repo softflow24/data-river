@@ -1,10 +1,11 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import type { Database } from "~/types/supabase";
 import { Navbar } from "~/components/layout/navbar";
 import { CookieConsent } from "~/components/layout/cookie-consent";
+import { isRedirectResponse } from "@remix-run/react/dist/data";
 
 type LoaderData = {
   profile: Pick<
@@ -14,27 +15,21 @@ type LoaderData = {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const { supabase } = await createClient(request);
 
-  if (!session.has("access_token")) {
-    // TODO: Remove this after testing
-    return json<LoaderData>({
-      profile: {
-        id: "test",
-        display_name: "test",
-        avatar_url: "test",
-        username: "test",
-      },
-    });
-    // return redirect("/sign-in");
+  let {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    console.log("redirecting to sign-in");
+    return redirect("/sign-in");
   }
-
-  const userId = session.get("user_id") as string;
 
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", userId)
+    .eq("id", user.id)
     .single();
 
   if (error || !profile) {

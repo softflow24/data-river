@@ -1,14 +1,14 @@
-import { createServerClient } from "./supabase.server";
+import { createClient } from "./supabase.server";
 
 export async function deleteStorageFile(
+  request: Request,
   path: string | null,
-  accessToken: string,
   bucket: string,
 ) {
   if (!path) return;
 
   try {
-    const supabase = createServerClient(accessToken);
+    const { supabase } = await createClient(request);
     const { error } = await supabase.storage
       .from(bucket)
       .remove([getFileNameFromUrl(path)]);

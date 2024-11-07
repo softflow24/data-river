@@ -14,7 +14,7 @@ import {
 } from "@data-river/shared/ui";
 import { AuthLayout } from "~/components/layout/auth-layout";
 import { SignUpForm } from "~/components/auth/sign-up-form";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import { getSession, commitSession } from "~/utils/session.server";
 import { useActionData } from "@remix-run/react";
 import { useState } from "react";
@@ -41,6 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const accessToken = session.get("access_token");
 
   if (accessToken) {
+    const { supabase } = await createClient(request);
     const {
       data: { user },
     } = await supabase.auth.getUser(accessToken);
@@ -72,6 +73,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const username = formData.get("username") as string;
+
+  const { supabase } = await createClient(request);
 
   // Handle username selection
   if (username) {
@@ -185,7 +188,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 const SignUpPage = () => {
   const actionData = useActionData<typeof action>();
-  const navigate = useNavigate();
 
   // Show username selection form
   if (actionData?.step === "username") {

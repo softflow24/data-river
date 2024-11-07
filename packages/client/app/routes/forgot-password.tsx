@@ -7,7 +7,7 @@ import { json, redirect } from "@remix-run/node";
 import { Card, CardHeader, CardContent } from "@data-river/shared/ui";
 import { AuthLayout } from "~/components/layout/auth-layout";
 import { ForgotPasswordForm } from "~/components/auth/forgot-password-form";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import { getSession } from "~/utils/session.server";
 import { useActionData } from "@remix-run/react";
 
@@ -38,6 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = formData.get("email") as string;
 
   try {
+    const { supabase } = await createClient(request);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${new URL(request.url).origin}/reset-password`,
     });

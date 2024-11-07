@@ -55,9 +55,9 @@ export const SignUpForm = ({ error, success }: SignUpFormProps) => {
             id="password"
             name="password"
             type="password"
-            placeholder="••••••••"
+            placeholder="········"
             required
-            className="h-11 text-base"
+            className="h-11 text-base placeholder:font-extrabold"
           />
         </div>
 

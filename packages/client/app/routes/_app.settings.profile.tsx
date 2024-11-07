@@ -6,7 +6,7 @@ import {
   redirect,
 } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
-import { supabase } from "~/utils/supabase.server";
+import { createClient } from "~/utils/supabase.server";
 import {
   Card,
   CardContent,
@@ -31,6 +31,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request);
   const userId = session.get("user_id") as string;
 
+  const { supabase } = await createClient(request);
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
@@ -76,6 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
+  const { supabase } = await createClient(request);
   const { error } = await supabase
     .from("profiles")
     .update({
