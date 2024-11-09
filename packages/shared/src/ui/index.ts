@@ -22,6 +22,7 @@ export * from "./components/ui/skeleton";
 export * from "./components/ui/alert-dialog";
 export * from "./components/ui/slider";
 export * from "./components/ui/switch";
+export * from "./components/ui/checkbox";
 
 // Re-export utilities
 export * from "./utils";

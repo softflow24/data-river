@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = formData.get("email") as string;
 
   try {
-    const { supabase } = await createClient(request);
+    const { supabase } = await createClient(request, true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${new URL(request.url).origin}/reset-password`,
     });
@@ -46,13 +46,15 @@ export async function action({ request }: ActionFunctionArgs) {
     if (error) throw error;
 
     return json<ActionData>({
-      message: "Password reset instructions have been sent to your email",
+      message:
+        "Password reset instructions have been sent to your email if it exists",
     });
   } catch (error) {
+    console.error("Error sending password reset email", error);
+
     return json<ActionData>(
       {
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: "Error occurred while resetting password",
       },
       { status: 400 },
     );

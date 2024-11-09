@@ -5,12 +5,12 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  redirect,
 } from "@remix-run/react";
 import type {
   LinksFunction,
   LoaderFunctionArgs,
   ActionFunctionArgs,
+  MetaFunction,
 } from "@remix-run/node";
 import { ReactNode, useEffect } from "react";
 import { json } from "@remix-run/node";
@@ -20,6 +20,10 @@ import "reflect-metadata";
 import "@data-river/shared/global.css";
 import "@data-river/shared/tailwind.css";
 import { localeCookie, themeCookie } from "~/cookies.server";
+
+export const meta: MetaFunction = () => {
+  return [{ title: "Data-river" }];
+};
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -75,7 +79,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request);
-  const url = new URL(request.url);
 
   // Get stored preferences
   const locale =

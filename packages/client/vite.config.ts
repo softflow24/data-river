@@ -2,10 +2,33 @@ import { defineConfig } from "vite";
 import { vitePlugin as remix } from "@remix-run/dev"; // Remix plugin
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
+
+const interestColors = [
+  "purple",
+  "red",
+  "green",
+  "blue",
+  "yellow",
+  "orange",
+  "teal",
+  "indigo",
+  "pink",
+  "emerald",
+  "cyan",
+  "violet",
+  "rose",
+  "slate",
+];
+
+const safelistClasses = [
+  ...interestColors.map((color) => `bg-${color}-100`),
+  ...interestColors.map((color) => `bg-${color}-950`),
+];
 
 export default defineConfig({
   plugins: [
-    // Remix Vite plugin with future flags enabled
     remix(),
     tsconfigPaths({
       projects: [
@@ -13,11 +36,11 @@ export default defineConfig({
         "../../packages/editor/tsconfig.json",
         "../../packages/shared/tsconfig.json",
       ],
-    }), // For resolving paths from tsconfig.json
+    }),
   ],
   resolve: {
     alias: {
-      "~": "/app", // Alias for simplifying imports
+      "~": "/app",
       "@data-river/editor": path.resolve(__dirname, "../editor/src"),
       "@data-river/blocks": path.resolve(__dirname, "../blocks/src"),
       "@data-river/shared": path.resolve(__dirname, "../shared/src"),
@@ -37,6 +60,14 @@ export default defineConfig({
     },
   },
   css: {
-    postcss: "./postcss.config.js",
+    postcss: {
+      plugins: [
+        tailwindcss({
+          config: "./tailwind.config.ts",
+          safelist: safelistClasses,
+        }),
+        autoprefixer(),
+      ],
+    },
   },
 });

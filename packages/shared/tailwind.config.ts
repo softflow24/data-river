@@ -88,12 +88,18 @@ export default {
           "0%, 100%": { color: "hsl(var(--focus))" },
           "50%": { color: "inherit" },
         },
+        "scale-pulse": {
+          "0%": { opacity: "0.7", transform: "scale(1)" },
+          "50%": { opacity: "0", transform: "scale(1.7)" },
+          "100%": { opacity: "0", transform: "scale(2.5)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         wiggle: "wiggle 0.3s ease-in-out",
         blink: "blink 1s ease-in-out infinite",
+        "scale-pulse": "scale-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

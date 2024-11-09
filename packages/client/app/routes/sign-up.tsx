@@ -4,29 +4,18 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Input,
-  Button,
-  Label,
-} from "@data-river/shared/ui";
+import { Card, CardHeader, CardContent } from "@data-river/shared/ui";
 import { AuthLayout } from "~/components/layout/auth-layout";
 import { SignUpForm } from "~/components/auth/sign-up-form";
 import { createClient } from "~/utils/supabase.server";
 import { getSession, commitSession } from "~/utils/session.server";
 import { useActionData } from "@remix-run/react";
-import { useState } from "react";
-import { Form } from "@remix-run/react";
-import { useNavigate } from "@remix-run/react";
 
 type ActionData = {
   error?: string;
   message?: string;
-  step?: "verify" | "username";
+  step?: "verify";
   email?: string;
-  oauth?: boolean;
 };
 
 export const meta: MetaFunction = () => {
@@ -37,34 +26,11 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
-  const accessToken = session.get("access_token");
+  const { getUser } = await createClient(request);
+  const user = await getUser();
 
-  if (accessToken) {
-    const { supabase } = await createClient(request);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(accessToken);
-
-    if (user) {
-      // Check if user has username
-      const { data: hasUsername } = await supabase.rpc("has_username", {
-        user_id: user.id,
-      });
-
-      // If no username, redirect to username selection
-      if (!hasUsername) {
-        return json({
-          step: "username",
-          oauth: true,
-          user_id: user.id,
-          access_token: accessToken,
-        });
-      }
-
-      // If has username, redirect to editor
-      return redirect("/editor");
-    }
+  if (user) {
+    return redirect("/welcome");
   }
 
   return null;
@@ -72,62 +38,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const username = formData.get("username") as string;
-
-  const { supabase } = await createClient(request);
-
-  // Handle username selection
-  if (username) {
-    try {
-      const session = await getSession(request.headers.get("Cookie"));
-      let userId = session.get("user_id") as string;
-
-      // If userId is not in session, get it from form data
-      if (!userId) {
-        userId = formData.get("user_id") as string;
-        session.set("user_id", userId);
-      }
-
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ username, display_name: username })
-        .eq("id", userId);
-
-      if (error) throw error;
-
-      // For OAuth users, we already have the session
-      if (!session.has("access_token")) {
-        session.set("access_token", formData.get("access_token") as string);
-        session.set("user_id", userId);
-      }
-
-      return redirect("/editor", {
-        headers: {
-          "Set-Cookie": await commitSession(session),
-        },
-      });
-    } catch (error) {
-      console.error(error);
-      return json<ActionData>(
-        {
-          error:
-            error instanceof Error ? error.message : "Username already taken",
-          step: "username",
-          oauth: formData.get("oauth") === "true",
-        },
-        { status: 400 },
-      );
-    }
-  }
-
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   try {
+    const { supabase } = await createClient(request);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -164,17 +79,15 @@ export async function action({ request }: ActionFunctionArgs) {
       );
     }
 
-    return json<ActionData>(
-      {
-        step: "username",
-        email,
+    // If we have a session, set it and redirect to welcome
+    session.set("access_token", data.session.access_token);
+    session.set("refresh_token", data.session.refresh_token);
+
+    return redirect("/welcome", {
+      headers: {
+        "Set-Cookie": await commitSession(session),
       },
-      {
-        headers: {
-          "Set-Cookie": await commitSession(session),
-        },
-      },
-    );
+    });
   } catch (error) {
     return json<ActionData>(
       {
@@ -188,53 +101,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 const SignUpPage = () => {
   const actionData = useActionData<typeof action>();
-
-  // Show username selection form
-  if (actionData?.step === "username") {
-    return (
-      <AuthLayout>
-        <Card className="mx-auto w-full max-w-md border-0 bg-transparent shadow-none">
-          <CardHeader className="space-y-2">
-            <h2 className="text-4xl font-bold">Choose your username</h2>
-            <p className="text-base text-muted-foreground">
-              Pick a unique username for your account
-            </p>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <Form method="post" className="space-y-4">
-              {actionData.oauth && (
-                <Input type="hidden" name="oauth" value="true" />
-              )}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="username"
-                  className="text-sm font-medium leading-none"
-                >
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className="w-full rounded-md border p-2"
-                  placeholder="cooluser123"
-                  pattern="[a-zA-Z0-9_]{3,}"
-                  title="Username must be at least 3 characters and can only contain letters, numbers, and underscores"
-                />
-              </div>
-              {actionData?.error && (
-                <div className="text-sm text-red-500">{actionData.error}</div>
-              )}
-              <Button type="submit" className="w-full">
-                Continue
-              </Button>
-            </Form>
-          </CardContent>
-        </Card>
-      </AuthLayout>
-    );
-  }
 
   if (actionData?.step === "verify") {
     return (

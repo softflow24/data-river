@@ -21,11 +21,9 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase } = await createClient(request, true);
+  const { getUser } = await createClient(request, true);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   if (user) {
     return redirect("/editor");

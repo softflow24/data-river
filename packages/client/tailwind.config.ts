@@ -10,6 +10,17 @@ export default {
     path.resolve(__dirname, "../shared/src/**/*.{js,ts,jsx,tsx}"),
     path.resolve(__dirname, "../editor/src/**/*.{js,ts,jsx,tsx}"),
   ],
-
+  safelist: [
+    {
+      pattern:
+        /bg-(purple|red|green|blue|yellow|orange|teal|indigo|pink|emerald|cyan|violet|rose|slate)-100/,
+      variants: ["dark"],
+    },
+    {
+      pattern:
+        /bg-(purple|red|green|blue|yellow|orange|teal|indigo|pink|emerald|cyan|violet|rose|slate)-950/,
+      variants: ["dark"],
+    },
+  ],
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;

@@ -1,11 +1,9 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
-import { getSession } from "~/utils/session.server";
 import { createClient } from "~/utils/supabase.server";
 import type { Database } from "~/types/supabase";
 import { Navbar } from "~/components/layout/navbar";
 import { CookieConsent } from "~/components/layout/cookie-consent";
-import { isRedirectResponse } from "@remix-run/react/dist/data";
 
 type LoaderData = {
   profile: Pick<
@@ -15,6 +13,10 @@ type LoaderData = {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  if (request.url.includes("/sign-up")) {
+    return;
+  }
+
   const { supabase } = await createClient(request);
 
   let {
@@ -34,6 +36,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (error || !profile) {
     throw new Error("Failed to load profile");
+  }
+
+  const username = profile.username;
+
+  if (!username) {
+    return redirect("/welcome");
   }
 
   return json<LoaderData>({ profile });
