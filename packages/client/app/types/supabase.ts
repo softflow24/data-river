@@ -201,9 +201,194 @@ export type Database = {
           },
         ]
       }
+      workflow_interests: {
+        Row: {
+          interest_id: string
+          workflow_id: string
+        }
+        Insert: {
+          interest_id: string
+          workflow_id: string
+        }
+        Update: {
+          interest_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_interests_interest_id_fkey"
+            columns: ["interest_id"]
+            isOneToOne: false
+            referencedRelation: "interests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_interests_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_list_items: {
+        Row: {
+          added_at: string
+          list_id: string
+          workflow_id: string
+        }
+        Insert: {
+          added_at?: string
+          list_id: string
+          workflow_id: string
+        }
+        Update: {
+          added_at?: string
+          list_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_list_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_list_items_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_lists: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      workflow_run_counts: {
+        Row: {
+          count: number | null
+          date: string
+          workflow_id: string
+        }
+        Insert: {
+          count?: number | null
+          date: string
+          workflow_id: string
+        }
+        Update: {
+          count?: number | null
+          date?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_run_counts_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          flow_state: Json
+          id: string
+          is_public: boolean | null
+          name: string
+          remix_count: number | null
+          remixed_from_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          flow_state?: Json
+          id?: string
+          is_public?: boolean | null
+          name: string
+          remix_count?: number | null
+          remixed_from_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          flow_state?: Json
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          remix_count?: number | null
+          remixed_from_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflows_remixed_from_id_fkey"
+            columns: ["remixed_from_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      user_workflow_stats: {
+        Row: {
+          public_workflow_count: number | null
+          total_workflow_count: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      workflow_total_runs: {
+        Row: {
+          total_runs: number | null
+          workflow_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_run_counts_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_username: {
@@ -211,6 +396,23 @@ export type Database = {
           user_id: string
         }
         Returns: boolean
+      }
+      increment_run_count: {
+        Args: {
+          workflow_id: string
+        }
+        Returns: undefined
+      }
+      increment_workflow_counter: {
+        Args: {
+          workflow_id: string
+          counter_name: string
+        }
+        Returns: undefined
+      }
+      refresh_workflow_total_runs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
