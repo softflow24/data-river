@@ -15,7 +15,7 @@ import { Link } from "@remix-run/react";
 import {
   parseSearchParams,
   stringifyFilters,
-  type WorkflowFilters,
+  type WorkflowFilters as WorkflowFiltersSchema,
 } from "~/schemas/workflow-filters";
 import { useCallback } from "react";
 
@@ -81,7 +81,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // First get workflow IDs that match the tag filter
   let workflowIds: string[] | null = null;
   if (filters.tags.length > 0) {
-    const { data: taggedWorkflows } = await supabase
+    const taggedWorkflows = await supabase
       .from("workflow_interests")
       .select("workflow_id")
       .in("interest_id", filters.tags)
@@ -169,7 +169,7 @@ export default function MyWorkflowsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFiltersChange = useCallback(
-    (newFilters: Partial<WorkflowFilters>) => {
+    (newFilters: Partial<WorkflowFiltersSchema>) => {
       const params = stringifyFilters({
         ...filters,
         ...newFilters,

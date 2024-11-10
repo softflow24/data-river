@@ -113,7 +113,7 @@ export default function ExplorePage() {
         </div>
         <ExploreFilters />
       </div>
-      <WorkflowGrid workflows={workflows} />
+      <WorkflowGrid workflows={workflows ?? []} />
     </div>
   );
 }
