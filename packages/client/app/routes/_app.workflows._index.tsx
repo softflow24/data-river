@@ -3,13 +3,7 @@ import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { createClient } from "~/utils/supabase.server";
 import { WorkflowList } from "../components/workflows/workflow-list";
 import { WorkflowFilters } from "../components/workflows/workflow-filters";
-import {
-  GitFork,
-  Globe,
-  Play,
-  Plus,
-  Workflow as WorkflowIcon,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@data-river/shared/ui/components/ui/button";
 import { Link } from "@remix-run/react";
 import {
@@ -18,45 +12,9 @@ import {
   type WorkflowFilters as WorkflowFiltersSchema,
 } from "~/schemas/workflow-filters";
 import { useCallback } from "react";
-
-type StatsCardProps = {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  description?: string;
-};
-
-function StatsCard({ title, value, icon, description }: StatsCardProps) {
-  return (
-    <div className="rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h3 className="text-sm font-medium">{title}</h3>
-      </div>
-      <div className="mt-3 text-2xl font-bold">{value}</div>
-      {description && (
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
-      )}
-    </div>
-  );
-}
-
-const MOCK_WORKFLOWS = [
-  {
-    id: "1",
-    name: "Email Notification Flow",
-    description: "Sends email notifications when new data arrives",
-    flow_state: {},
-    is_public: true,
-    remix_count: 12,
-    created_by: "user-1",
-    created_at: new Date().toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    remixed_from_id: null,
-    workflow_interests: [{ interest_id: "automation" }],
-    workflow_total_runs: [{ total_runs: 156 }],
-  },
-];
+import { WorkflowStats } from "~/components/workflows/workflow-stats";
+import { getFilteredWorkflows } from "~/services/workflow.server";
+import { MOCK_WORKFLOWS } from "~/data/mock-workflows";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -77,91 +35,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const { supabase } = await createClient(request);
-
-  // First get workflow IDs that match the tag filter
-  let workflowIds: string[] | null = null;
-  if (filters.tags.length > 0) {
-    const taggedWorkflows = await supabase
-      .from("workflow_interests")
-      .select("workflow_id")
-      .in("interest_id", filters.tags)
-      .then((res) => res.data?.map((w) => w.workflow_id) ?? []);
-
-    workflowIds = taggedWorkflows;
-  }
-
-  // Then build the main query
-  let query = supabase.from("workflows").select(`
-      *,
-      workflow_interests(interest_id),
-      workflow_total_runs(total_runs)
-    `);
-
-  // Apply filters
-  if (filters.search) {
-    query = query.ilike("name", `%${filters.search}%`);
-  }
-
-  if (filters.public) {
-    query = query.eq("is_public", true);
-  }
-
-  if (workflowIds !== null) {
-    query = query.in("id", workflowIds);
-  }
-
-  if (filters.dateFrom) {
-    query = query.gte("created_at", filters.dateFrom);
-  }
-
-  if (filters.dateTo) {
-    query = query.lte("created_at", filters.dateTo);
-  }
-
-  // Apply sorting
-  switch (filters.sort) {
-    case "created":
-      query = query.order("created_at", { ascending: false });
-      break;
-    case "name":
-      query = query.order("name");
-      break;
-    case "runs":
-      // We'll need to sort after fetching since this is in a view
-      break;
-    case "remixes":
-      query = query.order("remix_count", { ascending: false });
-      break;
-    default:
-      query = query.order("updated_at", { ascending: false });
-  }
-
-  const { data: workflows } = await query;
-
-  // Post-process for run count sorting if needed
-  let processedWorkflows = workflows || [];
-  if (filters.sort === "runs" && processedWorkflows.length > 0) {
-    processedWorkflows.sort((a, b) => {
-      const aRuns = a.workflow_total_runs?.[0]?.total_runs ?? 0;
-      const bRuns = b.workflow_total_runs?.[0]?.total_runs ?? 0;
-      return bRuns - aRuns;
-    });
-  }
+  const workflows = await getFilteredWorkflows(supabase, filters);
 
   const stats = {
-    totalWorkflows: processedWorkflows.length,
-    publicWorkflows: processedWorkflows.filter((w) => w.is_public).length,
-    totalRuns: processedWorkflows.reduce(
+    totalWorkflows: workflows.length,
+    publicWorkflows: workflows.filter((w) => w.is_public).length,
+    totalRuns: workflows.reduce(
       (acc, w) => acc + (w.workflow_total_runs?.[0]?.total_runs ?? 0),
       0,
     ),
-    totalRemixes: processedWorkflows.reduce(
-      (acc, w) => acc + (w.remix_count ?? 0),
-      0,
-    ),
+    totalRemixes: workflows.reduce((acc, w) => acc + (w.remix_count ?? 0), 0),
   };
 
-  return json({ workflows: processedWorkflows, stats, filters });
+  return json({ workflows, stats, filters });
 }
 
 export default function MyWorkflowsPage() {
@@ -199,29 +85,7 @@ export default function MyWorkflowsPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-4 gap-4 mt-4">
-            <StatsCard
-              title="Total Workflows"
-              value={stats.totalWorkflows}
-              icon={<WorkflowIcon className="h-4 w-4 text-muted-foreground" />}
-            />
-            <StatsCard
-              title="Public Workflows"
-              value={stats.publicWorkflows}
-              icon={<Globe className="h-4 w-4 text-muted-foreground" />}
-              description={`${stats.totalWorkflows - stats.publicWorkflows} private workflows`}
-            />
-            <StatsCard
-              title="Total Runs"
-              value={stats.totalRuns}
-              icon={<Play className="h-4 w-4 text-muted-foreground" />}
-            />
-            <StatsCard
-              title="Total Remixes"
-              value={stats.totalRemixes}
-              icon={<GitFork className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
+          <WorkflowStats {...stats} />
         </div>
       </div>
 

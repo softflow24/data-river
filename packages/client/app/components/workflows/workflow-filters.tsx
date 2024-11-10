@@ -106,19 +106,10 @@ export function WorkflowFilters({
       />
 
       <RangeFilter
-        title="Run Count"
-        value={filters.runRange}
-        onChange={handleRunRangeChange}
-        max={1000}
-        step={10}
-      />
-
-      <RangeFilter
-        title="Remix Count"
-        value={filters.remixRange}
-        onChange={handleRemixRangeChange}
-        max={100}
-        step={5}
+        runRange={filters.runRange}
+        remixRange={filters.remixRange}
+        onRunRangeChange={handleRunRangeChange}
+        onRemixRangeChange={handleRemixRangeChange}
       />
 
       <TagsFilter selectedTags={filters.tags} onChange={handleTagsChange} />

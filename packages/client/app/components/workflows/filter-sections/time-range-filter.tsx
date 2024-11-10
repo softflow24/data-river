@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { Calendar } from "@data-river/shared/ui/components/ui/calendar";
 import { format, subDays, startOfToday } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -14,7 +15,6 @@ import { FilterSection } from "./filter-section";
 const TIME_RANGES = [
   { label: "Today", value: "today", shortcut: "T" },
   { label: "Yesterday", value: "yesterday", shortcut: "Y" },
-  { label: "Last hour", value: "hour", shortcut: "H" },
   { label: "Last 7 days", value: "7days", shortcut: "W" },
   { label: "Last 14 days", value: "14days", shortcut: "B" },
   { label: "Last 30 days", value: "30days", shortcut: "M" },
@@ -28,8 +28,6 @@ function getPresetRange(preset: (typeof TIME_RANGES)[number]["value"]) {
       return { from: today, to: new Date() };
     case "yesterday":
       return { from: subDays(today, 1), to: today };
-    case "hour":
-      return { from: subDays(new Date(), 1 / 24), to: new Date() };
     case "7days":
       return { from: subDays(today, 7), to: new Date() };
     case "14days":
@@ -48,6 +46,31 @@ interface TimeRangeFilterProps {
 
 export function TimeRangeFilter({ dateRange, onChange }: TimeRangeFilterProps) {
   const [open, setOpen] = useState(false);
+
+  useHotkeys(
+    "enter",
+    (e: KeyboardEvent) => {
+      if (open) {
+        e.preventDefault();
+        setOpen(false);
+      }
+    },
+    { enableOnFormTags: true },
+    [open],
+  );
+
+  TIME_RANGES.forEach(({ value, shortcut }) => {
+    useHotkeys(
+      shortcut.toLowerCase(),
+      (e: KeyboardEvent) => {
+        if (!open) return;
+        e.preventDefault();
+        onChange(getPresetRange(value));
+      },
+      { enableOnFormTags: true },
+      [onChange, open],
+    );
+  });
 
   return (
     <FilterSection title="Time Range">
@@ -84,7 +107,7 @@ export function TimeRangeFilter({ dateRange, onChange }: TimeRangeFilterProps) {
                     setOpen(false);
                   }}
                 >
-                  <kbd className="pointer-events-none inline-flex h-6 select-none items-center gap-1 rounded border bg-muted px-2 font-mono text-[10px] font-medium text-muted-foreground">
+                  <kbd className="pointer-events-none inline-flex h-6 select-none items-center gap-1 rounded border bg-muted px-2 font-mono text-[10px] font-bold text-muted-foreground">
                     {shortcut}
                   </kbd>
                   <span className="font-medium">{label}</span>
@@ -95,22 +118,21 @@ export function TimeRangeFilter({ dateRange, onChange }: TimeRangeFilterProps) {
               <div className="font-medium text-sm mb-4">Custom Range</div>
               <Calendar
                 mode="range"
-                // selected={{
-                //   from: dateRange?.from || undefined,
-                //   to: dateRange?.to || undefined,
-                // }}
-                // onSelect={(range) => {
-                //   onChange(
-                //     range?.from
-                //       ? {
-                //           from: range.from,
-                //           to: range.to || range.from,
-                //         }
-                //       : null,
-                //   );
-                //   if (range?.to) setOpen(false);
-                // }}
-                numberOfMonths={1}
+                selected={{
+                  from: dateRange?.from || undefined,
+                  to: dateRange?.to || undefined,
+                }}
+                onSelect={(range) => {
+                  onChange(
+                    range?.from
+                      ? {
+                          from: range.from,
+                          to: range.to || range.from,
+                        }
+                      : null,
+                  );
+                  if (range?.to) setOpen(false);
+                }}
               />
             </div>
           </div>
