@@ -85,7 +85,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     workflows.map(async (workflow) => {
       const { data: hourlyStats } = await supabase
         .from("workflow_runs")
-        .select("*")
+        .select(
+          `
+          id,
+          workflow_id,
+          status,
+          started_at,
+          completed_at,
+          duration_ms
+        `,
+        )
         .eq("workflow_id", workflow.id)
         .gte(
           "started_at",
