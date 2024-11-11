@@ -317,6 +317,41 @@ export type Database = {
           },
         ]
       }
+      workflow_runs: {
+        Row: {
+          completed_at: string
+          duration_ms: number
+          id: string
+          started_at: string
+          status: Database["public"]["Enums"]["workflow_run_status"]
+          workflow_id: string | null
+        }
+        Insert: {
+          completed_at: string
+          duration_ms: number
+          id?: string
+          started_at?: string
+          status: Database["public"]["Enums"]["workflow_run_status"]
+          workflow_id?: string | null
+        }
+        Update: {
+          completed_at?: string
+          duration_ms?: number
+          id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["workflow_run_status"]
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflows: {
         Row: {
           created_at: string
@@ -374,6 +409,25 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_hourly_stats: {
+        Row: {
+          avg_duration_ms: number | null
+          failed_runs: number | null
+          hour: string | null
+          successful_runs: number | null
+          total_runs: number | null
+          workflow_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_total_runs: {
         Row: {
           total_runs: number | null
@@ -410,13 +464,26 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_workflow_run: {
+        Args: {
+          p_workflow_id: string
+          p_status: Database["public"]["Enums"]["workflow_run_status"]
+          p_started_at: string
+          p_completed_at: string
+        }
+        Returns: string
+      }
+      refresh_workflow_hourly_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       refresh_workflow_total_runs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
     }
     Enums: {
-      [_ in never]: never
+      workflow_run_status: "success" | "failure"
     }
     CompositeTypes: {
       [_ in never]: never

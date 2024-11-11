@@ -23,11 +23,13 @@ export type WorkflowFilters = {
 interface WorkflowFiltersProps {
   onChange: (filters: WorkflowFilters) => void;
   initialFilters?: WorkflowFilters;
+  availableTags: Array<{ id: string; count: number; color: string }>;
 }
 
 export function WorkflowFilters({
   onChange,
   initialFilters,
+  availableTags,
 }: WorkflowFiltersProps) {
   const [filters, setFilters] = useState<WorkflowFilters>(
     initialFilters ?? {
@@ -106,22 +108,17 @@ export function WorkflowFilters({
       />
 
       <RangeFilter
-        title="Run Count"
-        value={filters.runRange}
-        onChange={handleRunRangeChange}
-        max={1000}
-        step={10}
+        runRange={filters.runRange}
+        remixRange={filters.remixRange}
+        onRunRangeChange={handleRunRangeChange}
+        onRemixRangeChange={handleRemixRangeChange}
       />
 
-      <RangeFilter
-        title="Remix Count"
-        value={filters.remixRange}
-        onChange={handleRemixRangeChange}
-        max={100}
-        step={5}
+      <TagsFilter
+        selectedTags={filters.tags}
+        onChange={handleTagsChange}
+        availableTags={availableTags}
       />
-
-      <TagsFilter selectedTags={filters.tags} onChange={handleTagsChange} />
 
       {hasActiveFilters && (
         <Button

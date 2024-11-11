@@ -3,13 +3,7 @@ import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { createClient } from "~/utils/supabase.server";
 import { WorkflowList } from "../components/workflows/workflow-list";
 import { WorkflowFilters } from "../components/workflows/workflow-filters";
-import {
-  GitFork,
-  Globe,
-  Play,
-  Plus,
-  Workflow as WorkflowIcon,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@data-river/shared/ui/components/ui/button";
 import { Link } from "@remix-run/react";
 import {
@@ -18,45 +12,44 @@ import {
   type WorkflowFilters as WorkflowFiltersSchema,
 } from "~/schemas/workflow-filters";
 import { useCallback } from "react";
+import { WorkflowStats } from "~/components/workflows/workflow-stats";
+import { getFilteredWorkflows } from "~/services/workflow.server";
+import { MOCK_WORKFLOWS } from "~/data/mock-workflows";
+import { getWorkflowTags } from "~/services/tags.server";
 
-type StatsCardProps = {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  description?: string;
-};
-
-function StatsCard({ title, value, icon, description }: StatsCardProps) {
-  return (
-    <div className="rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h3 className="text-sm font-medium">{title}</h3>
-      </div>
-      <div className="mt-3 text-2xl font-bold">{value}</div>
-      {description && (
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
-      )}
-    </div>
-  );
-}
-
-const MOCK_WORKFLOWS = [
+// Update the mock data to be keyed by workflow ID
+const MOCK_ANALYTICS: Record<
+  string,
   {
-    id: "1",
-    name: "Email Notification Flow",
-    description: "Sends email notifications when new data arrives",
-    flow_state: {},
-    is_public: true,
-    remix_count: 12,
-    created_by: "user-1",
-    created_at: new Date().toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    remixed_from_id: null,
-    workflow_interests: [{ interest_id: "automation" }],
-    workflow_total_runs: [{ total_runs: 156 }],
+    hourly_stats: Array<{
+      hour: string;
+      total_runs: number;
+      successful_runs: number;
+      failed_runs: number;
+      avg_duration_ms: number;
+    }>;
+  }
+> = {
+  // Mock data for each workflow
+  "1": {
+    hourly_stats: Array.from({ length: 24 }, (_, i) => {
+      const date = new Date();
+      date.setHours(date.getHours() - i);
+
+      const total_runs = Math.floor(Math.random() * 20) + 5;
+      const failed_runs = Math.floor(Math.random() * (total_runs * 0.3));
+
+      return {
+        hour: date.toISOString(),
+        total_runs,
+        successful_runs: total_runs - failed_runs,
+        failed_runs,
+        avg_duration_ms: Math.floor(Math.random() * 10000) + 1000,
+      };
+    }).reverse(),
   },
-];
+  // Add more mock data for other workflows if needed
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -73,99 +66,109 @@ export async function loader({ request }: LoaderFunctionArgs) {
         totalRemixes: 45,
       },
       filters,
+      tags: [
+        { id: "automation", count: 9, color: "bg-blue" },
+        { id: "api", count: 5, color: "bg-green" },
+      ],
+      analytics: MOCK_ANALYTICS,
     });
   }
 
   const { supabase } = await createClient(request);
+  const [workflows, tags] = await Promise.all([
+    getFilteredWorkflows(supabase, filters),
+    getWorkflowTags(supabase),
+  ]);
 
-  // First get workflow IDs that match the tag filter
-  let workflowIds: string[] | null = null;
-  if (filters.tags.length > 0) {
-    const taggedWorkflows = await supabase
-      .from("workflow_interests")
-      .select("workflow_id")
-      .in("interest_id", filters.tags)
-      .then((res) => res.data?.map((w) => w.workflow_id) ?? []);
+  // Load analytics data for each workflow
+  const analyticsData = await Promise.all(
+    workflows.map(async (workflow) => {
+      const { data: hourlyStats } = await supabase
+        .from("workflow_runs")
+        .select(
+          `
+          id,
+          workflow_id,
+          status,
+          started_at,
+          completed_at,
+          duration_ms
+        `,
+        )
+        .eq("workflow_id", workflow.id)
+        .gte(
+          "started_at",
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        )
+        .order("started_at", { ascending: true });
 
-    workflowIds = taggedWorkflows;
-  }
+      // Group by hour and calculate stats
+      const hourlyMap = new Map<
+        string,
+        {
+          total_runs: number;
+          successful_runs: number;
+          failed_runs: number;
+          durations: number[];
+        }
+      >();
 
-  // Then build the main query
-  let query = supabase.from("workflows").select(`
-      *,
-      workflow_interests(interest_id),
-      workflow_total_runs(total_runs)
-    `);
+      hourlyStats?.forEach((run) => {
+        const hour =
+          new Date(run.started_at).toISOString().slice(0, 13) + ":00:00.000Z";
+        const current = hourlyMap.get(hour) || {
+          total_runs: 0,
+          successful_runs: 0,
+          failed_runs: 0,
+          durations: [],
+        };
 
-  // Apply filters
-  if (filters.search) {
-    query = query.ilike("name", `%${filters.search}%`);
-  }
+        current.total_runs++;
+        if (run.status === "success") {
+          current.successful_runs++;
+        } else {
+          current.failed_runs++;
+        }
+        current.durations.push(run.duration_ms);
 
-  if (filters.public) {
-    query = query.eq("is_public", true);
-  }
+        hourlyMap.set(hour, current);
+      });
 
-  if (workflowIds !== null) {
-    query = query.in("id", workflowIds);
-  }
+      // Convert to array and calculate averages
+      const hourly_stats = Array.from(hourlyMap.entries()).map(
+        ([hour, stats]) => ({
+          hour,
+          total_runs: stats.total_runs,
+          successful_runs: stats.successful_runs,
+          failed_runs: stats.failed_runs,
+          avg_duration_ms: Math.round(
+            stats.durations.reduce((a, b) => a + b, 0) / stats.durations.length,
+          ),
+        }),
+      );
 
-  if (filters.dateFrom) {
-    query = query.gte("created_at", filters.dateFrom);
-  }
+      return [workflow.id, { hourly_stats }] as const;
+    }),
+  );
 
-  if (filters.dateTo) {
-    query = query.lte("created_at", filters.dateTo);
-  }
-
-  // Apply sorting
-  switch (filters.sort) {
-    case "created":
-      query = query.order("created_at", { ascending: false });
-      break;
-    case "name":
-      query = query.order("name");
-      break;
-    case "runs":
-      // We'll need to sort after fetching since this is in a view
-      break;
-    case "remixes":
-      query = query.order("remix_count", { ascending: false });
-      break;
-    default:
-      query = query.order("updated_at", { ascending: false });
-  }
-
-  const { data: workflows } = await query;
-
-  // Post-process for run count sorting if needed
-  let processedWorkflows = workflows || [];
-  if (filters.sort === "runs" && processedWorkflows.length > 0) {
-    processedWorkflows.sort((a, b) => {
-      const aRuns = a.workflow_total_runs?.[0]?.total_runs ?? 0;
-      const bRuns = b.workflow_total_runs?.[0]?.total_runs ?? 0;
-      return bRuns - aRuns;
-    });
-  }
+  const analytics = Object.fromEntries(analyticsData);
 
   const stats = {
-    totalWorkflows: processedWorkflows.length,
-    publicWorkflows: processedWorkflows.filter((w) => w.is_public).length,
-    totalRuns: processedWorkflows.reduce(
+    totalWorkflows: workflows.length,
+    publicWorkflows: workflows.filter((w) => w.is_public).length,
+    totalRuns: workflows.reduce(
       (acc, w) => acc + (w.workflow_total_runs?.[0]?.total_runs ?? 0),
       0,
     ),
-    totalRemixes: processedWorkflows.reduce(
-      (acc, w) => acc + (w.remix_count ?? 0),
-      0,
-    ),
+    totalRemixes: workflows.reduce((acc, w) => acc + (w.remix_count ?? 0), 0),
   };
 
-  return json({ workflows: processedWorkflows, stats, filters });
+  return json({ workflows, stats, filters, tags, analytics });
 }
 
 export default function MyWorkflowsPage() {
-  const { workflows, stats, filters } = useLoaderData<typeof loader>();
+  const { workflows, stats, filters, tags, analytics } =
+    useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFiltersChange = useCallback(
@@ -199,29 +202,7 @@ export default function MyWorkflowsPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-4 gap-4 mt-4">
-            <StatsCard
-              title="Total Workflows"
-              value={stats.totalWorkflows}
-              icon={<WorkflowIcon className="h-4 w-4 text-muted-foreground" />}
-            />
-            <StatsCard
-              title="Public Workflows"
-              value={stats.publicWorkflows}
-              icon={<Globe className="h-4 w-4 text-muted-foreground" />}
-              description={`${stats.totalWorkflows - stats.publicWorkflows} private workflows`}
-            />
-            <StatsCard
-              title="Total Runs"
-              value={stats.totalRuns}
-              icon={<Play className="h-4 w-4 text-muted-foreground" />}
-            />
-            <StatsCard
-              title="Total Remixes"
-              value={stats.totalRemixes}
-              icon={<GitFork className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
+          <WorkflowStats {...stats} />
         </div>
       </div>
 
@@ -246,12 +227,14 @@ export default function MyWorkflowsPage() {
                   to: filters.dateTo ? new Date(filters.dateTo) : undefined,
                 },
               }}
+              availableTags={tags}
             />
           </div>
 
           {/* Workflow List */}
           <div className="flex-1 border-l border-border/50 pl-6">
             <WorkflowList
+              analytics={analytics}
               workflows={workflows.map((workflow) => ({
                 ...workflow,
                 total_runs: workflow.workflow_total_runs?.[0]?.total_runs ?? 0,

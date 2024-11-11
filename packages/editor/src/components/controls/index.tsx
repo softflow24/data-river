@@ -10,7 +10,7 @@ import MiniMapZoomControls from "./MiniMapZoomControls";
 import UndoRedoControls from "./UndoRedoControls";
 import ActionToolsControls from "./ActionToolsControls";
 
-const Controls: FC = () => {
+const Controls: FC<{ onlyMap?: boolean }> = ({ onlyMap = false }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { viewport } = useReactFlowState((state) => ({
     viewport: state.viewport,
@@ -43,10 +43,12 @@ const Controls: FC = () => {
         resetZoom={onResetZoom}
         zoom={viewport.zoom}
       />
-      <UndoRedoControls />
-      <ActionToolsControls
-        toggleMinimalist={() => dispatch(toggleMinimalistic())}
-      />
+      {!onlyMap && <UndoRedoControls />}
+      {!onlyMap && (
+        <ActionToolsControls
+          toggleMinimalist={() => dispatch(toggleMinimalistic())}
+        />
+      )}
     </div>
   );
 };

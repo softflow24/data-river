@@ -27,7 +27,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const interestIds = formData.getAll("interests") as string[];
 
-  const { supabase, headers } = await createClient(request);
+  const { supabase } = await createClient(request);
 
   const {
     data: { user },
@@ -55,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (insertError) throw insertError;
   }
 
-  return redirect("/editor", { headers });
+  return redirect("/");
 }
 
 export default function InterestsSetup() {

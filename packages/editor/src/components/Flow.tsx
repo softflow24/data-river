@@ -27,7 +27,7 @@ const edgeTypes: EdgeTypes = {
   custom: CustomEdge,
 };
 
-const FlowChart: React.FC = () => {
+const FlowChart: React.FC<{ readonly?: boolean }> = ({ readonly = false }) => {
   const theme = useTheme();
   const { nodes, edges } = useReactFlowState((state) => ({
     nodes: state.nodes,
@@ -48,19 +48,23 @@ const FlowChart: React.FC = () => {
         nodes={nodes}
         edges={edges}
         onNodesChange={eventHandlers.onNodesChangeHandler}
-        onEdgesChange={eventHandlers.onEdgesChangeHandler}
-        onConnect={eventHandlers.onConnect}
-        onConnectStart={eventHandlers.onConnectStart}
-        onConnectEnd={eventHandlers.onConnectEnd}
-        onEdgeClick={eventHandlers.onEdgeClick}
+        onEdgesChange={
+          readonly ? undefined : eventHandlers.onEdgesChangeHandler
+        }
+        onConnect={readonly ? undefined : eventHandlers.onConnect}
+        onConnectStart={readonly ? undefined : eventHandlers.onConnectStart}
+        onConnectEnd={readonly ? undefined : eventHandlers.onConnectEnd}
+        onEdgeClick={readonly ? undefined : eventHandlers.onEdgeClick}
         onEdgeMouseEnter={eventHandlers.onEdgeMouseEnter}
-        onEdgeMouseLeave={eventHandlers.onEdgeMouseLeave}
+        onEdgeMouseLeave={readonly ? undefined : eventHandlers.onEdgeMouseLeave}
         onPaneClick={eventHandlers.onPaneClick}
         onNodeMouseEnter={eventHandlers.onNodeMouseEnter}
         onNodeMouseLeave={eventHandlers.onNodeMouseLeave}
         onNodeClick={eventHandlers.onNodeClick}
-        onNodeDragStart={eventHandlers.onNodeDragStart}
-        onSelectionChange={eventHandlers.onSelectionChange}
+        onNodeDragStart={readonly ? undefined : eventHandlers.onNodeDragStart}
+        onSelectionChange={
+          readonly ? undefined : eventHandlers.onSelectionChange
+        }
         selectionKeyCode="Meta"
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
@@ -72,8 +76,8 @@ const FlowChart: React.FC = () => {
         minZoom={0.5}
         maxZoom={3}
         fitView
-        selectNodesOnDrag={true}
-        selectionOnDrag={true}
+        selectNodesOnDrag={readonly ? false : true}
+        selectionOnDrag={readonly ? false : true}
         selectionMode={SelectionMode.Partial}
         multiSelectionKeyCode="Shift"
         panOnDrag={[1, 2]}
@@ -84,8 +88,8 @@ const FlowChart: React.FC = () => {
           color={"hsl(var(--foreground))"}
           style={{ opacity: 0.6 }}
         />
-        <Controls />
-        {isCustomNodeInfoVisible && (
+        <Controls onlyMap={readonly} />
+        {!readonly && isCustomNodeInfoVisible && (
           <Panel position="bottom-right">
             <CustomNodeInfo />
           </Panel>

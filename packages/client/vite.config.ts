@@ -5,28 +5,6 @@ import path from "path";
 import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
 
-const interestColors = [
-  "purple",
-  "red",
-  "green",
-  "blue",
-  "yellow",
-  "orange",
-  "teal",
-  "indigo",
-  "pink",
-  "emerald",
-  "cyan",
-  "violet",
-  "rose",
-  "slate",
-];
-
-const safelistClasses = [
-  ...interestColors.map((color) => `bg-${color}-100`),
-  ...interestColors.map((color) => `bg-${color}-950`),
-];
-
 export default defineConfig({
   plugins: [
     remix(),
@@ -64,7 +42,6 @@ export default defineConfig({
       plugins: [
         tailwindcss({
           config: "./tailwind.config.ts",
-          safelist: safelistClasses,
         }),
         autoprefixer(),
       ],
