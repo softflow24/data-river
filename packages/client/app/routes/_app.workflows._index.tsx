@@ -17,6 +17,40 @@ import { getFilteredWorkflows } from "~/services/workflow.server";
 import { MOCK_WORKFLOWS } from "~/data/mock-workflows";
 import { getWorkflowTags } from "~/services/tags.server";
 
+// Update the mock data to be keyed by workflow ID
+const MOCK_ANALYTICS: Record<
+  string,
+  {
+    hourly_stats: Array<{
+      hour: string;
+      total_runs: number;
+      successful_runs: number;
+      failed_runs: number;
+      avg_duration_ms: number;
+    }>;
+  }
+> = {
+  // Mock data for each workflow
+  "1": {
+    hourly_stats: Array.from({ length: 24 }, (_, i) => {
+      const date = new Date();
+      date.setHours(date.getHours() - i);
+
+      const total_runs = Math.floor(Math.random() * 20) + 5;
+      const failed_runs = Math.floor(Math.random() * (total_runs * 0.3));
+
+      return {
+        hour: date.toISOString(),
+        total_runs,
+        successful_runs: total_runs - failed_runs,
+        failed_runs,
+        avg_duration_ms: Math.floor(Math.random() * 10000) + 1000,
+      };
+    }).reverse(),
+  },
+  // Add more mock data for other workflows if needed
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const isMock = url.searchParams.get("mock") === "true";
@@ -36,6 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         { id: "automation", count: 9, color: "bg-blue" },
         { id: "api", count: 5, color: "bg-green" },
       ],
+      analytics: MOCK_ANALYTICS,
     });
   }
 
@@ -44,6 +79,70 @@ export async function loader({ request }: LoaderFunctionArgs) {
     getFilteredWorkflows(supabase, filters),
     getWorkflowTags(supabase),
   ]);
+
+  // Load analytics data for each workflow
+  const analyticsData = await Promise.all(
+    workflows.map(async (workflow) => {
+      const { data: hourlyStats } = await supabase
+        .from("workflow_runs")
+        .select("*")
+        .eq("workflow_id", workflow.id)
+        .gte(
+          "started_at",
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        )
+        .order("started_at", { ascending: true });
+
+      // Group by hour and calculate stats
+      const hourlyMap = new Map<
+        string,
+        {
+          total_runs: number;
+          successful_runs: number;
+          failed_runs: number;
+          durations: number[];
+        }
+      >();
+
+      hourlyStats?.forEach((run) => {
+        const hour =
+          new Date(run.started_at).toISOString().slice(0, 13) + ":00:00.000Z";
+        const current = hourlyMap.get(hour) || {
+          total_runs: 0,
+          successful_runs: 0,
+          failed_runs: 0,
+          durations: [],
+        };
+
+        current.total_runs++;
+        if (run.status === "success") {
+          current.successful_runs++;
+        } else {
+          current.failed_runs++;
+        }
+        current.durations.push(run.duration_ms);
+
+        hourlyMap.set(hour, current);
+      });
+
+      // Convert to array and calculate averages
+      const hourly_stats = Array.from(hourlyMap.entries()).map(
+        ([hour, stats]) => ({
+          hour,
+          total_runs: stats.total_runs,
+          successful_runs: stats.successful_runs,
+          failed_runs: stats.failed_runs,
+          avg_duration_ms: Math.round(
+            stats.durations.reduce((a, b) => a + b, 0) / stats.durations.length,
+          ),
+        }),
+      );
+
+      return [workflow.id, { hourly_stats }] as const;
+    }),
+  );
+
+  const analytics = Object.fromEntries(analyticsData);
 
   const stats = {
     totalWorkflows: workflows.length,
@@ -55,11 +154,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     totalRemixes: workflows.reduce((acc, w) => acc + (w.remix_count ?? 0), 0),
   };
 
-  return json({ workflows, stats, filters, tags });
+  return json({ workflows, stats, filters, tags, analytics });
 }
 
 export default function MyWorkflowsPage() {
-  const { workflows, stats, filters, tags } = useLoaderData<typeof loader>();
+  const { workflows, stats, filters, tags, analytics } =
+    useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFiltersChange = useCallback(
@@ -125,6 +225,7 @@ export default function MyWorkflowsPage() {
           {/* Workflow List */}
           <div className="flex-1 border-l border-border/50 pl-6">
             <WorkflowList
+              analytics={analytics}
               workflows={workflows.map((workflow) => ({
                 ...workflow,
                 total_runs: workflow.workflow_total_runs?.[0]?.total_runs ?? 0,
