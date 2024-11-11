@@ -1,10 +1,8 @@
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
-  DialogClose,
+  DialogTitle,
 } from "@data-river/shared/ui/components/ui/dialog";
 import {
   Tabs,
@@ -12,15 +10,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@data-river/shared/ui/components/ui/tabs";
-import { Button } from "@data-river/shared/ui/components/ui/button";
-import { Link } from "@remix-run/react";
-import { ArrowUpRight, Copy, Share2, Star, X } from "lucide-react";
 import { ScrollArea } from "@data-river/shared/ui/components/ui/scroll-area";
 import { WorkflowOverview } from "./overview/workflow-overview";
 import { AnalyticsView } from "./analytics/analytics-view";
 import Editor from "@data-river/editor";
 import type { WorkflowData, WorkflowAnalytics } from "./types";
 import { ActionButtons } from "./action-buttons";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface WorkflowPreviewDialogProps {
   workflow: WorkflowData;
@@ -38,6 +34,14 @@ export function WorkflowPreviewDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl lg:h-[80vh]" showCloseButton={false}>
+        <VisuallyHidden>
+          <DialogTitle>Workflow Preview</DialogTitle>
+        </VisuallyHidden>
+        <VisuallyHidden>
+          <DialogDescription>
+            Summary of the workflow and its analytics data
+          </DialogDescription>
+        </VisuallyHidden>
         <Tabs defaultValue="overview" className="h-full">
           <div className="flex items-center justify-between mb-4">
             <TabsList>
@@ -56,7 +60,7 @@ export function WorkflowPreviewDialog({
 
           <TabsContent value="preview" className="mt-0 h-[calc(100%-60px)]">
             <div className="h-full border rounded-lg overflow-hidden">
-              <Editor />
+              <Editor readOnly />
             </div>
           </TabsContent>
 

@@ -93,8 +93,7 @@ const NodeControls: React.FC<NodeControlsProps> = ({
     );
   };
 
-  if (!controls || controls.length === 0 || !executionBlock || !node)
-    return null;
+  if (!controls || controls.length === 0 || !node) return null;
 
   return (
     <div className="grid w-full items-center gap-2">
