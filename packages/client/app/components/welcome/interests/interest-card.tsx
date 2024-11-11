@@ -42,7 +42,7 @@ export function InterestCard({
           className={`
             relative flex items-center gap-4 rounded-lg border-2 p-4
             transition-all duration-200 ease-in-out
-            ${color}
+            ${color}-700
             ${
               isSelected
                 ? "border-primary ring-1 ring-primary"

@@ -15,6 +15,7 @@ import { useCallback } from "react";
 import { WorkflowStats } from "~/components/workflows/workflow-stats";
 import { getFilteredWorkflows } from "~/services/workflow.server";
 import { MOCK_WORKFLOWS } from "~/data/mock-workflows";
+import { getWorkflowTags } from "~/services/tags.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -31,11 +32,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
         totalRemixes: 45,
       },
       filters,
+      tags: [
+        { id: "automation", count: 9, color: "bg-blue" },
+        { id: "api", count: 5, color: "bg-green" },
+      ],
     });
   }
 
   const { supabase } = await createClient(request);
-  const workflows = await getFilteredWorkflows(supabase, filters);
+  const [workflows, tags] = await Promise.all([
+    getFilteredWorkflows(supabase, filters),
+    getWorkflowTags(supabase),
+  ]);
 
   const stats = {
     totalWorkflows: workflows.length,
@@ -47,11 +55,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     totalRemixes: workflows.reduce((acc, w) => acc + (w.remix_count ?? 0), 0),
   };
 
-  return json({ workflows, stats, filters });
+  return json({ workflows, stats, filters, tags });
 }
 
 export default function MyWorkflowsPage() {
-  const { workflows, stats, filters } = useLoaderData<typeof loader>();
+  const { workflows, stats, filters, tags } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleFiltersChange = useCallback(
@@ -110,6 +118,7 @@ export default function MyWorkflowsPage() {
                   to: filters.dateTo ? new Date(filters.dateTo) : undefined,
                 },
               }}
+              availableTags={tags}
             />
           </div>
 
