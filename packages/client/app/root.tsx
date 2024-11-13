@@ -12,7 +12,7 @@ import type {
   ActionFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { json } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
 import "reflect-metadata";
@@ -20,6 +20,10 @@ import "reflect-metadata";
 import "@data-river/shared/global.css";
 import "@data-river/shared/tailwind.css";
 import { localeCookie, themeCookie } from "~/cookies.server";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import { settingsSlice, Theme } from "./store/settings/settings.slice";
+import { useTheme } from "~/hooks/useTheme";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Data-river" }];
@@ -96,45 +100,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
 function Document({
   children,
   locale = "en-US",
-  theme = "dark",
+  theme = "system",
 }: {
   children: ReactNode;
   locale?: string;
-  theme?: string;
+  theme?: Theme;
 }) {
+  const resolvedTheme = useTheme(theme as Theme);
+
   useEffect(() => {
-    // Handle locale
-    const browserLocale = navigator.language;
-    if (browserLocale && browserLocale !== locale) {
-      const formData = new FormData();
-      formData.append("locale", browserLocale);
-      fetch("/preferences", { method: "POST", body: formData });
-    }
-
-    // Handle theme
-    if (!theme) {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const prefersDark = mediaQuery.matches;
-
-      // Set theme immediately
-      document.documentElement.classList.toggle("dark", prefersDark);
-
-      // Send theme preference to server
-      const formData = new FormData();
-      formData.append("theme", prefersDark ? "dark" : "light");
-
-      fetch("/preferences", {
-        method: "POST",
-        body: formData,
-        credentials: "same-origin",
-      });
-    } else {
-      document.documentElement.classList.toggle("dark", theme === "dark");
-    }
-  }, [locale, theme]);
+    // Initialize Redux store with settings from the server
+    store.dispatch(
+      settingsSlice.actions.initializeSettings({
+        theme: theme as Theme,
+        locale,
+      }),
+    );
+  }, [theme, locale]);
 
   return (
-    <html lang={locale} className={`h-full ${theme}`}>
+    <html
+      lang={locale}
+      className={resolvedTheme === "dark" ? "dark" : undefined}
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -142,7 +130,7 @@ function Document({
         <Links />
       </head>
       <body className="h-full">
-        {children}
+        <Provider store={store}>{children}</Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -153,9 +141,11 @@ function Document({
 export default function App() {
   const { locale, theme } = useLoaderData<typeof loader>();
   return (
-    <Document locale={locale} theme={theme}>
-      <Outlet context={{ locale, theme }} />
-    </Document>
+    <Provider store={store}>
+      <Document locale={locale} theme={theme}>
+        <Outlet context={{ locale, theme }} />
+      </Document>
+    </Provider>
   );
 }
 

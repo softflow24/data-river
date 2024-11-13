@@ -75,7 +75,6 @@ function RunsOverTimeChart({
 }: {
   data: WorkflowAnalytics["hourly_stats"];
 }) {
-  console.log(data);
   return (
     <Card className="p-6">
       <h3 className="font-semibold mb-6">Runs Over Time</h3>

@@ -24,7 +24,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    console.log("redirecting to sign-in");
     return redirect("/sign-in");
   }
 
