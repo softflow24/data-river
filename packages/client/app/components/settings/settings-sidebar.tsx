@@ -66,6 +66,12 @@ const navigation = [
         icon: Code,
         disabled: true,
       },
+      {
+        title: "Environment Variables",
+        href: "/settings/environment-variables",
+        icon: Code,
+        disabled: false,
+      },
     ],
   },
 ];
