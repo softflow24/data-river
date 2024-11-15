@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@data-river/shared/ui/components/ui/dropdown-menu";
+import { ThemeSwitcher } from "./theme-switcher";
 import type { Database } from "~/types/supabase";
 
 type UserMenuProps = {
@@ -40,21 +41,28 @@ export function UserMenu({ profile }: UserMenuProps) {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <a href={`/profile/${profile.username}`}>
+          <a href={`/profile/${profile.username}`} className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             Profile
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href="/settings/profile">
+          <a href="/settings/profile" className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <div className="hover:bg-muted cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+          <ThemeSwitcher />
+        </div>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Form method="POST" action="/logout">
-            <button type="submit" className="flex items-center w-full">
+            <button
+              type="submit"
+              className="flex items-center w-full cursor-pointer"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Log out
             </button>
