@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@data-river/shared/ui/components/ui/card";
 import { Button } from "@data-river/shared/ui/components/ui/button";
+import { EnvironmentVariableTable } from "~/components/settings/environment-variable-table";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Environment Variables - Data River" }];
@@ -21,7 +22,7 @@ export default function EnvironmentVariablesPage() {
   const isSecretsRoute = location.pathname.includes('/secrets');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1400px]">
       <div className="border-b border-input pb-0">
         <div className="inline-flex h-8 items-center w-fit bg-background gap-1">
           <NavLink 
@@ -52,30 +53,34 @@ export default function EnvironmentVariablesPage() {
       <Outlet />
 
       {!isNewRoute && !isSecretsRoute && (
-        <div className="grid grid-cols-3 gap-6">
-          <Card className="col-span-2">
-            <CardHeader className="text-center">
-              <CardTitle>Environment Variables</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Add and manage environment variables for your project.
-                  </p>
+        <>
+          <div className="grid grid-cols-3 gap-6">
+            <Card className="col-span-2">
+              <CardHeader className="text-center">
+                <CardTitle>Environment Variables</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Add and manage environment variables for your project.
+                    </p>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button 
+                      variant="green"
+                      onClick={() => navigate("new")}
+                    >
+                      New environment variable
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-center">
-                  <Button 
-                    variant="green"
-                    onClick={() => navigate("new")}
-                  >
-                    New environment variable
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <EnvironmentVariableTable />
+        </>
       )}
     </div>
   );
