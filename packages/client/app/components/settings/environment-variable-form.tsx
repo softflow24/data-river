@@ -43,9 +43,22 @@ export function EnvironmentVariableForm() {
     }
   };
 
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const validItems = items.filter(item =>
+    item.key.trim() !== "" || item.value.trim() !== "" 
+  );
+
+    console.log("Saved Environment Variables", validItems.map(item => ({
+      key: item.key,
+      value: item.value
+    })))
+};
+
   return (
     <div className="w-full">
-      <Form method="post" className="w-full">
+      <Form method="post" className="w-full" onSubmit={handleSubmit}>
         <div className="bg-background shadow-sm rounded-lg px-16 py-4 space-y-4">
           <div className="rounded-md border">
             <Table>
